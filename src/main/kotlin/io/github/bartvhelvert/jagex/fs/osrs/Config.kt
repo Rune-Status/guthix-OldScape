@@ -1,7 +1,9 @@
 package io.github.bartvhelvert.jagex.fs.osrs
 
 import io.github.bartvhelvert.jagex.fs.Archive
-import io.github.bartvhelvert.jagex.fs.Cache
+import io.github.bartvhelvert.jagex.fs.Dictionary
+import io.github.bartvhelvert.jagex.fs.DictionaryCompanion
+import io.github.bartvhelvert.jagex.fs.JagexCache
 import io.github.bartvhelvert.jagex.fs.io.uByte
 import io.github.bartvhelvert.jagex.fs.io.uShort
 import java.io.ByteArrayOutputStream
@@ -9,12 +11,12 @@ import java.io.DataOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 
-class ConfigDictionary : Dictionary() {
-    override val id = 2
+class ConfigDictionary : Dictionary {
+    companion object : DictionaryCompanion<ConfigDictionary>() {
+        override val id = 2
 
-    companion object {
-        fun load(cache: Cache) {
-            //TODO
+        override fun load(cache: JagexCache): ConfigDictionary {
+            TODO()
         }
     }
 }
