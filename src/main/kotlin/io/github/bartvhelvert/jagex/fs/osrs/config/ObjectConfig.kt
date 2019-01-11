@@ -30,21 +30,21 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
     val textureFind: UShortArray?,
     val textureReplace: UShortArray?,
     val anInt2088: UByte?,
-    val animationID: UShort?,
+    val animationId: UShort?,
     val ambient: Int,
     val contrast: Int,
     val mapSceneID: UShort?,
     val modelSizeX: UShort,
     val modelSizeHeight: UShort,
     val modelSizeY: UShort,
-    val offsetX: UShort,
-    val offsetHeight: UShort,
-    val offsetY: UShort,
+    val offsetX: Short,
+    val offsetHeight: Short,
+    val offsetY: Short,
     val decorDisplacement: UByte,
     val isMirrored: Boolean,
     val obstructsGround: Boolean,
     val nonFlatShading: Boolean,
-    val contouredGround: UByte?,
+    val contouredGround: Int?,
     val supportItems: UByte?,
     val configChangeDest: Array<UShort?>?,
     val ambientSoundId: UShort?,
@@ -66,7 +66,7 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
             var name = "null"
             var width: UByte= 1u
             var length: UByte = 1u
-            var varpID: UShort? = null
+            var varpId: UShort? = null
             var mapIconId: UShort? = null
             var configId: UShort? = null
             val options = arrayOfNulls<String>(5)
@@ -83,21 +83,21 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
             var textureFind: UShortArray? = null
             var textureReplace: UShortArray? = null
             var anInt2088: UByte? = null
-            var animationID: UShort? = null
+            var animationId: UShort? = null
             var ambient = 0
             var contrast = 0
             var mapSceneID: UShort? = null
             var modelSizeX: UShort = 128u
             var modelSizeHeight: UShort = 128u
             var modelSizeY: UShort = 128u
-            var offsetX: UShort = 0u
-            var offsetHeight: UShort = 0u
-            var offsetY: UShort = 0u
+            var offsetX: Short = 0
+            var offsetHeight: Short = 0
+            var offsetY: Short = 0
             var decorDisplacement: UByte = 16u
             var isMirrored = false
             var obstructsGround = false
             var nonFlatShading = false
-            var contouredGround: UByte? = null
+            var contouredGround: Int? = null
             var supportItems: UByte? = null
             var configChangeDest: Array<UShort?>? = null
             var ambientSoundId: UShort? = null
@@ -107,7 +107,7 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
             var anIntArray2084: UShortArray? = null
             var params: MutableMap<Int, Any>? = null
 
-            decoder@ while (true) { //TODO fix some upcodes
+            decoder@ while (true) {
                 val opcode = buffer.uByte.toInt()
                 when (opcode) {
                     0 -> {
@@ -140,14 +140,17 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
                     }
                     18 -> impenetrable = false
                     19 -> anInt2088 = buffer.uByte
-                    21 -> contouredGround = 0u
-                    22 -> nonFlatShading = false
+                    21 -> contouredGround = 0
+                    22 -> nonFlatShading = true
                     23 -> modelClipped = true
-                    24 -> animationID = buffer.uShort
+                    24 -> {
+                        animationId = buffer.uShort
+                        if(animationId == UShort.MAX_VALUE) animationId = null
+                    }
                     27 -> clipType = 1
                     28 -> decorDisplacement = buffer.uByte
                     29 -> ambient = buffer.get().toInt()
-                    39 -> contrast = buffer.get().toInt()
+                    39 -> contrast = buffer.get().toInt() * 25
                     in 30..34 -> options[opcode - 30] = buffer.string.takeIf { it != "Hidden" }
                     40 -> {
                         val size = buffer.uByte.toInt()
@@ -174,18 +177,22 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
                     67 -> modelSizeY = buffer.uShort
                     68 -> mapSceneID = buffer.uShort
                     69 -> accessBlock = buffer.uByte
-                    70 -> offsetX = buffer.uShort
-                    71 -> offsetHeight = buffer.uShort
-                    72 -> offsetY = buffer.uShort
+                    70 -> offsetX = buffer.short
+                    71 -> offsetHeight = buffer.short
+                    72 -> offsetY = buffer.short
                     73 -> obstructsGround = true
                     74 -> isHollow = true
                     75 -> supportItems = buffer.uByte
                     77 -> {
-                        varpID = buffer.uShort
+                        varpId = buffer.uShort
+                        if(varpId == UShort.MAX_VALUE) varpId = null
                         configId = buffer.uShort
+                        if(configId == UShort.MAX_VALUE) configId = null
                         val size = buffer.uByte.toInt()
-                        configChangeDest = Array(size + 2) {
-                            if (it == size + 1) null else buffer.uShort
+                        configChangeDest = arrayOfNulls(size + 2)
+                        for(i in 0 until configChangeDest!!.size - 1) {
+                            configChangeDest[i] = buffer.uShort
+                            if(configChangeDest[i] == UShort.MAX_VALUE) configChangeDest = null
                         }
                     }
                     78 -> {
@@ -199,16 +206,23 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
                         val size = buffer.uByte.toInt()
                         anIntArray2084 = UShortArray(size) { buffer.uShort }
                     }
-                    81 -> contouredGround = buffer.uByte
+                    81 -> contouredGround = buffer.uByte.toInt() * 256
                     82 -> mapIconId = buffer.uShort
                     92 -> {
-                        varpID = buffer.uShort
+                        varpId = buffer.uShort
+                        if(varpId == UShort.MAX_VALUE) varpId = null
                         configId = buffer.uShort
-                        val def = buffer.uShort
+                        if(configId == UShort.MAX_VALUE) configId = null
+                        var lastEntry: UShort? = buffer.uShort
+                        if(lastEntry == UShort.MAX_VALUE) lastEntry = null
                         val size = buffer.uShort.toInt()
-                        configChangeDest = Array(size + 2) {
-                            if (it == size + 1) def else buffer.uShort
+                        configChangeDest = arrayOfNulls(size + 2)
+                        for(i in 0 until configChangeDest!!.size - 1) {
+                            configChangeDest[i] = buffer.uShort
+                            if(configChangeDest[i] == UShort.MAX_VALUE) configChangeDest = null
                         }
+                        configChangeDest[size + 1] = lastEntry
+
                     }
                     249 -> params = buffer.params
                     else -> error(opcode)
@@ -232,9 +246,9 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
                 clipType = 0
                 impenetrable = false
             }
-            return ObjectConfig(id, name, width, length, varpID, mapIconId, configId, options, clipType, isClipped, 
+            return ObjectConfig(id, name, width, length, varpId, mapIconId, configId, options, clipType, isClipped,
                 modelClipped, isHollow, impenetrable, accessBlock, objectModels, objectTypes, colorReplace, colorFind,
-                textureFind, textureReplace, anInt2088, animationID, ambient, contrast, mapSceneID, modelSizeX,
+                textureFind, textureReplace, anInt2088, animationId, ambient, contrast, mapSceneID, modelSizeX,
                 modelSizeHeight, modelSizeY, offsetX, offsetHeight, offsetY, decorDisplacement, isMirrored,
                 obstructsGround, nonFlatShading, contouredGround, supportItems, configChangeDest, ambientSoundId,
                 anInt2112, anInt2113, anInt2083, anIntArray2084, params
