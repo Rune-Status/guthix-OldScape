@@ -22,7 +22,7 @@ class ConfigDictionary(
 }
 
 abstract class ConfigFile(val id: Int) {
-    abstract fun encode()
+    abstract fun encode(): ByteBuffer
 
     protected fun DataOutputStream.writeOpcode(opcode: Int) = writeByte(opcode)
 }

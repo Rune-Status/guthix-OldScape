@@ -21,7 +21,7 @@ class IdentKitConfig @ExperimentalUnsignedTypes constructor(
     val nonSelectable: Boolean
 ) : ConfigFile(id) {
     @ExperimentalUnsignedTypes
-    override fun encode() {
+    override fun encode(): ByteBuffer {
         val byteStr = ByteArrayOutputStream()
         DataOutputStream(byteStr).use { os ->
             bodyPartId?.let {
@@ -54,7 +54,9 @@ class IdentKitConfig @ExperimentalUnsignedTypes constructor(
                 os.writeOpcode(60 + index)
                 os.writeShort(i)
             }
+            os.writeOpcode(0)
         }
+        return ByteBuffer.wrap(byteStr.toByteArray())
     }
 
     companion object : ConfigFileCompanion<IdentKitConfig>() {
