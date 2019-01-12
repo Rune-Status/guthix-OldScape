@@ -50,9 +50,11 @@ class IdentKitConfig @ExperimentalUnsignedTypes constructor(
                     os.writeShort(textureReplace[i].toInt())
                 }
             }
-            models.forEachIndexed { index, i ->
-                os.writeOpcode(60 + index)
-                os.writeShort(i)
+            models.forEachIndexed { i, id ->
+                if(id != -1) {
+                    os.writeOpcode(60 + i)
+                    os.writeShort(id)
+                }
             }
             os.writeOpcode(0)
         }

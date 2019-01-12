@@ -1,11 +1,11 @@
 package io.github.bartvhelvert.jagex.fs.osrs.config
 
-import io.github.bartvhelvert.jagex.fs.io.string
-import io.github.bartvhelvert.jagex.fs.io.uByte
-import io.github.bartvhelvert.jagex.fs.io.uShort
+import io.github.bartvhelvert.jagex.fs.io.*
 import io.github.bartvhelvert.jagex.fs.osrs.ConfigFile
 import io.github.bartvhelvert.jagex.fs.osrs.ConfigFileCompanion
-import io.github.bartvhelvert.jagex.fs.osrs.params
+import java.io.ByteArrayOutputStream
+import java.io.DataOutputStream
+import java.io.IOException
 import java.nio.ByteBuffer
 
 class ObjectConfig @ExperimentalUnsignedTypes constructor(
@@ -13,7 +13,7 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
     val name: String,
     val width: UByte,
     val length: UByte,
-    val varpID: UShort?,
+    val varpId: UShort?,
     val mapIconId: UShort?,
     val configId: UShort?,
     val options: Array<String?>,
@@ -33,7 +33,7 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
     val animationId: UShort?,
     val ambient: Int,
     val contrast: Int,
-    val mapSceneID: UShort?,
+    val mapSceneId: UShort?,
     val modelSizeX: UShort,
     val modelSizeHeight: UShort,
     val modelSizeY: UShort,
@@ -52,10 +52,172 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
     val anInt2113: UShort,
     val anInt2083: UByte,
     val anIntArray2084: UShortArray?,
-    val params: MutableMap<Int, Any>?
+    val params: HashMap<Int, Any>?
 ): ConfigFile(id) {
-    override fun encode() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    @ExperimentalUnsignedTypes
+    override fun encode(): ByteBuffer {
+        val byteStr = ByteArrayOutputStream()
+        DataOutputStream(byteStr).use { os ->
+            objectModels?.let {
+                os.writeOpcode(1)
+                os.writeByte(objectModels.size)
+                for(i in 0 until objectModels.size) {
+                    os.writeShort(objectModels[i].toInt())
+                    os.writeByte(objectModels[i].toInt())
+                }
+            }
+            if(name != "null") {
+                os.writeOpcode(2)
+                os.writeString(name)
+            }
+            if(objectTypes == null && objectModels != null) {
+                os.writeOpcode(5)
+                os.writeByte(objectModels.size)
+                for(i in 0 until objectModels.size) {
+                    os.writeShort(objectModels[i].toInt())
+                }
+            }
+            if(width.toInt() != 1) {
+                os.writeOpcode(14)
+                os.writeByte(width.toInt())
+            }
+            if(length.toInt() != 1) {
+                os.writeOpcode(15)
+                os.writeByte(length.toInt())
+            }
+            if(!impenetrable) {
+                if(clipType == 0) {
+                    os.writeOpcode(17)
+                } else {
+                    os.writeOpcode(18)
+                }
+            }
+            anInt2088?.let {
+                os.writeByte(anInt2088.toInt())
+            }
+            contouredGround?.let {
+                if(contouredGround == 0) {
+                    os.writeOpcode(21)
+                } else {
+                    os.writeOpcode(81)
+                    os.writeByte(contouredGround / 256)
+                }
+            }
+            if(nonFlatShading) os.writeOpcode(22)
+            if(modelClipped) os.writeOpcode(23)
+            if(animationId == null) os.writeShort(UShort.MAX_VALUE.toInt()) else os.writeShort(animationId.toInt())
+            if(clipType == 1) os.writeOpcode(27)
+            if(decorDisplacement.toInt() != 16) {
+                os.writeOpcode(28)
+                os.writeByte(decorDisplacement.toInt())
+            }
+            if(ambient != 0) {
+                os.writeOpcode(29)
+                os.writeByte(ambient)
+            }
+            if(contrast != 0) {
+                os.writeOpcode(39)
+                os.writeByte(contrast)
+            }
+            options.forEachIndexed { i, str ->
+                if(str != null && str != "Hidden") {
+                    os.writeOpcode(30 + i)
+                    os.writeString(str)
+                }
+            }
+            if (colorFind != null && colorReplace != null) {
+                os.writeOpcode(40)
+                os.writeByte(colorFind.size)
+                for (i in 0 until colorFind.size) {
+                    os.writeShort(colorFind[i].toInt())
+                    os.writeShort(colorReplace[i].toInt())
+                }
+            }
+            if (textureFind != null && textureReplace != null) {
+                os.writeOpcode(41)
+                os.writeByte(textureFind.size)
+                for (i in 0 until textureReplace.size) {
+                    os.writeShort(textureFind[i].toInt())
+                    os.writeShort(textureReplace[i].toInt())
+                }
+            }
+            if(isMirrored) os.writeOpcode(62)
+            if(!isClipped) os.writeOpcode(64)
+            if(modelSizeX.toInt() != 128) {
+                os.writeOpcode(65)
+                os.writeShort(modelSizeX.toInt())
+            }
+            if(modelSizeHeight.toInt() != 128) {
+                os.writeOpcode(66)
+                os.writeShort(modelSizeHeight.toInt())
+            }
+            if(modelSizeY.toInt() != 128) {
+                os.writeOpcode(67)
+                os.writeShort(modelSizeY.toInt())
+            }
+            mapSceneId?.let {
+                os.writeOpcode(68)
+                os.writeShort(mapSceneId.toInt())
+            }
+            if(accessBlock.toInt() != 0) {
+                os.writeOpcode(69)
+                os.writeByte(accessBlock.toInt())
+            }
+            if(offsetX.toInt() != 0) {
+                os.writeOpcode(70)
+                os.writeShort(offsetX.toInt())
+            }
+            if(offsetHeight.toInt() != 0) {
+                os.writeOpcode(71)
+                os.writeShort(offsetHeight.toInt())
+            }
+            if(offsetY.toInt() != 0) {
+                os.writeOpcode(72)
+                os.writeShort(offsetY.toInt())
+            }
+            if(obstructsGround) os.writeOpcode(73)
+            if(isHollow) os.writeOpcode(74)
+            supportItems?.let {
+                os.writeOpcode(75)
+                os.writeByte(supportItems.toInt())
+            }
+            if(configChangeDest != null) {
+                if(configChangeDest.last() != null) os.writeOpcode(92) else os.writeOpcode(77)
+                if(varpId == null) os.writeShort(UShort.MAX_VALUE.toInt()) else os.writeShort(varpId.toInt())
+                if(configId == null) os.writeShort(UShort.MAX_VALUE.toInt()) else os.writeShort(configId.toInt())
+                if(configChangeDest.last() != null) os.writeShort(configChangeDest.last()!!.toInt())
+                os.writeByte(configChangeDest.size - 2)
+                for(i in 0 until configChangeDest.size - 1) {
+                    if(configChangeDest[i] != null) {
+                        os.writeShort(UShort.MAX_VALUE.toInt())
+                    } else {
+                        os.writeShort(configChangeDest[i]!!.toInt())
+                    }
+                }
+            }
+            if(ambientSoundId != null) {
+                os.writeOpcode(78)
+                os.writeShort(ambientSoundId.toInt())
+                os.writeByte(anInt2083.toInt())
+            }
+            if(anIntArray2084 != null) {
+                os.writeOpcode(79)
+                os.writeShort(anInt2112.toInt())
+                os.writeShort(anInt2113.toInt())
+                os.writeByte(anInt2083.toInt())
+                os.writeByte(anIntArray2084.size)
+                anIntArray2084.forEach { os.writeShort(it.toInt()) }
+            }
+            mapIconId?.let {
+                os.writeOpcode(82)
+                os.writeShort(mapIconId.toInt())
+            }
+            params?.let {
+                os.writeOpcode(249)
+                os.writeParams(params)
+            }
+            return ByteBuffer.wrap(byteStr.toByteArray())
+        }
     }
 
     companion object : ConfigFileCompanion<ConfigFile>() {
@@ -86,7 +248,7 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
             var animationId: UShort? = null
             var ambient = 0
             var contrast = 0
-            var mapSceneID: UShort? = null
+            var mapSceneId: UShort? = null
             var modelSizeX: UShort = 128u
             var modelSizeHeight: UShort = 128u
             var modelSizeY: UShort = 128u
@@ -105,7 +267,7 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
             var anInt2113: UShort = 0u
             var anInt2083: UByte = 0u
             var anIntArray2084: UShortArray? = null
-            var params: MutableMap<Int, Any>? = null
+            var params: HashMap<Int, Any>? = null
 
             decoder@ while (true) {
                 val opcode = buffer.uByte.toInt()
@@ -175,7 +337,7 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
                     65 -> modelSizeX = buffer.uShort
                     66 -> modelSizeHeight = buffer.uShort
                     67 -> modelSizeY = buffer.uShort
-                    68 -> mapSceneID = buffer.uShort
+                    68 -> mapSceneId = buffer.uShort
                     69 -> accessBlock = buffer.uByte
                     70 -> offsetX = buffer.short
                     71 -> offsetHeight = buffer.short
@@ -183,16 +345,23 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
                     73 -> obstructsGround = true
                     74 -> isHollow = true
                     75 -> supportItems = buffer.uByte
-                    77 -> {
+                    77, 92 -> {
                         varpId = buffer.uShort
                         if(varpId == UShort.MAX_VALUE) varpId = null
                         configId = buffer.uShort
                         if(configId == UShort.MAX_VALUE) configId = null
+                        val lastEntry = if(opcode == 92) {
+                            val entry = buffer.uShort
+                            if(entry == UShort.MAX_VALUE) null else entry
+                        } else null
                         val size = buffer.uByte.toInt()
                         configChangeDest = arrayOfNulls(size + 2)
                         for(i in 0 until configChangeDest!!.size - 1) {
                             configChangeDest[i] = buffer.uShort
                             if(configChangeDest[i] == UShort.MAX_VALUE) configChangeDest = null
+                        }
+                        if(opcode == 92) {
+                            configChangeDest[size + 1] = lastEntry
                         }
                     }
                     78 -> {
@@ -208,24 +377,8 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
                     }
                     81 -> contouredGround = buffer.uByte.toInt() * 256
                     82 -> mapIconId = buffer.uShort
-                    92 -> {
-                        varpId = buffer.uShort
-                        if(varpId == UShort.MAX_VALUE) varpId = null
-                        configId = buffer.uShort
-                        if(configId == UShort.MAX_VALUE) configId = null
-                        var lastEntry: UShort? = buffer.uShort
-                        if(lastEntry == UShort.MAX_VALUE) lastEntry = null
-                        val size = buffer.uShort.toInt()
-                        configChangeDest = arrayOfNulls(size + 2)
-                        for(i in 0 until configChangeDest!!.size - 1) {
-                            configChangeDest[i] = buffer.uShort
-                            if(configChangeDest[i] == UShort.MAX_VALUE) configChangeDest = null
-                        }
-                        configChangeDest[size + 1] = lastEntry
-
-                    }
                     249 -> params = buffer.params
-                    else -> error(opcode)
+                    else -> throw IOException("Did not recognise opcode $opcode")
                 }
             }
             if (anInt2088 == null) {
@@ -248,7 +401,7 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
             }
             return ObjectConfig(id, name, width, length, varpId, mapIconId, configId, options, clipType, isClipped,
                 modelClipped, isHollow, impenetrable, accessBlock, objectModels, objectTypes, colorReplace, colorFind,
-                textureFind, textureReplace, anInt2088, animationId, ambient, contrast, mapSceneID, modelSizeX,
+                textureFind, textureReplace, anInt2088, animationId, ambient, contrast, mapSceneId, modelSizeX,
                 modelSizeHeight, modelSizeY, offsetX, offsetHeight, offsetY, decorDisplacement, isMirrored,
                 obstructsGround, nonFlatShading, contouredGround, supportItems, configChangeDest, ambientSoundId,
                 anInt2112, anInt2113, anInt2083, anIntArray2084, params
