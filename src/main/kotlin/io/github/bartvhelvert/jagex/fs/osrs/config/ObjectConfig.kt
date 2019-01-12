@@ -15,7 +15,7 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
     val length: UByte,
     val varpId: UShort?,
     val mapIconId: UShort?,
-    val configId: UShort?,
+    val varp32Id: UShort?,
     val options: Array<String?>,
     val clipType: Int,
     val isClipped: Boolean,
@@ -46,7 +46,7 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
     val nonFlatShading: Boolean,
     val contouredGround: Int?,
     val supportItems: UByte?,
-    val configChangeDest: Array<UShort?>?,
+    val configs: Array<UShort?>?,
     val ambientSoundId: UShort?,
     val anInt2112: UShort,
     val anInt2113: UShort,
@@ -181,17 +181,17 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
                 os.writeOpcode(75)
                 os.writeByte(supportItems.toInt())
             }
-            if(configChangeDest != null) {
-                if(configChangeDest.last() != null) os.writeOpcode(92) else os.writeOpcode(77)
+            if(configs != null) {
+                if(configs.last() != null) os.writeOpcode(92) else os.writeOpcode(77)
                 if(varpId == null) os.writeShort(UShort.MAX_VALUE.toInt()) else os.writeShort(varpId.toInt())
-                if(configId == null) os.writeShort(UShort.MAX_VALUE.toInt()) else os.writeShort(configId.toInt())
-                if(configChangeDest.last() != null) os.writeShort(configChangeDest.last()!!.toInt())
-                os.writeByte(configChangeDest.size - 2)
-                for(i in 0 until configChangeDest.size - 1) {
-                    if(configChangeDest[i] != null) {
+                if(varp32Id == null) os.writeShort(UShort.MAX_VALUE.toInt()) else os.writeShort(varp32Id.toInt())
+                if(configs.last() != null) os.writeShort(configs.last()!!.toInt())
+                os.writeByte(configs.size - 2)
+                for(i in 0 until configs.size - 1) {
+                    if(configs[i] != null) {
                         os.writeShort(UShort.MAX_VALUE.toInt())
                     } else {
-                        os.writeShort(configChangeDest[i]!!.toInt())
+                        os.writeShort(configs[i]!!.toInt())
                     }
                 }
             }
@@ -216,6 +216,7 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
                 os.writeOpcode(249)
                 os.writeParams(params)
             }
+            os.writeOpcode(0)
             return ByteBuffer.wrap(byteStr.toByteArray())
         }
     }
@@ -230,7 +231,7 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
             var length: UByte = 1u
             var varpId: UShort? = null
             var mapIconId: UShort? = null
-            var configId: UShort? = null
+            var varp32Id: UShort? = null
             val options = arrayOfNulls<String>(5)
             var clipType = 2
             var isClipped = true
@@ -261,7 +262,7 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
             var nonFlatShading = false
             var contouredGround: Int? = null
             var supportItems: UByte? = null
-            var configChangeDest: Array<UShort?>? = null
+            var configs: Array<UShort?>? = null
             var ambientSoundId: UShort? = null
             var anInt2112: UShort = 0u
             var anInt2113: UShort = 0u
@@ -348,20 +349,20 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
                     77, 92 -> {
                         varpId = buffer.uShort
                         if(varpId == UShort.MAX_VALUE) varpId = null
-                        configId = buffer.uShort
-                        if(configId == UShort.MAX_VALUE) configId = null
+                        varp32Id = buffer.uShort
+                        if(varp32Id == UShort.MAX_VALUE) varp32Id = null
                         val lastEntry = if(opcode == 92) {
                             val entry = buffer.uShort
                             if(entry == UShort.MAX_VALUE) null else entry
                         } else null
                         val size = buffer.uByte.toInt()
-                        configChangeDest = arrayOfNulls(size + 2)
-                        for(i in 0 until configChangeDest!!.size - 1) {
-                            configChangeDest[i] = buffer.uShort
-                            if(configChangeDest[i] == UShort.MAX_VALUE) configChangeDest = null
+                        configs = arrayOfNulls(size + 2)
+                        for(i in 0 until configs!!.size - 1) {
+                            configs[i] = buffer.uShort
+                            if(configs[i] == UShort.MAX_VALUE) configs = null
                         }
                         if(opcode == 92) {
-                            configChangeDest[size + 1] = lastEntry
+                            configs[size + 1] = lastEntry
                         }
                     }
                     78 -> {
@@ -399,11 +400,11 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
                 clipType = 0
                 impenetrable = false
             }
-            return ObjectConfig(id, name, width, length, varpId, mapIconId, configId, options, clipType, isClipped,
+            return ObjectConfig(id, name, width, length, varpId, mapIconId, varp32Id, options, clipType, isClipped,
                 modelClipped, isHollow, impenetrable, accessBlock, objectModels, objectTypes, colorReplace, colorFind,
                 textureFind, textureReplace, anInt2088, animationId, ambient, contrast, mapSceneId, modelSizeX,
                 modelSizeHeight, modelSizeY, offsetX, offsetHeight, offsetY, decorDisplacement, isMirrored,
-                obstructsGround, nonFlatShading, contouredGround, supportItems, configChangeDest, ambientSoundId,
+                obstructsGround, nonFlatShading, contouredGround, supportItems, configs, ambientSoundId,
                 anInt2112, anInt2113, anInt2083, anIntArray2084, params
             )
         }
