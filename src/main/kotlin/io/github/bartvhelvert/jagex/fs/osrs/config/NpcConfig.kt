@@ -166,6 +166,7 @@ class NpcConfig @ExperimentalUnsignedTypes constructor(
             if(!isClickable) os.writeOpcode(109)
             if(aBool2190) os.writeOpcode(111)
             params?.let {
+                os.writeOpcode(249)
                 os.writeParams(params)
             }
             os.writeOpcode(0)

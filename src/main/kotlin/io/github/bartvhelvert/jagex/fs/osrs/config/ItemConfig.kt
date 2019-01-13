@@ -225,7 +225,8 @@ class ItemConfig @ExperimentalUnsignedTypes constructor(
                 os.writeOpcode(148)
                 os.writeShort(placeholderId.toInt())
             }
-            if(params != null) {
+            params?.let {
+                os.writeOpcode(249)
                 os.writeParams(params)
             }
             os.writeOpcode(0)
