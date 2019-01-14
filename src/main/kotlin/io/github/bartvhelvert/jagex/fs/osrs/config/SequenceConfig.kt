@@ -173,6 +173,13 @@ class SequenceConfig @ExperimentalUnsignedTypes constructor(
                     else -> throw IOException("Did not recognise opcode $opcode")
                 }
             }
+            precedenceAnimating?.let {
+                precedenceAnimating = if (interleaveLeave != null) 2u else 0u
+
+            }
+            priority?.let {
+                priority = if (interleaveLeave != null) 2u else 0u
+            }
             return SequenceConfig(id, frameIds, field3048, frameLengths, interleaveLeave, stretches, forcedPriority,
                 maxLoops, field3056, precedenceAnimating, leftHandItem, rightHandItem, replyMode, frameStep, priority
             )
