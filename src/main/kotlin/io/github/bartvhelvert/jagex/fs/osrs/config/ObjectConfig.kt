@@ -217,8 +217,8 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
                 os.writeParams(params)
             }
             os.writeOpcode(0)
-            return ByteBuffer.wrap(byteStr.toByteArray())
         }
+        return ByteBuffer.wrap(byteStr.toByteArray())
     }
 
     companion object : ConfigFileCompanion<ConfigFile>() {
