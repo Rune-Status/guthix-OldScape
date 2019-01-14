@@ -215,9 +215,7 @@ class NpcConfig @ExperimentalUnsignedTypes constructor(
             decoder@ while (true) {
                 val opcode = buffer.uByte.toInt()
                 when (opcode) {
-                    0 -> {
-                        break@decoder
-                    }
+                    0 -> break@decoder
                     1 -> {
                         val length = buffer.uByte.toInt()
                         models = UShortArray(length) { buffer.uShort }

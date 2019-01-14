@@ -273,9 +273,7 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
             decoder@ while (true) {
                 val opcode = buffer.uByte.toInt()
                 when (opcode) {
-                    0 -> {
-                        break@decoder
-                    }
+                    0 -> break@decoder
                     1 -> {
                         val size = buffer.uByte.toInt()
                         if (size > 0) {
