@@ -1,34 +1,37 @@
 package io.github.bartvhelvert.jagex.fs.osrs.config
 
 import io.github.bartvhelvert.jagex.fs.io.uByte
+import io.github.bartvhelvert.jagex.fs.io.uShort
 import io.github.bartvhelvert.jagex.fs.osrs.ConfigFile
 import io.github.bartvhelvert.jagex.fs.osrs.ConfigFileCompanion
 import java.nio.ByteBuffer
 
-class VarClientString(id: Int, val isSerializable: Boolean) : ConfigFile(id) {
-    override fun encode(): ByteBuffer = if(isSerializable) {
+class VarPlayerConfig @ExperimentalUnsignedTypes constructor(id: Int, val type: UShort) : ConfigFile(id) {
+    @ExperimentalUnsignedTypes
+    override fun encode(): ByteBuffer = if(type.toInt() != 0) {
         ByteBuffer.allocate(2).apply {
-            put(2)
+            put(5)
+            putShort(type.toShort())
             put(0)
         }
     } else {
         ByteBuffer.allocate(1).apply { put(0) }
     }
 
-    companion object : ConfigFileCompanion<VarClientString>() {
-        override val id = 15
+    companion object : ConfigFileCompanion<VarPlayerConfig>() {
+        override val id = 16
 
         @ExperimentalUnsignedTypes
-        override fun decode(id: Int, buffer: ByteBuffer): VarClientString {
-            var isSerializable = false
+        override fun decode(id: Int, buffer: ByteBuffer): VarPlayerConfig {
+            var type: UShort = 0u
             decoder@ while (true) {
                 val opcode = buffer.uByte.toInt()
                 when (opcode) {
                     0 -> break@decoder
-                    2 -> isSerializable = true
+                    5 -> type = buffer.uShort
                 }
             }
-            return VarClientString(id, isSerializable)
+            return VarPlayerConfig(id, type)
         }
     }
 }

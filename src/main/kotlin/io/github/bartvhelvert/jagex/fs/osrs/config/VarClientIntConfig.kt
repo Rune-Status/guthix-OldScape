@@ -5,7 +5,7 @@ import io.github.bartvhelvert.jagex.fs.osrs.ConfigFile
 import io.github.bartvhelvert.jagex.fs.osrs.ConfigFileCompanion
 import java.nio.ByteBuffer
 
-class VarClientInt(id: Int, val isSerializable: Boolean) : ConfigFile(id) {
+class VarClientIntConfig(id: Int, val isSerializable: Boolean) : ConfigFile(id) {
     override fun encode(): ByteBuffer = if(isSerializable) {
         ByteBuffer.allocate(2).apply {
             put(2)
@@ -28,7 +28,7 @@ class VarClientInt(id: Int, val isSerializable: Boolean) : ConfigFile(id) {
                     2 -> isSerializable = true
                 }
             }
-            return VarClientInt(id, isSerializable)
+            return VarClientIntConfig(id, isSerializable)
         }
     }
 }
