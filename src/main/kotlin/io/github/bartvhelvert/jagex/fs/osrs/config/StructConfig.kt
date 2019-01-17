@@ -3,13 +3,13 @@ package io.github.bartvhelvert.jagex.fs.osrs.config
 import io.github.bartvhelvert.jagex.fs.io.params
 import io.github.bartvhelvert.jagex.fs.io.uByte
 import io.github.bartvhelvert.jagex.fs.io.writeParams
-import io.github.bartvhelvert.jagex.fs.osrs.ConfigFile
-import io.github.bartvhelvert.jagex.fs.osrs.ConfigFileCompanion
+import io.github.bartvhelvert.jagex.fs.osrs.Config
+import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.nio.ByteBuffer
 
-class StructConfig(id: Int, val params: HashMap<Int, Any>?) : ConfigFile(id) {
+class StructConfig(id: Int, val params: HashMap<Int, Any>?) : Config(id) {
     override fun encode(): ByteBuffer {
         val byteStr = ByteArrayOutputStream()
         DataOutputStream(byteStr).use { os ->
@@ -22,7 +22,7 @@ class StructConfig(id: Int, val params: HashMap<Int, Any>?) : ConfigFile(id) {
         return ByteBuffer.wrap(byteStr.toByteArray())
     }
 
-    companion object : ConfigFileCompanion<StructConfig>() {
+    companion object : ConfigCompanion<StructConfig>() {
         override val id = 34
 
         @ExperimentalUnsignedTypes

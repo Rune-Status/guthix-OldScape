@@ -1,15 +1,14 @@
 package io.github.bartvhelvert.jagex.fs.osrs.config
 
-import io.github.bartvhelvert.jagex.fs.io.medium
 import io.github.bartvhelvert.jagex.fs.io.putMedium
 import io.github.bartvhelvert.jagex.fs.io.uByte
 import io.github.bartvhelvert.jagex.fs.io.uMedium
-import io.github.bartvhelvert.jagex.fs.osrs.ConfigFile
-import io.github.bartvhelvert.jagex.fs.osrs.ConfigFileCompanion
+import io.github.bartvhelvert.jagex.fs.osrs.Config
+import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
 import java.nio.ByteBuffer
 
 
-class UnderlayConfig(id: Int, val color: Int) : ConfigFile(id) {
+class UnderlayConfig(id: Int, val color: Int) : Config(id) {
     override fun encode(): ByteBuffer = if(color != 0) {
         ByteBuffer.allocate(2).apply {
             put(1)
@@ -20,7 +19,7 @@ class UnderlayConfig(id: Int, val color: Int) : ConfigFile(id) {
         ByteBuffer.allocate(1).apply { put(0) }
     }
 
-    companion object : ConfigFileCompanion<UnderlayConfig>() {
+    companion object : ConfigCompanion<UnderlayConfig>() {
         override val id = 1
 
         @ExperimentalUnsignedTypes

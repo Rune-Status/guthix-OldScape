@@ -3,8 +3,8 @@ package io.github.bartvhelvert.jagex.fs.osrs.config
 import io.github.bartvhelvert.jagex.fs.io.uByte
 import io.github.bartvhelvert.jagex.fs.io.uMedium
 import io.github.bartvhelvert.jagex.fs.io.writeMedium
-import io.github.bartvhelvert.jagex.fs.osrs.ConfigFile
-import io.github.bartvhelvert.jagex.fs.osrs.ConfigFileCompanion
+import io.github.bartvhelvert.jagex.fs.osrs.Config
+import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
 import java.awt.Color
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
@@ -16,7 +16,7 @@ class OverlayConfig @ExperimentalUnsignedTypes constructor(
     val texture: UByte?,
     val isHidden: Boolean,
     val otherColor: Color?
-) : ConfigFile(id) {
+) : Config(id) {
     @ExperimentalUnsignedTypes
     override fun encode(): ByteBuffer {
         val byteStr = ByteArrayOutputStream()
@@ -39,7 +39,7 @@ class OverlayConfig @ExperimentalUnsignedTypes constructor(
         return ByteBuffer.wrap(byteStr.toByteArray())
     }
 
-    companion object : ConfigFileCompanion<OverlayConfig>() {
+    companion object : ConfigCompanion<OverlayConfig>() {
         override val id = 4
 
         @ExperimentalUnsignedTypes

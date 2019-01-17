@@ -4,8 +4,8 @@ import io.github.bartvhelvert.jagex.fs.io.uByte
 import io.github.bartvhelvert.jagex.fs.io.uMedium
 import io.github.bartvhelvert.jagex.fs.io.uShort
 import io.github.bartvhelvert.jagex.fs.io.writeMedium
-import io.github.bartvhelvert.jagex.fs.osrs.ConfigFile
-import io.github.bartvhelvert.jagex.fs.osrs.ConfigFileCompanion
+import io.github.bartvhelvert.jagex.fs.osrs.Config
+import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.IOException
@@ -27,7 +27,7 @@ class SequenceConfig @ExperimentalUnsignedTypes constructor(
     val replyMode: UByte,
     val frameStep: UShort?,
     val priority: UByte?
-) : ConfigFile(id) {
+) : Config(id) {
     @ExperimentalUnsignedTypes
     override fun encode(): ByteBuffer {
         val byteStr = ByteArrayOutputStream()
@@ -108,7 +108,7 @@ class SequenceConfig @ExperimentalUnsignedTypes constructor(
         return ByteBuffer.wrap(byteStr.toByteArray())
     }
 
-    companion object : ConfigFileCompanion<SequenceConfig>() {
+    companion object : ConfigCompanion<SequenceConfig>() {
         override val id = 12
 
         @ExperimentalUnsignedTypes

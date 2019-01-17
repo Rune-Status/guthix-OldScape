@@ -2,8 +2,8 @@ package io.github.bartvhelvert.jagex.fs.osrs.config
 
 import io.github.bartvhelvert.jagex.fs.io.uByte
 import io.github.bartvhelvert.jagex.fs.io.uShort
-import io.github.bartvhelvert.jagex.fs.osrs.ConfigFile
-import io.github.bartvhelvert.jagex.fs.osrs.ConfigFileCompanion
+import io.github.bartvhelvert.jagex.fs.osrs.Config
+import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.IOException
@@ -19,7 +19,7 @@ class IdentKitConfig @ExperimentalUnsignedTypes constructor(
     val modelIds: UShortArray?,
     val models: IntArray,
     val nonSelectable: Boolean
-) : ConfigFile(id) {
+) : Config(id) {
     @ExperimentalUnsignedTypes
     override fun encode(): ByteBuffer {
         val byteStr = ByteArrayOutputStream()
@@ -61,7 +61,7 @@ class IdentKitConfig @ExperimentalUnsignedTypes constructor(
         return ByteBuffer.wrap(byteStr.toByteArray())
     }
 
-    companion object : ConfigFileCompanion<IdentKitConfig>() {
+    companion object : ConfigCompanion<IdentKitConfig>() {
         override val id = 3
 
         @ExperimentalUnsignedTypes

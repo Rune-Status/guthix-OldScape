@@ -1,8 +1,8 @@
 package io.github.bartvhelvert.jagex.fs.osrs.config
 
 import io.github.bartvhelvert.jagex.fs.io.*
-import io.github.bartvhelvert.jagex.fs.osrs.ConfigFile
-import io.github.bartvhelvert.jagex.fs.osrs.ConfigFileCompanion
+import io.github.bartvhelvert.jagex.fs.osrs.Config
+import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.IOException
@@ -56,7 +56,7 @@ class ItemConfig @ExperimentalUnsignedTypes constructor(
     val placeholderId: UShort?,
     val placeholderTemplateId: UShort?,
     val params: HashMap<Int, Any>?
-) : ConfigFile(id) {
+) : Config(id) {
     @ExperimentalUnsignedTypes
     override fun encode(): ByteBuffer {
         val byteStr = ByteArrayOutputStream()
@@ -234,7 +234,7 @@ class ItemConfig @ExperimentalUnsignedTypes constructor(
         return ByteBuffer.wrap(byteStr.toByteArray())
     }
 
-    companion object : ConfigFileCompanion<ItemConfig>() {
+    companion object : ConfigCompanion<ItemConfig>() {
         override val id = 10
 
         @ExperimentalUnsignedTypes

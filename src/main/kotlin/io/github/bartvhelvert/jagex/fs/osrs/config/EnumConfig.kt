@@ -4,8 +4,8 @@ import io.github.bartvhelvert.jagex.fs.io.string
 import io.github.bartvhelvert.jagex.fs.io.uByte
 import io.github.bartvhelvert.jagex.fs.io.uShort
 import io.github.bartvhelvert.jagex.fs.io.writeString
-import io.github.bartvhelvert.jagex.fs.osrs.ConfigFile
-import io.github.bartvhelvert.jagex.fs.osrs.ConfigFileCompanion
+import io.github.bartvhelvert.jagex.fs.osrs.Config
+import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.IOException
@@ -19,7 +19,7 @@ class EnumConfig(
     val defaultString: String,
     val defaultInt: Int,
     val keyValuePairs: Map<Int, Any>
-) : ConfigFile(id) {
+) : Config(id) {
     override fun encode(): ByteBuffer {
         val byteStr = ByteArrayOutputStream()
         DataOutputStream(byteStr).use { os ->
@@ -61,7 +61,7 @@ class EnumConfig(
         return ByteBuffer.wrap(byteStr.toByteArray())
     }
 
-    companion object : ConfigFileCompanion<EnumConfig>() {
+    companion object : ConfigCompanion<EnumConfig>() {
         override val id = 8
 
         @ExperimentalUnsignedTypes

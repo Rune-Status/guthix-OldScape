@@ -55,13 +55,13 @@ class ConfigDictionary(
     }
 }
 
-abstract class ConfigFile(val id: Int) {
+abstract class Config(val id: Int) {
     abstract fun encode(): ByteBuffer
 
     protected fun DataOutputStream.writeOpcode(opcode: Int) = writeByte(opcode)
 }
 
-abstract class ConfigFileCompanion<out T: ConfigFile> {
+abstract class ConfigCompanion<out T: Config> {
     abstract val id: Int
 
     fun load(archive: Archive): Map<Int, T> {

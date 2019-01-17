@@ -1,11 +1,11 @@
 package io.github.bartvhelvert.jagex.fs.osrs.config
 
 import io.github.bartvhelvert.jagex.fs.io.uByte
-import io.github.bartvhelvert.jagex.fs.osrs.ConfigFile
-import io.github.bartvhelvert.jagex.fs.osrs.ConfigFileCompanion
+import io.github.bartvhelvert.jagex.fs.osrs.Config
+import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
 import java.nio.ByteBuffer
 
-class VarClientIntConfig(id: Int, val isSerializable: Boolean) : ConfigFile(id) {
+class VarClientIntConfig(id: Int, val isSerializable: Boolean) : Config(id) {
     override fun encode(): ByteBuffer = if(isSerializable) {
         ByteBuffer.allocate(2).apply {
             put(2)
@@ -15,7 +15,7 @@ class VarClientIntConfig(id: Int, val isSerializable: Boolean) : ConfigFile(id) 
         ByteBuffer.allocate(1).apply { put(0) }
     }
 
-    companion object : ConfigFileCompanion<VarClientIntConfig>() {
+    companion object : ConfigCompanion<VarClientIntConfig>() {
         override val id = 19
 
         @ExperimentalUnsignedTypes

@@ -2,11 +2,11 @@ package io.github.bartvhelvert.jagex.fs.osrs.config
 
 import io.github.bartvhelvert.jagex.fs.io.uByte
 import io.github.bartvhelvert.jagex.fs.io.uShort
-import io.github.bartvhelvert.jagex.fs.osrs.ConfigFile
-import io.github.bartvhelvert.jagex.fs.osrs.ConfigFileCompanion
+import io.github.bartvhelvert.jagex.fs.osrs.Config
+import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
 import java.nio.ByteBuffer
 
-class VarPlayerConfig @ExperimentalUnsignedTypes constructor(id: Int, val type: UShort) : ConfigFile(id) {
+class VarPlayerConfig @ExperimentalUnsignedTypes constructor(id: Int, val type: UShort) : Config(id) {
     @ExperimentalUnsignedTypes
     override fun encode(): ByteBuffer = if(type.toInt() != 0) {
         ByteBuffer.allocate(2).apply {
@@ -18,7 +18,7 @@ class VarPlayerConfig @ExperimentalUnsignedTypes constructor(id: Int, val type: 
         ByteBuffer.allocate(1).apply { put(0) }
     }
 
-    companion object : ConfigFileCompanion<VarPlayerConfig>() {
+    companion object : ConfigCompanion<VarPlayerConfig>() {
         override val id = 16
 
         @ExperimentalUnsignedTypes

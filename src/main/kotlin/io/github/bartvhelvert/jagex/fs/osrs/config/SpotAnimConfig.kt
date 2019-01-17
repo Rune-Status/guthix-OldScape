@@ -2,8 +2,8 @@ package io.github.bartvhelvert.jagex.fs.osrs.config
 
 import io.github.bartvhelvert.jagex.fs.io.uByte
 import io.github.bartvhelvert.jagex.fs.io.uShort
-import io.github.bartvhelvert.jagex.fs.osrs.ConfigFile
-import io.github.bartvhelvert.jagex.fs.osrs.ConfigFileCompanion
+import io.github.bartvhelvert.jagex.fs.osrs.Config
+import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.IOException
@@ -23,7 +23,7 @@ class SpotAnimConfig @ExperimentalUnsignedTypes constructor(
     val textureFind: UShortArray?,
     val colorFind: UShortArray?,
     val colorReplace: UShortArray?
-) : ConfigFile(id) {
+) : Config(id) {
     @ExperimentalUnsignedTypes
     override fun encode(): ByteBuffer {
         val byteStr = ByteArrayOutputStream()
@@ -77,7 +77,7 @@ class SpotAnimConfig @ExperimentalUnsignedTypes constructor(
         return ByteBuffer.wrap(byteStr.toByteArray())
     }
 
-    companion object : ConfigFileCompanion<SpotAnimConfig>() {
+    companion object : ConfigCompanion<SpotAnimConfig>() {
         override val id = 13
 
         @ExperimentalUnsignedTypes

@@ -4,8 +4,8 @@ import io.github.bartvhelvert.jagex.fs.io.nullableSmart
 import io.github.bartvhelvert.jagex.fs.io.uByte
 import io.github.bartvhelvert.jagex.fs.io.uShort
 import io.github.bartvhelvert.jagex.fs.io.writeNullableSmart
-import io.github.bartvhelvert.jagex.fs.osrs.ConfigFile
-import io.github.bartvhelvert.jagex.fs.osrs.ConfigFileCompanion
+import io.github.bartvhelvert.jagex.fs.osrs.Config
+import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.IOException
@@ -22,7 +22,7 @@ class HitBarConfig @ExperimentalUnsignedTypes constructor(
     val field3316: Int?,
     val healthScale: UByte,
     val field3318: UByte
-) : ConfigFile(id) {
+) : Config(id) {
     @ExperimentalUnsignedTypes
     override fun encode(): ByteBuffer {
         val byteStr = ByteArrayOutputStream()
@@ -68,11 +68,11 @@ class HitBarConfig @ExperimentalUnsignedTypes constructor(
         return ByteBuffer.wrap(byteStr.toByteArray())
     }
 
-    companion object : ConfigFileCompanion<ConfigFile>() {
+    companion object : ConfigCompanion<Config>() {
         override val id = 33
 
         @ExperimentalUnsignedTypes
-        override fun decode(id: Int, buffer: ByteBuffer): ConfigFile {
+        override fun decode(id: Int, buffer: ByteBuffer): Config {
             var field3310: UByte = UByte.MAX_VALUE
             var field3307: UByte = UByte.MAX_VALUE
             var field3312: UShort? = null
