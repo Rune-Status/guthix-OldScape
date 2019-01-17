@@ -64,6 +64,7 @@ abstract class Config(val id: Int) {
 abstract class ConfigCompanion<out T: Config> {
     abstract val id: Int
 
+    @ExperimentalUnsignedTypes
     fun load(archive: Archive): Map<Int, T> {
         val configs = mutableMapOf<Int, T>()
         archive.attributes.fileAttributes.forEach {
@@ -72,5 +73,6 @@ abstract class ConfigCompanion<out T: Config> {
         return configs
     }
 
+    @ExperimentalUnsignedTypes
     abstract fun decode(id: Int, buffer: ByteBuffer): T
 }

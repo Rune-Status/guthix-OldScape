@@ -7,6 +7,7 @@ import io.github.bartvhelvert.jagex.fs.osrs.Config
 import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
+import java.io.IOException
 import java.nio.ByteBuffer
 
 class StructConfig(id: Int, val params: HashMap<Int, Any>?) : Config(id) {
@@ -33,6 +34,7 @@ class StructConfig(id: Int, val params: HashMap<Int, Any>?) : Config(id) {
                 when (opcode) {
                     0 -> break@decoder
                     249 -> params = buffer.params
+                    else -> throw IOException("Did not recognise opcode $opcode")
                 }
             }
             return StructConfig(id, params)

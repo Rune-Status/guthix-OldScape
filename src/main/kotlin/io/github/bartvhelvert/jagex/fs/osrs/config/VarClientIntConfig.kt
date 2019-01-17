@@ -3,6 +3,7 @@ package io.github.bartvhelvert.jagex.fs.osrs.config
 import io.github.bartvhelvert.jagex.fs.io.uByte
 import io.github.bartvhelvert.jagex.fs.osrs.Config
 import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
+import java.io.IOException
 import java.nio.ByteBuffer
 
 class VarClientIntConfig(id: Int, val isSerializable: Boolean) : Config(id) {
@@ -26,6 +27,7 @@ class VarClientIntConfig(id: Int, val isSerializable: Boolean) : Config(id) {
                 when (opcode) {
                     0 -> break@decoder
                     2 -> isSerializable = true
+                    else -> throw IOException("Did not recognise opcode $opcode")
                 }
             }
             return VarClientIntConfig(id, isSerializable)

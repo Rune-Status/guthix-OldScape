@@ -5,6 +5,7 @@ import io.github.bartvhelvert.jagex.fs.io.uByte
 import io.github.bartvhelvert.jagex.fs.io.uMedium
 import io.github.bartvhelvert.jagex.fs.osrs.Config
 import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
+import java.io.IOException
 import java.nio.ByteBuffer
 
 
@@ -30,6 +31,7 @@ class UnderlayConfig(id: Int, val color: Int) : Config(id) {
                 when (opcode) {
                     0 -> break@decoder
                     1 -> color = buffer.uMedium
+                    else -> throw IOException("Did not recognise opcode $opcode")
                 }
             }
             return UnderlayConfig(id, color)

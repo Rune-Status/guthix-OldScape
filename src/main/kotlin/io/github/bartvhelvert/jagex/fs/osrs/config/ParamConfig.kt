@@ -58,6 +58,7 @@ class ParamConfig(
                     2 -> defaultInt = buffer.int
                     4 -> autoDisable = false
                     5 -> defaultString = buffer.string
+                    else -> throw IOException("Did not recognise opcode $opcode")
                 }
             }
             return ParamConfig(id, stackType, autoDisable, defaultInt, defaultString)

@@ -8,6 +8,7 @@ import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
 import java.awt.Color
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
+import java.io.IOException
 import java.nio.ByteBuffer
 
 class OverlayConfig @ExperimentalUnsignedTypes constructor(
@@ -56,6 +57,7 @@ class OverlayConfig @ExperimentalUnsignedTypes constructor(
                     2 -> texture = buffer.uByte
                     5 -> isHidden = false
                     7 -> otherColor = Color(buffer.uMedium)
+                    else -> throw IOException("Did not recognise opcode $opcode")
                 }
             }
             return OverlayConfig(id, color, texture, isHidden, otherColor)

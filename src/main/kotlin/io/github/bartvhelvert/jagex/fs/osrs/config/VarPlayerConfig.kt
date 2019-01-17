@@ -4,6 +4,7 @@ import io.github.bartvhelvert.jagex.fs.io.uByte
 import io.github.bartvhelvert.jagex.fs.io.uShort
 import io.github.bartvhelvert.jagex.fs.osrs.Config
 import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
+import java.io.IOException
 import java.nio.ByteBuffer
 
 class VarPlayerConfig @ExperimentalUnsignedTypes constructor(id: Int, val type: UShort) : Config(id) {
@@ -29,6 +30,7 @@ class VarPlayerConfig @ExperimentalUnsignedTypes constructor(id: Int, val type: 
                 when (opcode) {
                     0 -> break@decoder
                     5 -> type = buffer.uShort
+                    else -> throw IOException("Did not recognise opcode $opcode")
                 }
             }
             return VarPlayerConfig(id, type)

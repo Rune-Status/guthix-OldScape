@@ -5,6 +5,7 @@ import io.github.bartvhelvert.jagex.fs.osrs.Config
 import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
+import java.io.IOException
 import java.nio.ByteBuffer
 
 
@@ -165,6 +166,7 @@ class HitMarkConfig @ExperimentalUnsignedTypes constructor(
                             configs[size + 1] = lastEntry
                         }
                     }
+                    else -> throw IOException("Did not recognise opcode $opcode")
                 }
             }
             return HitMarkConfig(

@@ -4,6 +4,7 @@ import io.github.bartvhelvert.jagex.fs.io.uByte
 import io.github.bartvhelvert.jagex.fs.io.uShort
 import io.github.bartvhelvert.jagex.fs.osrs.Config
 import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
+import java.io.IOException
 import java.nio.ByteBuffer
 
 
@@ -44,6 +45,7 @@ class VarbitConfig @ExperimentalUnsignedTypes constructor(
                         lsb = buffer.uByte
                         msb = buffer.uByte
                     }
+                    else -> throw IOException("Did not recognise opcode $opcode")
                 }
             }
             return VarbitConfig(id, varpId, lsb, msb)

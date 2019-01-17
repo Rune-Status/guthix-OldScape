@@ -4,6 +4,7 @@ import io.github.bartvhelvert.jagex.fs.io.uByte
 import io.github.bartvhelvert.jagex.fs.io.uShort
 import io.github.bartvhelvert.jagex.fs.osrs.Config
 import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
+import java.io.IOException
 import java.nio.ByteBuffer
 
 class InvConfig @ExperimentalUnsignedTypes constructor(id: Int, val capacity: UShort) : Config(id) {
@@ -31,6 +32,7 @@ class InvConfig @ExperimentalUnsignedTypes constructor(id: Int, val capacity: US
                 when (opcode) {
                     0 -> break@decoder
                     2 -> capacity = buffer.uShort
+                    else -> throw IOException("Did not recognise opcode $opcode")
                 }
             }
             return InvConfig(id, capacity)

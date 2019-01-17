@@ -5,6 +5,7 @@ import io.github.bartvhelvert.jagex.fs.osrs.Config
 import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
+import java.io.IOException
 import java.nio.ByteBuffer
 
 
@@ -135,6 +136,7 @@ class AreaConfig @ExperimentalUnsignedTypes constructor(
                     28 -> buffer.uByte
                     29 -> buffer.uByte
                     30 -> buffer.uByte
+                    else -> throw IOException("Did not recognise opcode $opcode")
                 }
             }
 
