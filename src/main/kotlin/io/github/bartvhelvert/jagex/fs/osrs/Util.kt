@@ -3,7 +3,7 @@ package io.github.bartvhelvert.jagex.fs.osrs
 import java.awt.Color
 import java.lang.IllegalStateException
 
-fun Color.toHsl(): IntArray {
+fun Color.getHSLComponents(): IntArray {
     val r = red / 256.0
     val g = green / 256.0
     val b = blue / 256.0
@@ -40,5 +40,5 @@ fun Color.toHsl(): IntArray {
     } else if (lightness > 255) {
         lightness = 255
     }
-    return intArrayOf(hue, lightness, lightness)
+    return intArrayOf(hue, saturation, lightness)
 }
