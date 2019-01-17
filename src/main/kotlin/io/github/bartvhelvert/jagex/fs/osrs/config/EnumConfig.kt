@@ -61,11 +61,11 @@ class EnumConfig(
         return ByteBuffer.wrap(byteStr.toByteArray())
     }
 
-    companion object : ConfigFileCompanion<ConfigFile>() {
+    companion object : ConfigFileCompanion<EnumConfig>() {
         override val id = 8
 
         @ExperimentalUnsignedTypes
-        override fun decode(id: Int, buffer: ByteBuffer): ConfigFile {
+        override fun decode(id: Int, buffer: ByteBuffer): EnumConfig {
             var keyType: Char = 0.toChar()
             var valType: Char = 0.toChar()
             var defaultString = "null"

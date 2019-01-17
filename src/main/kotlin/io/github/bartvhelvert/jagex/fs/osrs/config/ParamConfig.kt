@@ -36,11 +36,11 @@ class ParamConfig(
         return ByteBuffer.wrap(byteStr.toByteArray())
     }
 
-    companion object : ConfigFileCompanion<ConfigFile>() {
+    companion object : ConfigFileCompanion<ParamConfig>() {
         override val id = 11
 
         @ExperimentalUnsignedTypes
-        override fun decode(id: Int, buffer: ByteBuffer): ConfigFile {
+        override fun decode(id: Int, buffer: ByteBuffer): ParamConfig {
             var stackType: Char? = null
             var autoDisable: Boolean = true
             var defaultInt: Int? = null

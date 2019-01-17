@@ -234,11 +234,11 @@ class ItemConfig @ExperimentalUnsignedTypes constructor(
         return ByteBuffer.wrap(byteStr.toByteArray())
     }
 
-    companion object : ConfigFileCompanion<ConfigFile>() {
+    companion object : ConfigFileCompanion<ItemConfig>() {
         override val id = 10
 
         @ExperimentalUnsignedTypes
-        override fun decode(id: Int, buffer: ByteBuffer): ConfigFile {
+        override fun decode(id: Int, buffer: ByteBuffer): ItemConfig {
             var name = "null"
             var resizeX: UShort = 128u
             var resizeY: UShort = 128u

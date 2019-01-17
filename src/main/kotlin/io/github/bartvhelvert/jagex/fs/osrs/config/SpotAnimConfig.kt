@@ -77,11 +77,11 @@ class SpotAnimConfig @ExperimentalUnsignedTypes constructor(
         return ByteBuffer.wrap(byteStr.toByteArray())
     }
 
-    companion object : ConfigFileCompanion<ConfigFile>() {
+    companion object : ConfigFileCompanion<SpotAnimConfig>() {
         override val id = 13
 
         @ExperimentalUnsignedTypes
-        override fun decode(id: Int, buffer: ByteBuffer): ConfigFile {
+        override fun decode(id: Int, buffer: ByteBuffer): SpotAnimConfig {
             var animationId: UShort? = null
             var rotation: UShort = 0u
             var resizeY: UShort = 128u

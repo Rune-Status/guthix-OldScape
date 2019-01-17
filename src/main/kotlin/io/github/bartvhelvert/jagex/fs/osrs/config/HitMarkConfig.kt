@@ -106,11 +106,11 @@ class HitMarkConfig @ExperimentalUnsignedTypes constructor(
         return ByteBuffer.wrap(byteStr.toByteArray())
     }
 
-    companion object : ConfigFileCompanion<ConfigFile>() {
+    companion object : ConfigFileCompanion<HitMarkConfig>() {
         override val id = 32
 
         @ExperimentalUnsignedTypes
-        override fun decode(id: Int, buffer: ByteBuffer): ConfigFile {
+        override fun decode(id: Int, buffer: ByteBuffer): HitMarkConfig {
             var field3353: Int? = null
             var field3364 = 16777215
             var field3355: UShort = 70u

@@ -15,11 +15,11 @@ class VarClientIntConfig(id: Int, val isSerializable: Boolean) : ConfigFile(id) 
         ByteBuffer.allocate(1).apply { put(0) }
     }
 
-    companion object : ConfigFileCompanion<ConfigFile>() {
+    companion object : ConfigFileCompanion<VarClientIntConfig>() {
         override val id = 19
 
         @ExperimentalUnsignedTypes
-        override fun decode(id: Int, buffer: ByteBuffer): ConfigFile {
+        override fun decode(id: Int, buffer: ByteBuffer): VarClientIntConfig {
             var isSerializable = false
             decoder@ while (true) {
                 val opcode = buffer.uByte.toInt()

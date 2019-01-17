@@ -174,11 +174,11 @@ class NpcConfig @ExperimentalUnsignedTypes constructor(
         return ByteBuffer.wrap(byteStr.toByteArray())
     }
 
-    companion object : ConfigFileCompanion<ConfigFile>() {
+    companion object : ConfigFileCompanion<NpcConfig>() {
         override val id = 9
 
         @ExperimentalUnsignedTypes
-        override fun decode(id: Int, buffer: ByteBuffer): ConfigFile {
+        override fun decode(id: Int, buffer: ByteBuffer): NpcConfig {
             var name = "null"
             var size: UByte = 1u
             var combatLevel: UShort? = null
