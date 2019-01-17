@@ -104,8 +104,8 @@ class AreaConfig @ExperimentalUnsignedTypes constructor(
                     1 -> spriteId = buffer.nullableSmart
                     2 -> field3032 = buffer.nullableSmart
                     3 -> name = buffer.string
-                    4 -> field3033 = buffer.medium
-                    5 -> buffer.medium
+                    4 -> field3033 = buffer.uMedium
+                    5 -> buffer.uMedium
                     6 -> field3034 = buffer.uByte
                     7 -> flags = buffer.uByte
                     8 -> buffer.uByte

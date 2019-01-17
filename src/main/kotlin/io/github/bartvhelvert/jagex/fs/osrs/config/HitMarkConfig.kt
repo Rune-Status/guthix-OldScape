@@ -133,7 +133,7 @@ class HitMarkConfig @ExperimentalUnsignedTypes constructor(
                 when(opcode) {
                     0 -> break@decoder
                     1 -> field3353 = buffer.nullableSmart
-                    2 -> field3364 = buffer.medium
+                    2 -> field3364 = buffer.uMedium
                     3 -> field3358 = buffer.nullableSmart
                     4 -> field3350 = buffer.nullableSmart
                     5 -> field3357 = buffer.nullableSmart
