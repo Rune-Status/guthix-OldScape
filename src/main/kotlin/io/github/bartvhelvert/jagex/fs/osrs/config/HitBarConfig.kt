@@ -68,11 +68,11 @@ class HitBarConfig @ExperimentalUnsignedTypes constructor(
         return ByteBuffer.wrap(byteStr.toByteArray())
     }
 
-    companion object : ConfigCompanion<Config>() {
+    companion object : ConfigCompanion<HitBarConfig>() {
         override val id = 33
 
         @ExperimentalUnsignedTypes
-        override fun decode(id: Int, buffer: ByteBuffer): Config {
+        override fun decode(id: Int, buffer: ByteBuffer): HitBarConfig {
             var field3310: UByte = UByte.MAX_VALUE
             var field3307: UByte = UByte.MAX_VALUE
             var field3312: UShort? = null

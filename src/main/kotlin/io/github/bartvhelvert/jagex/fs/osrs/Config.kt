@@ -11,6 +11,7 @@ import java.nio.ByteBuffer
 class ConfigDictionary(
     val areaConfigs: Map<Int, AreaConfig>,
     val enumConfigs: Map<Int, EnumConfig>,
+    val hitBarConfig: Map<Int, HitBarConfig>,
     val hitMarkConfigss: Map<Int, HitMarkConfig>,
     val identKitConfigs: Map<Int, IdentKitConfig>,
     val invConfigs: Map<Int, InvConfig>,
@@ -35,6 +36,7 @@ class ConfigDictionary(
         override fun load(cache: JagexCache): ConfigDictionary = ConfigDictionary(
             AreaConfig.load(cache.readArchive(id, AreaConfig.id)),
             EnumConfig.load(cache.readArchive(id, EnumConfig.id)),
+            HitBarConfig.load(cache.readArchive(id, HitBarConfig.id)),
             HitMarkConfig.load(cache.readArchive(id, HitMarkConfig.id)),
             IdentKitConfig.load(cache.readArchive(id, IdentKitConfig.id)),
             InvConfig.load(cache.readArchive(id, InvConfig.id)),
