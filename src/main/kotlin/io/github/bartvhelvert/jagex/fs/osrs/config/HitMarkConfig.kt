@@ -149,9 +149,9 @@ class HitMarkConfig @ExperimentalUnsignedTypes constructor(
                     14 -> field3354 = buffer.uShort
                     17, 18 -> {
                         varpId = buffer.uShort
-                        if(varpId == UShort.MAX_VALUE) varpId = null
+                        if(varpId.toInt() == UShort.MAX_VALUE.toInt()) varpId = null
                         varp32Id = buffer.uShort
-                        if(varp32Id == UShort.MAX_VALUE) varp32Id = null
+                        if(varp32Id.toInt() == UShort.MAX_VALUE.toInt()) varp32Id = null
                         val lastEntry = if(opcode == 18) {
                             val entry = buffer.uShort
                             if(entry == UShort.MAX_VALUE) null else entry
@@ -160,7 +160,7 @@ class HitMarkConfig @ExperimentalUnsignedTypes constructor(
                         configs = arrayOfNulls(size + 2)
                         for(i in 0 until configs!!.size - 1) {
                             configs[i] = buffer.uShort
-                            if(configs[i] == UShort.MAX_VALUE) configs = null
+                            if(configs[i]!!.toInt() == UShort.MAX_VALUE.toInt()) configs = null
                         }
                         if(opcode == 18) {
                             configs[size + 1] = lastEntry

@@ -266,9 +266,9 @@ class NpcConfig @ExperimentalUnsignedTypes constructor(
                     103 -> rotation = buffer.uShort
                     106, 118 -> {
                         varpId = buffer.uShort
-                        if(varpId == UShort.MAX_VALUE) varpId = null
+                        if(varpId.toInt() == UShort.MAX_VALUE.toInt()) varpId = null
                         varp32Id = buffer.uShort
-                        if(varp32Id == UShort.MAX_VALUE) varp32Id = null
+                        if(varp32Id.toInt() == UShort.MAX_VALUE.toInt()) varp32Id = null
                         val lastEntry = if(opcode == 118) {
                             val entry = buffer.uShort
                             if(entry == UShort.MAX_VALUE) null else entry
@@ -277,7 +277,7 @@ class NpcConfig @ExperimentalUnsignedTypes constructor(
                         configs = arrayOfNulls(length + 2)
                         for(i in 0 until configs!!.size - 1) {
                             configs[i] = buffer.uShort
-                            if(configs[i] == UShort.MAX_VALUE) configs = null
+                            if(configs[i]!!.toInt() == UShort.MAX_VALUE.toInt()) configs = null
                         }
                         if(opcode == 92) {
                             configs[length + 1] = lastEntry
