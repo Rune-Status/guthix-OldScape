@@ -267,19 +267,23 @@ class NpcConfig @ExperimentalUnsignedTypes constructor(
                     106, 118 -> {
                         varpId = buffer.uShort
                         if(varpId.toInt() == UShort.MAX_VALUE.toInt()) varpId = null
+
                         varp32Id = buffer.uShort
                         if(varp32Id.toInt() == UShort.MAX_VALUE.toInt()) varp32Id = null
+
                         val lastEntry = if(opcode == 118) {
                             val entry = buffer.uShort
                             if(entry == UShort.MAX_VALUE) null else entry
                         } else null
+
                         val length = buffer.uByte.toInt()
                         configs = arrayOfNulls(length + 2)
-                        for(i in 0 until configs!!.size - 1) {
-                            configs[i] = buffer.uShort
-                            if(configs[i]!!.toInt() == UShort.MAX_VALUE.toInt()) configs = null
+                        for(i in 0 until configs.size - 1) {
+                            var config: UShort? = buffer.uShort
+                            if(config!!.toInt() == UShort.MAX_VALUE.toInt()) config = null
+                            configs[i] = config
                         }
-                        if(opcode == 92) {
+                        if(opcode == 118) {
                             configs[length + 1] = lastEntry
                         }
                     }

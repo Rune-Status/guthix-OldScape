@@ -158,9 +158,10 @@ class HitMarkConfig @ExperimentalUnsignedTypes constructor(
                         } else null
                         val size = buffer.uByte.toInt()
                         configs = arrayOfNulls(size + 2)
-                        for(i in 0 until configs!!.size - 1) {
-                            configs[i] = buffer.uShort
-                            if(configs[i]!!.toInt() == UShort.MAX_VALUE.toInt()) configs = null
+                        for(i in 0 until configs.size - 1) {
+                            var config: UShort? = buffer.uShort
+                            if(config!!.toInt() == UShort.MAX_VALUE.toInt()) config = null
+                            configs[i] = config
                         }
                         if(opcode == 18) {
                             configs[size + 1] = lastEntry
