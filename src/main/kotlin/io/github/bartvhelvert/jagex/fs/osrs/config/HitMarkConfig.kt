@@ -21,7 +21,7 @@ class HitMarkConfig @ExperimentalUnsignedTypes constructor(
     val field3365: Short,
     val field3361: Short,
     val field3354: UShort?,
-    val field3363: String,
+    val field3363: String?,
     val field3360: UByte?,
     val field3347: Short,
     val varpId: UShort?,
@@ -60,7 +60,7 @@ class HitMarkConfig @ExperimentalUnsignedTypes constructor(
                 os.writeOpcode(7)
                 os.writeShort(field3365.toInt())
             }
-            if(field3363 != "") {
+            if(field3363 != "" && field3363 != null) {
                 os.writeOpcode(8)
                 os.writeString(field3363)
             }
@@ -122,7 +122,7 @@ class HitMarkConfig @ExperimentalUnsignedTypes constructor(
             var field3365: Short = 0
             var field3361: Short = 0
             var field3354: UShort? = null
-            var field3363 = ""
+            var field3363: String? = ""
             var field3360: UByte? = null
             var field3347: Short = 0
             var varpId: UShort? = null
@@ -140,7 +140,7 @@ class HitMarkConfig @ExperimentalUnsignedTypes constructor(
                     5 -> field3357 = buffer.nullableSmart
                     6 -> field3359 = buffer.nullableSmart
                     7 -> field3365 = buffer.short
-                    8 -> field3363 = buffer.string
+                    8 -> field3363 = buffer.nullableString
                     9 -> field3355 = buffer.uShort
                     10 -> field3361 = buffer.short
                     11 -> field3354 = 0u
