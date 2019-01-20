@@ -145,7 +145,7 @@ class SequenceConfig @ExperimentalUnsignedTypes constructor(
                         val length = buffer.uByte.toInt()
                         interleaveLeave = IntArray(length + 1)
                         for(i in 0 until length) {
-                            interleaveLeave[i] = buffer.uShort.toInt()
+                            interleaveLeave[i] = buffer.uByte.toInt()
                         }
                         interleaveLeave[length] = 9999999
                     }
