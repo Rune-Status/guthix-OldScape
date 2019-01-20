@@ -8,8 +8,8 @@ import java.io.DataOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 
-class NpcConfig @ExperimentalUnsignedTypes constructor(
-    id: Int,
+data class NpcConfig @ExperimentalUnsignedTypes constructor(
+    override val id: Int,
     val name: String,
     val size: UByte,
     val combatLevel: UShort?,
@@ -172,6 +172,87 @@ class NpcConfig @ExperimentalUnsignedTypes constructor(
             os.writeOpcode(0)
         }
         return ByteBuffer.wrap(byteStr.toByteArray())
+    }
+
+    @ExperimentalUnsignedTypes
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is NpcConfig) return false
+        if (id != other.id) return false
+        if (name != other.name) return false
+        if (size != other.size) return false
+        if (combatLevel != other.combatLevel) return false
+        if (varpId != other.varpId) return false
+        if (varp32Id != other.varp32Id) return false
+        if (isInteractable != other.isInteractable) return false
+        if (drawMapDot != other.drawMapDot) return false
+        if (isClickable != other.isClickable) return false
+        if (rotation != other.rotation) return false
+        if (headIcon != other.headIcon) return false
+        if (!options.contentEquals(other.options)) return false
+        if (stanceAnimation != other.stanceAnimation) return false
+        if (walkAnimation != other.walkAnimation) return false
+        if (rotate90RightAnimation != other.rotate90RightAnimation) return false
+        if (rotate90LeftAnimation != other.rotate90LeftAnimation) return false
+        if (rotate180Animation != other.rotate180Animation) return false
+        if (anInt2165 != other.anInt2165) return false
+        if (anInt2189 != other.anInt2189) return false
+        if (colorReplace != other.colorReplace) return false
+        if (colorFind != other.colorFind) return false
+        if (textureReplace != other.textureReplace) return false
+        if (textureFind != other.textureFind) return false
+        if (models != other.models) return false
+        if (models2 != other.models2) return false
+        if (resizeX != other.resizeX) return false
+        if (resizeY != other.resizeY) return false
+        if (contrast != other.contrast) return false
+        if (ambient != other.ambient) return false
+        if (hasRenderPriority != other.hasRenderPriority) return false
+        if (configs != null) {
+            if (other.configs == null) return false
+            if (!configs.contentEquals(other.configs)) return false
+        } else if (other.configs != null) return false
+        if (aBool2190 != other.aBool2190) return false
+        if (params != other.params) return false
+        return true
+    }
+
+    @ExperimentalUnsignedTypes
+    override fun hashCode(): Int {
+        var result = id
+        result = 31 * result + name.hashCode()
+        result = 31 * result + size.hashCode()
+        result = 31 * result + (combatLevel?.hashCode() ?: 0)
+        result = 31 * result + (varpId?.hashCode() ?: 0)
+        result = 31 * result + (varp32Id?.hashCode() ?: 0)
+        result = 31 * result + isInteractable.hashCode()
+        result = 31 * result + drawMapDot.hashCode()
+        result = 31 * result + isClickable.hashCode()
+        result = 31 * result + rotation.hashCode()
+        result = 31 * result + (headIcon?.hashCode() ?: 0)
+        result = 31 * result + options.contentHashCode()
+        result = 31 * result + (stanceAnimation?.hashCode() ?: 0)
+        result = 31 * result + (walkAnimation?.hashCode() ?: 0)
+        result = 31 * result + (rotate90RightAnimation?.hashCode() ?: 0)
+        result = 31 * result + (rotate90LeftAnimation?.hashCode() ?: 0)
+        result = 31 * result + (rotate180Animation?.hashCode() ?: 0)
+        result = 31 * result + (anInt2165?.hashCode() ?: 0)
+        result = 31 * result + (anInt2189?.hashCode() ?: 0)
+        result = 31 * result + (colorReplace?.hashCode() ?: 0)
+        result = 31 * result + (colorFind?.hashCode() ?: 0)
+        result = 31 * result + (textureReplace?.hashCode() ?: 0)
+        result = 31 * result + (textureFind?.hashCode() ?: 0)
+        result = 31 * result + (models?.hashCode() ?: 0)
+        result = 31 * result + (models2?.hashCode() ?: 0)
+        result = 31 * result + resizeX.hashCode()
+        result = 31 * result + resizeY.hashCode()
+        result = 31 * result + contrast
+        result = 31 * result + ambient
+        result = 31 * result + hasRenderPriority.hashCode()
+        result = 31 * result + (configs?.contentHashCode() ?: 0)
+        result = 31 * result + aBool2190.hashCode()
+        result = 31 * result + (params?.hashCode() ?: 0)
+        return result
     }
 
     companion object : ConfigCompanion<NpcConfig>() {

@@ -8,7 +8,7 @@ import io.github.bartvhelvert.jagex.fs.osrs.config.*
 import java.io.DataOutputStream
 import java.nio.ByteBuffer
 
-class ConfigDictionary(
+data class ConfigDictionary(
     val areaConfigs: Map<Int, AreaConfig>,
     val enumConfigs: Map<Int, EnumConfig>,
     val hitBarConfig: Map<Int, HitBarConfig>,
@@ -57,7 +57,7 @@ class ConfigDictionary(
     }
 }
 
-abstract class Config(val id: Int) {
+abstract class Config(open val id: Int) {
     abstract fun encode(): ByteBuffer
 
     protected fun DataOutputStream.writeOpcode(opcode: Int) = writeByte(opcode)

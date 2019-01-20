@@ -10,8 +10,8 @@ import java.io.IOException
 import java.nio.ByteBuffer
 
 
-class SpotAnimConfig @ExperimentalUnsignedTypes constructor(
-    id: Int,
+data class SpotAnimConfig @ExperimentalUnsignedTypes constructor(
+    override val id: Int,
     val animationId: UShort?,
     val rotation: UShort,
     val resizeY: UShort,

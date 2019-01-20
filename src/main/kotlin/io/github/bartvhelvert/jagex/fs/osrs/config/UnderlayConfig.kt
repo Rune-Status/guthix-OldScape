@@ -8,8 +8,7 @@ import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
 import java.io.IOException
 import java.nio.ByteBuffer
 
-
-class UnderlayConfig(id: Int, val color: Int) : Config(id) {
+data class UnderlayConfig(override val id: Int, val color: Int) : Config(id) {
     override fun encode(): ByteBuffer = if(color != 0) {
         ByteBuffer.allocate(2).apply {
             put(1)

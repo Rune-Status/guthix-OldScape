@@ -11,8 +11,8 @@ import java.io.DataOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 
-class SequenceConfig @ExperimentalUnsignedTypes constructor(
-    id: Int,
+data class SequenceConfig @ExperimentalUnsignedTypes constructor(
+    override val id: Int,
     val frameIds: IntArray?,
     val field3048: IntArray?,
     val frameLengths: UShortArray?,
@@ -106,6 +106,60 @@ class SequenceConfig @ExperimentalUnsignedTypes constructor(
             os.writeOpcode(0)
         }
         return ByteBuffer.wrap(byteStr.toByteArray())
+    }
+
+    @ExperimentalUnsignedTypes
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is SequenceConfig) return false
+        if (id != other.id) return false
+        if (frameIds != null) {
+            if (other.frameIds == null) return false
+            if (!frameIds.contentEquals(other.frameIds)) return false
+        } else if (other.frameIds != null) return false
+        if (field3048 != null) {
+            if (other.field3048 == null) return false
+            if (!field3048.contentEquals(other.field3048)) return false
+        } else if (other.field3048 != null) return false
+        if (frameLengths != other.frameLengths) return false
+        if (interleaveLeave != null) {
+            if (other.interleaveLeave == null) return false
+            if (!interleaveLeave.contentEquals(other.interleaveLeave)) return false
+        } else if (other.interleaveLeave != null) return false
+        if (stretches != other.stretches) return false
+        if (forcedPriority != other.forcedPriority) return false
+        if (maxLoops != other.maxLoops) return false
+        if (field3056 != null) {
+            if (other.field3056 == null) return false
+            if (!field3056.contentEquals(other.field3056)) return false
+        } else if (other.field3056 != null) return false
+        if (precedenceAnimating != other.precedenceAnimating) return false
+        if (leftHandItem != other.leftHandItem) return false
+        if (rightHandItem != other.rightHandItem) return false
+        if (replyMode != other.replyMode) return false
+        if (frameStep != other.frameStep) return false
+        if (priority != other.priority) return false
+        return true
+    }
+
+    @ExperimentalUnsignedTypes
+    override fun hashCode(): Int {
+        var result = id
+        result = 31 * result + (frameIds?.contentHashCode() ?: 0)
+        result = 31 * result + (field3048?.contentHashCode() ?: 0)
+        result = 31 * result + (frameLengths?.hashCode() ?: 0)
+        result = 31 * result + (interleaveLeave?.contentHashCode() ?: 0)
+        result = 31 * result + stretches.hashCode()
+        result = 31 * result + forcedPriority.hashCode()
+        result = 31 * result + maxLoops.hashCode()
+        result = 31 * result + (field3056?.contentHashCode() ?: 0)
+        result = 31 * result + (precedenceAnimating?.hashCode() ?: 0)
+        result = 31 * result + (leftHandItem?.hashCode() ?: 0)
+        result = 31 * result + (rightHandItem?.hashCode() ?: 0)
+        result = 31 * result + replyMode.hashCode()
+        result = 31 * result + (frameStep?.hashCode() ?: 0)
+        result = 31 * result + (priority?.hashCode() ?: 0)
+        return result
     }
 
     companion object : ConfigCompanion<SequenceConfig>() {

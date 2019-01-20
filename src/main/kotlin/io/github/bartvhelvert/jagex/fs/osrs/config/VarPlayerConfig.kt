@@ -7,7 +7,7 @@ import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
 import java.io.IOException
 import java.nio.ByteBuffer
 
-class VarPlayerConfig @ExperimentalUnsignedTypes constructor(id: Int, val type: UShort) : Config(id) {
+data class VarPlayerConfig @ExperimentalUnsignedTypes constructor(override val id: Int, val type: UShort) : Config(id) {
     @ExperimentalUnsignedTypes
     override fun encode(): ByteBuffer = if(type.toInt() != 0) {
         ByteBuffer.allocate(2).apply {

@@ -12,8 +12,8 @@ import java.io.IOException
 import java.nio.ByteBuffer
 
 
-class EnumConfig(
-    id: Int,
+data class EnumConfig(
+    override val id: Int,
     val keyType: Char,
     val valType: Char,
     val defaultString: String,

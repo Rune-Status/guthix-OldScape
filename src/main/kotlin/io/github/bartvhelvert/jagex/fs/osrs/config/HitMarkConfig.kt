@@ -9,8 +9,8 @@ import java.io.IOException
 import java.nio.ByteBuffer
 
 
-class HitMarkConfig @ExperimentalUnsignedTypes constructor(
-    id: Int,
+data class HitMarkConfig @ExperimentalUnsignedTypes constructor(
+    override val id: Int,
     val field3353: Int?,
     val field3364: Int,
     val field3355: UShort,
@@ -105,6 +105,55 @@ class HitMarkConfig @ExperimentalUnsignedTypes constructor(
             os.writeOpcode(0)
         }
         return ByteBuffer.wrap(byteStr.toByteArray())
+    }
+
+    @ExperimentalUnsignedTypes
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is HitMarkConfig) return false
+        if (id != other.id) return false
+        if (field3353 != other.field3353) return false
+        if (field3364 != other.field3364) return false
+        if (field3355 != other.field3355) return false
+        if (field3358 != other.field3358) return false
+        if (field3357 != other.field3357) return false
+        if (field3350 != other.field3350) return false
+        if (field3359 != other.field3359) return false
+        if (field3365 != other.field3365) return false
+        if (field3361 != other.field3361) return false
+        if (field3354 != other.field3354) return false
+        if (field3363 != other.field3363) return false
+        if (field3360 != other.field3360) return false
+        if (field3347 != other.field3347) return false
+        if (varpId != other.varpId) return false
+        if (varp32Id != other.varp32Id) return false
+        if (configs != null) {
+            if (other.configs == null) return false
+            if (!configs.contentEquals(other.configs)) return false
+        } else if (other.configs != null) return false
+        return true
+    }
+
+    @ExperimentalUnsignedTypes
+    override fun hashCode(): Int {
+        var result = id
+        result = 31 * result + (field3353 ?: 0)
+        result = 31 * result + field3364
+        result = 31 * result + field3355.hashCode()
+        result = 31 * result + (field3358 ?: 0)
+        result = 31 * result + (field3357 ?: 0)
+        result = 31 * result + (field3350 ?: 0)
+        result = 31 * result + (field3359 ?: 0)
+        result = 31 * result + field3365
+        result = 31 * result + field3361
+        result = 31 * result + (field3354?.hashCode() ?: 0)
+        result = 31 * result + (field3363?.hashCode() ?: 0)
+        result = 31 * result + (field3360?.hashCode() ?: 0)
+        result = 31 * result + field3347
+        result = 31 * result + (varpId?.hashCode() ?: 0)
+        result = 31 * result + (varp32Id?.hashCode() ?: 0)
+        result = 31 * result + (configs?.contentHashCode() ?: 0)
+        return result
     }
 
     companion object : ConfigCompanion<HitMarkConfig>() {

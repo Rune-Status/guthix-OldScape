@@ -9,8 +9,8 @@ import java.io.IOException
 import java.nio.ByteBuffer
 
 
-class AreaConfig @ExperimentalUnsignedTypes constructor(
-    id: Int,
+data class AreaConfig @ExperimentalUnsignedTypes constructor(
+    override val id: Int,
     val spriteId: Int?,
     val field3032: Int?,
     val name: String?,
@@ -78,6 +78,51 @@ class AreaConfig @ExperimentalUnsignedTypes constructor(
             os.writeOpcode(0)
         }
         return ByteBuffer.wrap(byteStr.toByteArray())
+    }
+
+    @ExperimentalUnsignedTypes
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is AreaConfig) return false
+        if (spriteId != other.spriteId) return false
+        if (field3032 != other.field3032) return false
+        if (name != other.name) return false
+        if (field3033 != other.field3033) return false
+        if (field3034 != other.field3034) return false
+        if (shortArray != null) {
+            if (other.shortArray == null) return false
+            if (!shortArray.contentEquals(other.shortArray)) return false
+        } else if (other.shortArray != null) return false
+        if (aString1970 != other.aString1970) return false
+        if (flags != other.flags) return false
+        if (intarray35 != null) {
+            if (other.intarray35 == null) return false
+            if (!intarray35.contentEquals(other.intarray35)) return false
+        } else if (other.intarray35 != null) return false
+        if (anInt1980 != other.anInt1980) return false
+        if (byteArray33 != null) {
+            if (other.byteArray33 == null) return false
+            if (!byteArray33.contentEquals(other.byteArray33)) return false
+        } else if (other.byteArray33 != null) return false
+        if (!stringArray.contentEquals(other.stringArray)) return false
+        return true
+    }
+
+    @ExperimentalUnsignedTypes
+    override fun hashCode(): Int {
+        var result = spriteId ?: 0
+        result = 31 * result + (field3032 ?: 0)
+        result = 31 * result + (name?.hashCode() ?: 0)
+        result = 31 * result + (field3033 ?: 0)
+        result = 31 * result + field3034.hashCode()
+        result = 31 * result + (shortArray?.contentHashCode() ?: 0)
+        result = 31 * result + (aString1970?.hashCode() ?: 0)
+        result = 31 * result + flags.hashCode()
+        result = 31 * result + (intarray35?.contentHashCode() ?: 0)
+        result = 31 * result + (anInt1980?.hashCode() ?: 0)
+        result = 31 * result + (byteArray33?.contentHashCode() ?: 0)
+        result = 31 * result + stringArray.contentHashCode()
+        return result
     }
 
     companion object : ConfigCompanion<AreaConfig>() {

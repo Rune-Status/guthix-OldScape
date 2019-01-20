@@ -6,7 +6,7 @@ import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
 import java.io.IOException
 import java.nio.ByteBuffer
 
-class VarClientIntConfig(id: Int, val isSerializable: Boolean) : Config(id) {
+data class VarClientIntConfig(override val id: Int, val isSerializable: Boolean) : Config(id) {
     override fun encode(): ByteBuffer = if(isSerializable) {
         ByteBuffer.allocate(2).apply {
             put(2)

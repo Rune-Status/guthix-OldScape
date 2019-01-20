@@ -7,7 +7,10 @@ import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
 import java.io.IOException
 import java.nio.ByteBuffer
 
-class InvConfig @ExperimentalUnsignedTypes constructor(id: Int, val capacity: UShort) : Config(id) {
+data class InvConfig @ExperimentalUnsignedTypes constructor(
+    override val id: Int,
+    val capacity: UShort
+) : Config(id) {
     @ExperimentalUnsignedTypes
     override fun encode(): ByteBuffer = if(capacity.toInt() != 0) {
         ByteBuffer.allocate(4).apply {

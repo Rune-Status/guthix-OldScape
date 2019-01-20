@@ -10,7 +10,7 @@ import java.io.DataOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 
-class StructConfig(id: Int, val params: HashMap<Int, Any>?) : Config(id) {
+data class StructConfig(override val id: Int, val params: HashMap<Int, Any>?) : Config(id) {
     override fun encode(): ByteBuffer {
         val byteStr = ByteArrayOutputStream()
         DataOutputStream(byteStr).use { os ->

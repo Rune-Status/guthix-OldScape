@@ -8,8 +8,8 @@ import java.io.DataOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 
-class ItemConfig @ExperimentalUnsignedTypes constructor(
-    id: Int,
+data class ItemConfig @ExperimentalUnsignedTypes constructor(
+    override val id: Int,
     val name: String,
     val resizeX: UShort,
     val resizeY: UShort,
@@ -232,6 +232,118 @@ class ItemConfig @ExperimentalUnsignedTypes constructor(
             os.writeOpcode(0)
         }
         return ByteBuffer.wrap(byteStr.toByteArray())
+    }
+
+    @ExperimentalUnsignedTypes
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ItemConfig) return false
+        if (id != other.id) return false
+        if (name != other.name) return false
+        if (resizeX != other.resizeX) return false
+        if (resizeY != other.resizeY) return false
+        if (resizeZ != other.resizeZ) return false
+        if (xan2d != other.xan2d) return false
+        if (yan2d != other.yan2d) return false
+        if (zan2d != other.zan2d) return false
+        if (price != other.price) return false
+        if (isTradeable != other.isTradeable) return false
+        if (isStackable != other.isStackable) return false
+        if (inventoryModel != other.inventoryModel) return false
+        if (isMembersOnly != other.isMembersOnly) return false
+        if (colorFind != other.colorFind) return false
+        if (colorReplace != other.colorReplace) return false
+        if (textureFind != other.textureFind) return false
+        if (textureReplace != other.textureReplace) return false
+        if (zoom2d != other.zoom2d) return false
+        if (xOffset2d != other.xOffset2d) return false
+        if (yOffset2d != other.yOffset2d) return false
+        if (ambient != other.ambient) return false
+        if (contrast != other.contrast) return false
+        if (countCo != null) {
+            if (other.countCo == null) return false
+            if (!countCo.contentEquals(other.countCo)) return false
+        } else if (other.countCo != null) return false
+        if (countObj != null) {
+            if (other.countObj == null) return false
+            if (!countObj.contentEquals(other.countObj)) return false
+        } else if (other.countObj != null) return false
+        if (!groundActions.contentEquals(other.groundActions)) return false
+        if (!interfaceActions.contentEquals(other.interfaceActions)) return false
+        if (maleModel0 != other.maleModel0) return false
+        if (maleModel1 != other.maleModel1) return false
+        if (maleModel2 != other.maleModel2) return false
+        if (maleOffset != other.maleOffset) return false
+        if (maleHeadModel != other.maleHeadModel) return false
+        if (maleHeadModel2 != other.maleHeadModel2) return false
+        if (femaleModel0 != other.femaleModel0) return false
+        if (femaleModel1 != other.femaleModel1) return false
+        if (femaleModel2 != other.femaleModel2) return false
+        if (femaleOffset != other.femaleOffset) return false
+        if (femaleHeadModel != other.femaleHeadModel) return false
+        if (femaleHeadModel2 != other.femaleHeadModel2) return false
+        if (notedId != other.notedId) return false
+        if (notedTemplate != other.notedTemplate) return false
+        if (team != other.team) return false
+        if (shiftClickDropIndex != other.shiftClickDropIndex) return false
+        if (boughtId != other.boughtId) return false
+        if (boughtTemplate != other.boughtTemplate) return false
+        if (placeholderId != other.placeholderId) return false
+        if (placeholderTemplateId != other.placeholderTemplateId) return false
+        if (params != other.params) return false
+        return true
+    }
+
+    @ExperimentalUnsignedTypes
+    override fun hashCode(): Int {
+        var result = id
+        result = 31 * result + name.hashCode()
+        result = 31 * result + resizeX.hashCode()
+        result = 31 * result + resizeY.hashCode()
+        result = 31 * result + resizeZ.hashCode()
+        result = 31 * result + xan2d.hashCode()
+        result = 31 * result + yan2d.hashCode()
+        result = 31 * result + zan2d.hashCode()
+        result = 31 * result + price
+        result = 31 * result + isTradeable.hashCode()
+        result = 31 * result + isStackable.hashCode()
+        result = 31 * result + inventoryModel.hashCode()
+        result = 31 * result + isMembersOnly.hashCode()
+        result = 31 * result + (colorFind?.hashCode() ?: 0)
+        result = 31 * result + (colorReplace?.hashCode() ?: 0)
+        result = 31 * result + (textureFind?.hashCode() ?: 0)
+        result = 31 * result + (textureReplace?.hashCode() ?: 0)
+        result = 31 * result + zoom2d
+        result = 31 * result + xOffset2d
+        result = 31 * result + yOffset2d
+        result = 31 * result + ambient
+        result = 31 * result + contrast
+        result = 31 * result + (countCo?.contentHashCode() ?: 0)
+        result = 31 * result + (countObj?.contentHashCode() ?: 0)
+        result = 31 * result + groundActions.contentHashCode()
+        result = 31 * result + interfaceActions.contentHashCode()
+        result = 31 * result + (maleModel0?.hashCode() ?: 0)
+        result = 31 * result + (maleModel1?.hashCode() ?: 0)
+        result = 31 * result + (maleModel2?.hashCode() ?: 0)
+        result = 31 * result + maleOffset.hashCode()
+        result = 31 * result + (maleHeadModel?.hashCode() ?: 0)
+        result = 31 * result + (maleHeadModel2?.hashCode() ?: 0)
+        result = 31 * result + (femaleModel0?.hashCode() ?: 0)
+        result = 31 * result + (femaleModel1?.hashCode() ?: 0)
+        result = 31 * result + (femaleModel2?.hashCode() ?: 0)
+        result = 31 * result + femaleOffset.hashCode()
+        result = 31 * result + (femaleHeadModel?.hashCode() ?: 0)
+        result = 31 * result + (femaleHeadModel2?.hashCode() ?: 0)
+        result = 31 * result + (notedId?.hashCode() ?: 0)
+        result = 31 * result + (notedTemplate?.hashCode() ?: 0)
+        result = 31 * result + team.hashCode()
+        result = 31 * result + shiftClickDropIndex
+        result = 31 * result + (boughtId?.hashCode() ?: 0)
+        result = 31 * result + (boughtTemplate?.hashCode() ?: 0)
+        result = 31 * result + (placeholderId?.hashCode() ?: 0)
+        result = 31 * result + (placeholderTemplateId?.hashCode() ?: 0)
+        result = 31 * result + (params?.hashCode() ?: 0)
+        return result
     }
 
     companion object : ConfigCompanion<ItemConfig>() {

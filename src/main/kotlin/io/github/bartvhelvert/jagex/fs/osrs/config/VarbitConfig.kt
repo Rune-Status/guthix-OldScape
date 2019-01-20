@@ -8,8 +8,8 @@ import java.io.IOException
 import java.nio.ByteBuffer
 
 
-class VarbitConfig @ExperimentalUnsignedTypes constructor(
-    id: Int,
+data class VarbitConfig @ExperimentalUnsignedTypes constructor(
+    override val id: Int,
     val varpId: UShort,
     val lsb: UByte,
     val msb: UByte

@@ -9,8 +9,8 @@ import java.io.DataOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 
-class IdentKitConfig @ExperimentalUnsignedTypes constructor(
-    id: Int,
+data class IdentKitConfig @ExperimentalUnsignedTypes constructor(
+    override val id: Int,
     val colorFind: UShortArray?,
     val colorReplace: UShortArray?,
     val textureFind: UShortArray?,
@@ -59,6 +59,36 @@ class IdentKitConfig @ExperimentalUnsignedTypes constructor(
             os.writeOpcode(0)
         }
         return ByteBuffer.wrap(byteStr.toByteArray())
+    }
+
+    @ExperimentalUnsignedTypes
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is IdentKitConfig) return false
+        if (id != other.id) return false
+        if (colorFind != other.colorFind) return false
+        if (colorReplace != other.colorReplace) return false
+        if (textureFind != other.textureFind) return false
+        if (textureReplace != other.textureReplace) return false
+        if (bodyPartId != other.bodyPartId) return false
+        if (modelIds != other.modelIds) return false
+        if (!models.contentEquals(other.models)) return false
+        if (nonSelectable != other.nonSelectable) return false
+        return true
+    }
+
+    @ExperimentalUnsignedTypes
+    override fun hashCode(): Int {
+        var result = id
+        result = 31 * result + (colorFind?.hashCode() ?: 0)
+        result = 31 * result + (colorReplace?.hashCode() ?: 0)
+        result = 31 * result + (textureFind?.hashCode() ?: 0)
+        result = 31 * result + (textureReplace?.hashCode() ?: 0)
+        result = 31 * result + (bodyPartId?.hashCode() ?: 0)
+        result = 31 * result + (modelIds?.hashCode() ?: 0)
+        result = 31 * result + models.contentHashCode()
+        result = 31 * result + nonSelectable.hashCode()
+        return result
     }
 
     companion object : ConfigCompanion<IdentKitConfig>() {

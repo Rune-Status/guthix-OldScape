@@ -11,8 +11,8 @@ import java.io.DataOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 
-class HitBarConfig @ExperimentalUnsignedTypes constructor(
-    id: Int,
+data class HitBarConfig @ExperimentalUnsignedTypes constructor(
+    override val id: Int,
     val field3310: UByte,
     val field3307: UByte,
     val field3312: UShort?,

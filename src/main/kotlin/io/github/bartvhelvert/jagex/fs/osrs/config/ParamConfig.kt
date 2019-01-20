@@ -8,8 +8,8 @@ import java.io.DataOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 
-class ParamConfig(
-    id: Int,
+data class ParamConfig(
+    override val id: Int,
     val stackType: Char?,
     val autoDisable: Boolean,
     val defaultInt: Int?,

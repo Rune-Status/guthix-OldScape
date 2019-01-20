@@ -8,8 +8,8 @@ import java.io.DataOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 
-class ObjectConfig @ExperimentalUnsignedTypes constructor(
-    id: Int,
+data class ObjectConfig @ExperimentalUnsignedTypes constructor(
+    override val id: Int,
     val name: String,
     val width: UByte,
     val length: UByte,
@@ -219,6 +219,109 @@ class ObjectConfig @ExperimentalUnsignedTypes constructor(
             os.writeOpcode(0)
         }
         return ByteBuffer.wrap(byteStr.toByteArray())
+    }
+
+    @ExperimentalUnsignedTypes
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ObjectConfig) return false
+        if (id != other.id) return false
+        if (name != other.name) return false
+        if (width != other.width) return false
+        if (length != other.length) return false
+        if (varpId != other.varpId) return false
+        if (mapIconId != other.mapIconId) return false
+        if (varp32Id != other.varp32Id) return false
+        if (!options.contentEquals(other.options)) return false
+        if (clipType != other.clipType) return false
+        if (isClipped != other.isClipped) return false
+        if (modelClipped != other.modelClipped) return false
+        if (isHollow != other.isHollow) return false
+        if (impenetrable != other.impenetrable) return false
+        if (accessBlock != other.accessBlock) return false
+        if (objectModels != other.objectModels) return false
+        if (objectTypes != other.objectTypes) return false
+        if (colorReplace != other.colorReplace) return false
+        if (colorFind != other.colorFind) return false
+        if (textureFind != other.textureFind) return false
+        if (textureReplace != other.textureReplace) return false
+        if (anInt2088 != other.anInt2088) return false
+        if (animationId != other.animationId) return false
+        if (ambient != other.ambient) return false
+        if (contrast != other.contrast) return false
+        if (mapSceneId != other.mapSceneId) return false
+        if (modelSizeX != other.modelSizeX) return false
+        if (modelSizeHeight != other.modelSizeHeight) return false
+        if (modelSizeY != other.modelSizeY) return false
+        if (offsetX != other.offsetX) return false
+        if (offsetHeight != other.offsetHeight) return false
+        if (offsetY != other.offsetY) return false
+        if (decorDisplacement != other.decorDisplacement) return false
+        if (isMirrored != other.isMirrored) return false
+        if (obstructsGround != other.obstructsGround) return false
+        if (nonFlatShading != other.nonFlatShading) return false
+        if (contouredGround != other.contouredGround) return false
+        if (supportItems != other.supportItems) return false
+        if (configs != null) {
+            if (other.configs == null) return false
+            if (!configs.contentEquals(other.configs)) return false
+        } else if (other.configs != null) return false
+        if (ambientSoundId != other.ambientSoundId) return false
+        if (anInt2112 != other.anInt2112) return false
+        if (anInt2113 != other.anInt2113) return false
+        if (anInt2083 != other.anInt2083) return false
+        if (anIntArray2084 != other.anIntArray2084) return false
+        if (params != other.params) return false
+        return true
+    }
+
+    @ExperimentalUnsignedTypes
+    override fun hashCode(): Int {
+        var result = id
+        result = 31 * result + name.hashCode()
+        result = 31 * result + width.hashCode()
+        result = 31 * result + length.hashCode()
+        result = 31 * result + (varpId?.hashCode() ?: 0)
+        result = 31 * result + (mapIconId?.hashCode() ?: 0)
+        result = 31 * result + (varp32Id?.hashCode() ?: 0)
+        result = 31 * result + options.contentHashCode()
+        result = 31 * result + clipType
+        result = 31 * result + isClipped.hashCode()
+        result = 31 * result + modelClipped.hashCode()
+        result = 31 * result + isHollow.hashCode()
+        result = 31 * result + impenetrable.hashCode()
+        result = 31 * result + accessBlock.hashCode()
+        result = 31 * result + (objectModels?.hashCode() ?: 0)
+        result = 31 * result + (objectTypes?.hashCode() ?: 0)
+        result = 31 * result + (colorReplace?.hashCode() ?: 0)
+        result = 31 * result + (colorFind?.hashCode() ?: 0)
+        result = 31 * result + (textureFind?.hashCode() ?: 0)
+        result = 31 * result + (textureReplace?.hashCode() ?: 0)
+        result = 31 * result + (anInt2088?.hashCode() ?: 0)
+        result = 31 * result + (animationId?.hashCode() ?: 0)
+        result = 31 * result + ambient
+        result = 31 * result + contrast
+        result = 31 * result + (mapSceneId?.hashCode() ?: 0)
+        result = 31 * result + modelSizeX.hashCode()
+        result = 31 * result + modelSizeHeight.hashCode()
+        result = 31 * result + modelSizeY.hashCode()
+        result = 31 * result + offsetX
+        result = 31 * result + offsetHeight
+        result = 31 * result + offsetY
+        result = 31 * result + decorDisplacement.hashCode()
+        result = 31 * result + isMirrored.hashCode()
+        result = 31 * result + obstructsGround.hashCode()
+        result = 31 * result + nonFlatShading.hashCode()
+        result = 31 * result + (contouredGround ?: 0)
+        result = 31 * result + (supportItems?.hashCode() ?: 0)
+        result = 31 * result + (configs?.contentHashCode() ?: 0)
+        result = 31 * result + (ambientSoundId?.hashCode() ?: 0)
+        result = 31 * result + anInt2112.hashCode()
+        result = 31 * result + anInt2113.hashCode()
+        result = 31 * result + anInt2083.hashCode()
+        result = 31 * result + (anIntArray2084?.hashCode() ?: 0)
+        result = 31 * result + (params?.hashCode() ?: 0)
+        return result
     }
 
     companion object : ConfigCompanion<ObjectConfig>() {

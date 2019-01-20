@@ -11,8 +11,8 @@ import java.io.DataOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 
-class OverlayConfig @ExperimentalUnsignedTypes constructor(
-    id: Int,
+data class OverlayConfig @ExperimentalUnsignedTypes constructor(
+    override val id: Int,
     val color: Color,
     val texture: UByte?,
     val isHidden: Boolean,
