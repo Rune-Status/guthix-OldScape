@@ -69,8 +69,8 @@ abstract class ConfigCompanion<out T: Config> {
     @ExperimentalUnsignedTypes
     fun load(archive: Archive): Map<Int, T> {
         val configs = mutableMapOf<Int, T>()
-        archive.attributes.fileAttributes.forEach {
-            configs[it.key] = decode(it.key, archive.fileData[it.key])
+        archive.files.forEach{ fileId, file ->
+            configs[fileId] = decode(fileId, file.data)
         }
         return configs
     }
