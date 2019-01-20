@@ -7,14 +7,12 @@ version '0.1-DEV'
 
 repositories {
     mavenCentral()
-    flatDir {
-        dirs 'libs'
-    }
+    mavenLocal()
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    compile name: 'Jagex-Filesystem-0.1-DEV'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "io.github.bartvhelvert.jagex:Jagex-Filesystem:0.1-DEV"
 }
 
 compileKotlin {
