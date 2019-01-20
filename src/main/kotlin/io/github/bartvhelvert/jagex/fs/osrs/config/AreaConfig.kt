@@ -110,7 +110,7 @@ class AreaConfig @ExperimentalUnsignedTypes constructor(
                     6 -> field3034 = buffer.uByte
                     7 -> flags = buffer.uByte
                     8 -> buffer.uByte
-                    in 10..14 -> stringArray[opcode - 30] = buffer.string
+                    in 10..14 -> stringArray[opcode - 10] = buffer.string
                     15 -> {
                         val size = buffer.uByte.toInt()
                         shortArray = ShortArray(size * 2) {
