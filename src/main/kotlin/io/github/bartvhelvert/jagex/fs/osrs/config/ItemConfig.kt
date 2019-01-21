@@ -14,27 +14,27 @@ data class ItemConfig @ExperimentalUnsignedTypes constructor(
     val resizeX: UShort,
     val resizeY: UShort,
     val resizeZ: UShort,
-    val xan2d: UShort,
-    val yan2d: UShort,
-    val zan2d: UShort,
-    val price: Int,
-    val isTradeable: Boolean,
-    val isStackable: Boolean,
-    val inventoryModel: UShort,
-    val isMembersOnly: Boolean,
+    var xan2d: UShort,
+    var yan2d: UShort,
+    var zan2d: UShort,
+    var xoff2d: Short,
+    var yoff2d: Short,
+    var zoom2d: Int,
+    val cost: Int,
+    val tradable: Boolean,
+    val stackable: Boolean,
+    val model: UShort,
+    val members: Boolean,
     val colorFind: UShortArray?,
     val colorReplace: UShortArray?,
     val textureFind: UShortArray?,
     val textureReplace: UShortArray?,
-    val zoom2d: Int,
-    val xOffset2d: Short,
-    val yOffset2d: Short,
     val ambient: Int,
     val contrast: Int,
     val countCo: Array<UShort?>?,
     val countObj: Array<UShort?>?,
     val groundActions: Array<String?>,
-    val interfaceActions: Array<String?>,
+    val iop: Array<String?>,
     val maleModel0: UShort?,
     val maleModel1: UShort?,
     val maleModel2: UShort?,
@@ -61,9 +61,9 @@ data class ItemConfig @ExperimentalUnsignedTypes constructor(
     override fun encode(): ByteBuffer {
         val byteStr = ByteArrayOutputStream()
         DataOutputStream(byteStr).use { os ->
-            if(inventoryModel.toInt() != 0) {
+            if(model.toInt() != 0) {
                 os.writeOpcode(1)
-                os.writeShort(inventoryModel.toInt())
+                os.writeShort(model.toInt())
             }
             if(name != "null") {
                 os.writeOpcode(2)
@@ -81,20 +81,20 @@ data class ItemConfig @ExperimentalUnsignedTypes constructor(
                 os.writeOpcode(6)
                 os.writeShort(yan2d.toInt())
             }
-            if(xOffset2d.toInt() != 0) {
+            if(xoff2d.toInt() != 0) {
                 os.writeOpcode(7)
-                if(xOffset2d < 0) os.writeShort(xOffset2d + 65536) else os.writeShort(xOffset2d.toInt())
+                if(xoff2d < 0) os.writeShort(xoff2d + 65536) else os.writeShort(xoff2d.toInt())
             }
-            if(yOffset2d.toInt() != 0) {
+            if(yoff2d.toInt() != 0) {
                 os.writeOpcode(8)
-                if(yOffset2d < 0) os.writeShort(yOffset2d + 65536) else os.writeShort(yOffset2d.toInt())
+                if(yoff2d < 0) os.writeShort(yoff2d + 65536) else os.writeShort(yoff2d.toInt())
             }
-            if(isStackable) os.writeOpcode(11)
-            if(price != 1) {
+            if(stackable) os.writeOpcode(11)
+            if(cost != 1) {
                 os.writeOpcode(12)
-                os.writeInt(price)
+                os.writeInt(cost)
             }
-            if(isMembersOnly) os.writeOpcode(16)
+            if(members) os.writeOpcode(16)
             maleModel0?.let {
                 os.writeOpcode(23)
                 os.writeShort(maleModel0.toInt())
@@ -119,7 +119,7 @@ data class ItemConfig @ExperimentalUnsignedTypes constructor(
                     os.writeString(str)
                 }
             }
-            interfaceActions.forEachIndexed { i, str ->
+            iop.forEachIndexed { i, str ->
                 if(str != null && str != "Hidden" && str != "Drop") {
                     os.writeOpcode(35 + i)
                     os.writeString(str)
@@ -145,7 +145,7 @@ data class ItemConfig @ExperimentalUnsignedTypes constructor(
                 os.writeOpcode(42)
                 os.writeByte(shiftClickDropIndex.toInt())
             }
-            if(isTradeable) os.writeOpcode(65)
+            if(tradable) os.writeOpcode(65)
             maleModel2?.let {
                 os.writeOpcode(78)
                 os.writeShort(maleModel2.toInt())
@@ -246,18 +246,18 @@ data class ItemConfig @ExperimentalUnsignedTypes constructor(
         if (xan2d != other.xan2d) return false
         if (yan2d != other.yan2d) return false
         if (zan2d != other.zan2d) return false
-        if (price != other.price) return false
-        if (isTradeable != other.isTradeable) return false
-        if (isStackable != other.isStackable) return false
-        if (inventoryModel != other.inventoryModel) return false
-        if (isMembersOnly != other.isMembersOnly) return false
+        if (xoff2d != other.xoff2d) return false
+        if (yoff2d != other.yoff2d) return false
+        if (zoom2d != other.zoom2d) return false
+        if (cost != other.cost) return false
+        if (tradable != other.tradable) return false
+        if (stackable != other.stackable) return false
+        if (model != other.model) return false
+        if (members != other.members) return false
         if (colorFind != other.colorFind) return false
         if (colorReplace != other.colorReplace) return false
         if (textureFind != other.textureFind) return false
         if (textureReplace != other.textureReplace) return false
-        if (zoom2d != other.zoom2d) return false
-        if (xOffset2d != other.xOffset2d) return false
-        if (yOffset2d != other.yOffset2d) return false
         if (ambient != other.ambient) return false
         if (contrast != other.contrast) return false
         if (countCo != null) {
@@ -269,7 +269,7 @@ data class ItemConfig @ExperimentalUnsignedTypes constructor(
             if (!countObj.contentEquals(other.countObj)) return false
         } else if (other.countObj != null) return false
         if (!groundActions.contentEquals(other.groundActions)) return false
-        if (!interfaceActions.contentEquals(other.interfaceActions)) return false
+        if (!iop.contentEquals(other.iop)) return false
         if (maleModel0 != other.maleModel0) return false
         if (maleModel1 != other.maleModel1) return false
         if (maleModel2 != other.maleModel2) return false
@@ -304,24 +304,24 @@ data class ItemConfig @ExperimentalUnsignedTypes constructor(
         result = 31 * result + xan2d.hashCode()
         result = 31 * result + yan2d.hashCode()
         result = 31 * result + zan2d.hashCode()
-        result = 31 * result + price
-        result = 31 * result + isTradeable.hashCode()
-        result = 31 * result + isStackable.hashCode()
-        result = 31 * result + inventoryModel.hashCode()
-        result = 31 * result + isMembersOnly.hashCode()
+        result = 31 * result + xoff2d
+        result = 31 * result + yoff2d
+        result = 31 * result + zoom2d
+        result = 31 * result + cost
+        result = 31 * result + tradable.hashCode()
+        result = 31 * result + stackable.hashCode()
+        result = 31 * result + model.hashCode()
+        result = 31 * result + members.hashCode()
         result = 31 * result + (colorFind?.hashCode() ?: 0)
         result = 31 * result + (colorReplace?.hashCode() ?: 0)
         result = 31 * result + (textureFind?.hashCode() ?: 0)
         result = 31 * result + (textureReplace?.hashCode() ?: 0)
-        result = 31 * result + zoom2d
-        result = 31 * result + xOffset2d
-        result = 31 * result + yOffset2d
         result = 31 * result + ambient
         result = 31 * result + contrast
         result = 31 * result + (countCo?.contentHashCode() ?: 0)
         result = 31 * result + (countObj?.contentHashCode() ?: 0)
         result = 31 * result + groundActions.contentHashCode()
-        result = 31 * result + interfaceActions.contentHashCode()
+        result = 31 * result + iop.contentHashCode()
         result = 31 * result + (maleModel0?.hashCode() ?: 0)
         result = 31 * result + (maleModel1?.hashCode() ?: 0)
         result = 31 * result + (maleModel2?.hashCode() ?: 0)
@@ -358,24 +358,24 @@ data class ItemConfig @ExperimentalUnsignedTypes constructor(
             var xan2d: UShort = 0u
             var yan2d: UShort = 0u
             var zan2d: UShort = 0u
-            var price = 1
-            var isTradeable = false
-            var isStackable = false
-            var inventoryModel: UShort = 0u
-            var isMembersOnly = false
+            var xoff2d: Short = 0
+            var yoff2d: Short = 0
+            var zoom2d = 200000
+            var cost = 1
+            var tradable = false
+            var stackable = false
+            var model: UShort = 0u
+            var members = false
             var colorFind: UShortArray? = null
             var colorReplace: UShortArray? = null
             var textureFind: UShortArray? = null
             var textureReplace: UShortArray? = null
-            var zoom2d = 200000
-            var xOffset2d: Short = 0
-            var yOffset2d: Short = 0
             var ambient = 0
             var contrast = 0
             var countCo: Array<UShort?>? = null
             var countObj: Array<UShort?>? = null
             val groundActions = arrayOf(null, null, "Take", null, null)
-            val interfaceActions= arrayOf(null, null, null, null, "Drop")
+            val iop= arrayOf(null, null, null, null, "Drop")
             var maleModel0: UShort? = null
             var maleModel1: UShort? = null
             var maleModel2: UShort? = null
@@ -402,14 +402,14 @@ data class ItemConfig @ExperimentalUnsignedTypes constructor(
                 val opcode = buffer.uByte.toInt()
                 when (opcode) {
                     0 -> break@decoder
-                    1 -> inventoryModel = buffer.uShort
+                    1 -> model = buffer.uShort
                     2 -> name = buffer.string
                     4 -> zoom2d = buffer.uShort.toInt()
                     5 -> xan2d = buffer.uShort
                     6 -> yan2d = buffer.uShort
                     7 -> {
                         val temp= buffer.uShort
-                        xOffset2d = if (temp.toInt() > Short.MAX_VALUE) {
+                        xoff2d = if (temp.toInt() > Short.MAX_VALUE) {
                             (temp.toInt() - 65536).toShort()
                         } else {
                             temp.toShort()
@@ -418,15 +418,15 @@ data class ItemConfig @ExperimentalUnsignedTypes constructor(
                     8 -> {
                         val temp= buffer.uShort
                         UShort.MAX_VALUE
-                        yOffset2d = if (temp.toInt() > Short.MAX_VALUE) {
+                        yoff2d = if (temp.toInt() > Short.MAX_VALUE) {
                             (temp.toInt() - 65536).toShort()
                         } else {
                             temp.toShort()
                         }
                     }
-                    11 -> isStackable = true
-                    12 -> price = buffer.int
-                    16 -> isMembersOnly = true
+                    11 -> stackable = true
+                    12 -> cost = buffer.int
+                    16 -> members = true
                     23 -> {
                         maleModel0 = buffer.uShort
                         maleOffset = buffer.uByte
@@ -438,7 +438,7 @@ data class ItemConfig @ExperimentalUnsignedTypes constructor(
                     }
                     26 -> femaleModel1 = buffer.uShort
                     in 30..34 -> groundActions[opcode - 30] = buffer.string.takeIf { it != "Hidden" }
-                    in 35..39 -> interfaceActions[opcode - 35] = buffer.string
+                    in 35..39 -> iop[opcode - 35] = buffer.string
                     40 -> {
                         val size = buffer.uByte.toInt()
                         colorFind = UShortArray(size)
@@ -458,7 +458,7 @@ data class ItemConfig @ExperimentalUnsignedTypes constructor(
                         }
                     }
                     42 -> shiftClickDropIndex = buffer.get()
-                    65 -> isTradeable = true
+                    65 -> tradable = true
                     78 -> maleModel2 = buffer.uShort
                     79 -> femaleModel2 = buffer.uShort
                     90 -> maleHeadModel = buffer.uShort
@@ -490,12 +490,12 @@ data class ItemConfig @ExperimentalUnsignedTypes constructor(
                     else -> throw IOException("Did not recognise opcode $opcode")
                 }
             }
-            return ItemConfig(id, name, resizeX, resizeY, resizeZ, xan2d, yan2d, zan2d, price, isTradeable, isStackable,
-                inventoryModel, isMembersOnly, colorFind, colorReplace, textureFind, textureReplace, zoom2d, xOffset2d,
-                yOffset2d, ambient, contrast, countCo, countObj, groundActions, interfaceActions, maleModel0, maleModel1,
-                maleModel2, maleOffset, maleHeadModel, maleHeadModel2, femaleModel0, femaleModel1, femaleModel2,
-                femaleOffset, femaleHeadModel, femaleHeadModel2, notedId, notedTemplate, team, shiftClickDropIndex,
-                boughtId, boughtTemplate, placeholderId, placeholderTemplateId, params
+            return ItemConfig(id, name, resizeX, resizeY, resizeZ, xan2d, yan2d, zan2d, xoff2d, yoff2d, zoom2d, cost,
+                tradable, stackable, model, members, colorFind, colorReplace, textureFind,
+                textureReplace, ambient, contrast, countCo, countObj, groundActions, iop, maleModel0,
+                maleModel1, maleModel2, maleOffset, maleHeadModel, maleHeadModel2, femaleModel0, femaleModel1,
+                femaleModel2, femaleOffset, femaleHeadModel, femaleHeadModel2, notedId, notedTemplate, team,
+                shiftClickDropIndex, boughtId, boughtTemplate, placeholderId, placeholderTemplateId, params
             )
 
         }
