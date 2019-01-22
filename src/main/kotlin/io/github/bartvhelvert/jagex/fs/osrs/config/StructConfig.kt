@@ -3,8 +3,6 @@ package io.github.bartvhelvert.jagex.fs.osrs.config
 import io.github.bartvhelvert.jagex.fs.io.params
 import io.github.bartvhelvert.jagex.fs.io.uByte
 import io.github.bartvhelvert.jagex.fs.io.writeParams
-import io.github.bartvhelvert.jagex.fs.osrs.Config
-import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.IOException

@@ -2,8 +2,6 @@ package io.github.bartvhelvert.jagex.fs.osrs.config
 
 import io.github.bartvhelvert.jagex.fs.io.uByte
 import io.github.bartvhelvert.jagex.fs.io.uShort
-import io.github.bartvhelvert.jagex.fs.osrs.Config
-import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
 import java.io.IOException
 import java.nio.ByteBuffer
 

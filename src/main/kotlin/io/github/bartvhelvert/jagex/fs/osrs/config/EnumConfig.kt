@@ -4,13 +4,10 @@ import io.github.bartvhelvert.jagex.fs.io.string
 import io.github.bartvhelvert.jagex.fs.io.uByte
 import io.github.bartvhelvert.jagex.fs.io.uShort
 import io.github.bartvhelvert.jagex.fs.io.writeString
-import io.github.bartvhelvert.jagex.fs.osrs.Config
-import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
-
 
 data class EnumConfig(
     override val id: Int,

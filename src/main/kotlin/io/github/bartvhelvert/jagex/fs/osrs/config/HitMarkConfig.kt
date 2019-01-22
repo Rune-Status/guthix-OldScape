@@ -1,13 +1,10 @@
 package io.github.bartvhelvert.jagex.fs.osrs.config
 
 import io.github.bartvhelvert.jagex.fs.io.*
-import io.github.bartvhelvert.jagex.fs.osrs.Config
-import io.github.bartvhelvert.jagex.fs.osrs.ConfigCompanion
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
-
 
 data class HitMarkConfig @ExperimentalUnsignedTypes constructor(
     override val id: Int,
