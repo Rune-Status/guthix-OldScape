@@ -1,9 +1,9 @@
 package io.github.bartvhelvert.jagex.fs.osrs.config
 
-import io.github.bartvhelvert.jagex.fs.io.nullableSmart
+import io.github.bartvhelvert.jagex.fs.io.nullableLargeSmart
 import io.github.bartvhelvert.jagex.fs.io.uByte
 import io.github.bartvhelvert.jagex.fs.io.uShort
-import io.github.bartvhelvert.jagex.fs.io.writeNullableSmart
+import io.github.bartvhelvert.jagex.fs.io.writeNullableLargeSmart
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.IOException
@@ -43,11 +43,11 @@ data class HitBarConfig @ExperimentalUnsignedTypes constructor(
             }
             field3315?.let {
                 os.writeOpcode(7)
-                os.writeNullableSmart(field3315)
+                os.writeNullableLargeSmart(field3315)
             }
             field3316?.let {
                 os.writeOpcode(8)
-                os.writeNullableSmart(field3316)
+                os.writeNullableLargeSmart(field3316)
             }
             field3312?.let {
                 os.writeOpcode(11)
@@ -91,8 +91,8 @@ data class HitBarConfig @ExperimentalUnsignedTypes constructor(
                     4 -> field3312 = 0u
                     5 -> field3313 = buffer.uShort
                     6 -> buffer.uByte
-                    7 -> field3315 = buffer.nullableSmart
-                    8 -> field3316 = buffer.nullableSmart
+                    7 -> field3315 = buffer.nullableLargeSmart
+                    8 -> field3316 = buffer.nullableLargeSmart
                     11 -> field3312 = buffer.uShort
                     14 -> healthScale = buffer.uByte
                     15 -> field3318 = buffer.uByte

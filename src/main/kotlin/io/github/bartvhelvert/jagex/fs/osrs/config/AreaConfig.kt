@@ -27,11 +27,11 @@ data class AreaConfig @ExperimentalUnsignedTypes constructor(
         DataOutputStream(byteStr).use { os ->
             spriteId?.let {
                 os.writeOpcode(1)
-                os.writeNullableSmart(spriteId)
+                os.writeNullableLargeSmart(spriteId)
             }
             field3032?.let {
                 os.writeOpcode(2)
-                os.writeNullableSmart(field3032)
+                os.writeNullableLargeSmart(field3032)
             }
             name?.let {
                 os.writeOpcode(3)
@@ -144,8 +144,8 @@ data class AreaConfig @ExperimentalUnsignedTypes constructor(
                 val opcode = buffer.uByte.toInt()
                 when (opcode) {
                     0 -> break@decoder
-                    1 -> spriteId = buffer.nullableSmart
-                    2 -> field3032 = buffer.nullableSmart
+                    1 -> spriteId = buffer.nullableLargeSmart
+                    2 -> field3032 = buffer.nullableLargeSmart
                     3 -> name = buffer.string
                     4 -> field3033 = buffer.uMedium
                     5 -> buffer.uMedium
@@ -168,13 +168,13 @@ data class AreaConfig @ExperimentalUnsignedTypes constructor(
                         }
                     }
                     17 -> aString1970 = buffer.string
-                    18 -> buffer.smart
+                    18 -> buffer.largeSmart
                     19 -> anInt1980 = buffer.uShort
                     21 -> buffer.int
                     22 -> buffer.int
                     23 -> repeat(3) { buffer.uByte }
                     24 -> repeat(2) { buffer.short }
-                    25 -> buffer.nullableSmart
+                    25 -> buffer.nullableLargeSmart
                     28 -> buffer.uByte
                     29 -> buffer.uByte
                     30 -> buffer.uByte

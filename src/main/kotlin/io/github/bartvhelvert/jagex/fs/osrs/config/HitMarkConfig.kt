@@ -31,7 +31,7 @@ data class HitMarkConfig @ExperimentalUnsignedTypes constructor(
         DataOutputStream(byteStr).use { os ->
             field3353?.let {
                 os.writeOpcode(1)
-                os.writeNullableSmart(field3353)
+                os.writeNullableLargeSmart(field3353)
             }
             if(field3364 != 16777215) {
                 os.writeOpcode(2)
@@ -39,19 +39,19 @@ data class HitMarkConfig @ExperimentalUnsignedTypes constructor(
             }
             field3358?.let {
                 os.writeOpcode(3)
-                os.writeNullableSmart(field3358)
+                os.writeNullableLargeSmart(field3358)
             }
             field3350?.let {
                 os.writeOpcode(4)
-                os.writeNullableSmart(field3350)
+                os.writeNullableLargeSmart(field3350)
             }
             field3357?.let {
                 os.writeOpcode(5)
-                os.writeNullableSmart(field3357)
+                os.writeNullableLargeSmart(field3357)
             }
             field3359?.let {
                 os.writeOpcode(6)
-                os.writeNullableSmart(field3359)
+                os.writeNullableLargeSmart(field3359)
             }
             if(field3365.toInt() != 0) {
                 os.writeOpcode(7)
@@ -179,12 +179,12 @@ data class HitMarkConfig @ExperimentalUnsignedTypes constructor(
                 val opcode = buffer.uByte.toInt()
                 when(opcode) {
                     0 -> break@decoder
-                    1 -> field3353 = buffer.nullableSmart
+                    1 -> field3353 = buffer.nullableLargeSmart
                     2 -> field3364 = buffer.uMedium
-                    3 -> field3358 = buffer.nullableSmart
-                    4 -> field3350 = buffer.nullableSmart
-                    5 -> field3357 = buffer.nullableSmart
-                    6 -> field3359 = buffer.nullableSmart
+                    3 -> field3358 = buffer.nullableLargeSmart
+                    4 -> field3350 = buffer.nullableLargeSmart
+                    5 -> field3357 = buffer.nullableLargeSmart
+                    6 -> field3359 = buffer.nullableLargeSmart
                     7 -> field3365 = buffer.short
                     8 -> field3363 = buffer.nullableString
                     9 -> field3355 = buffer.uShort

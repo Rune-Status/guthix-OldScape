@@ -3,10 +3,10 @@ package io.github.bartvhelvert.jagex.fs.osrs.dict
 import io.github.bartvhelvert.jagex.fs.Dictionary
 import io.github.bartvhelvert.jagex.fs.DictionaryCompanion
 import io.github.bartvhelvert.jagex.fs.JagexCache
-import io.github.bartvhelvert.jagex.fs.osrs.SoundFile
+import io.github.bartvhelvert.jagex.fs.osrs.sound.MidiFile
 
 class MusicTrackDictionary(
-    val tracks: List<SoundFile>
+    val tracks: List<MidiFile>
 ): Dictionary {
 
     companion object : DictionaryCompanion<MusicTrackDictionary>() {
@@ -14,9 +14,9 @@ class MusicTrackDictionary(
 
         @ExperimentalUnsignedTypes
         override fun load(cache: JagexCache): MusicTrackDictionary {
-            val tracks = mutableListOf<SoundFile>()
+            val tracks = mutableListOf<MidiFile>()
             cache.readContainers(id).forEach { id, container ->
-                tracks.add(SoundFile.decode(container.data))
+                tracks.add(MidiFile.decode(container.data))
             }
             return MusicTrackDictionary(tracks)
         }

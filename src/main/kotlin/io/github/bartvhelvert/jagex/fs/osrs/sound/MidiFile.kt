@@ -1,15 +1,15 @@
-package io.github.bartvhelvert.jagex.fs.osrs
+package io.github.bartvhelvert.jagex.fs.osrs.sound
 
 import io.github.bartvhelvert.jagex.fs.io.*
 import java.io.IOException
 import java.nio.ByteBuffer
 
-class SoundFile(
+class MidiFile(
     val midi: ByteArray
 ) {
     companion object {
         @ExperimentalUnsignedTypes
-        fun decode(buffer: ByteBuffer): SoundFile {
+        fun decode(buffer: ByteBuffer): MidiFile {
             buffer.position(buffer.limit() - 3)
             val tracks = buffer.uByte.toInt()
             val division = buffer.uShort.toInt()
@@ -211,7 +211,7 @@ class SoundFile(
                             }
                             JAG_CONTROL_CHANGE -> {
                                 if (shouldWriteOpcode) {
-                                    midiBuff.put((CONTROL_CHANGE  + var52).toByte())
+                                    midiBuff.put((CONTROL_CHANGE + var52).toByte())
                                 }
                                 controllerNumber = controllerNumber + buffer.array()[controlChangeIndex++] and
                                         Byte.MAX_VALUE.toInt()
@@ -258,33 +258,33 @@ class SoundFile(
                                 midiBuff.put((var67 and Byte.MAX_VALUE.toInt()).toByte())
                             }
                             JAG_PITCH_BEND -> {
-                                if (shouldWriteOpcode)  midiBuff.put((PITCH_WHEEL_CHANGE  + var52).toByte())
+                                if (shouldWriteOpcode)  midiBuff.put((PITCH_WHEEL_CHANGE + var52).toByte())
                                 var56 += buffer.array()[pitchWheelLowIndex++].toInt()
                                 var56 += buffer.array()[pitchWheelHighIndex++].toInt() shl 7
                                 midiBuff.put((var56 and Byte.MAX_VALUE.toInt()).toByte())
                                 midiBuff.put((var56 shr 7 and Byte.MAX_VALUE.toInt()).toByte())
                             }
                             JAG_CHANNEL_PRESSURE -> {
-                                if (shouldWriteOpcode) midiBuff.put((CHANNEL_PRESSURE  + var52).toByte())
+                                if (shouldWriteOpcode) midiBuff.put((CHANNEL_PRESSURE + var52).toByte())
                                 var57 += buffer.array()[channelPressureIndex++].toInt()
                                 midiBuff.put((var57 and Byte.MAX_VALUE.toInt()).toByte())
                             }
                             JAG_POLY_PRESSURE -> {
-                                if (shouldWriteOpcode) midiBuff.put((POLYPHONIC_KEY_PRESSURE  + var52).toByte())
+                                if (shouldWriteOpcode) midiBuff.put((POLYPHONIC_KEY_PRESSURE + var52).toByte())
                                 var53 += buffer.array()[notesIndex++].toInt()
                                 var58 += buffer.array()[polyPressureIndex++].toInt()
                                 midiBuff.put((var53 and Byte.MAX_VALUE.toInt()).toByte())
                                 midiBuff.put((var58 and Byte.MAX_VALUE.toInt()).toByte())
                             }
                             JAG_PROGRAM_CHANGE -> {
-                                if (shouldWriteOpcode) midiBuff.put((PROGRAM_CHANGE  + var52).toByte())
+                                if (shouldWriteOpcode) midiBuff.put((PROGRAM_CHANGE + var52).toByte())
                                 midiBuff.put(buffer.array()[programChangeIndex++])
                             } else -> throw IOException("Did not recognise jag track opcode $curJagOpcode")
                         }
                     }
                 }
             }
-            return SoundFile(midiBuff.array())
+            return MidiFile(midiBuff.array())
         }
 
         private fun ByteBuffer.writeLength(length: Int) {
