@@ -15,8 +15,10 @@ class MusicTrackDictionary(
         @ExperimentalUnsignedTypes
         override fun load(cache: JagexCache): MusicTrackDictionary {
             val tracks = mutableListOf<MidiFile>()
-            cache.readContainers(id).forEach { id, container ->
-                tracks.add(MidiFile.decode(container.data))
+            cache.readArchives(id).forEach { _, archive ->
+                archive.files.forEach { _, file ->
+                    tracks.add(MidiFile.decode(file.data))
+                }
             }
             return MusicTrackDictionary(tracks)
         }

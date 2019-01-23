@@ -8,6 +8,54 @@ class MidiFile(
     val midi: ByteArray
 ) {
     companion object {
+
+        // Headers
+        private const val MTHD_MAGIC = 1297377380
+        private const val MTRK_MAGIC = 1297379947
+
+        // Major MIDI Messages. Bottom 4 bits are the channel.
+        private const val NOTE_ON = 144
+        private const val NOTE_OFF = 128
+        private const val CONTROL_CHANGE = 176
+        private const val PITCH_WHEEL_CHANGE = 224
+        private const val CHANNEL_PRESSURE = 208
+        private const val POLYPHONIC_KEY_PRESSURE = 160
+        private const val PROGRAM_CHANGE = 192
+
+        // Meta Events
+        private const val META = 255
+        private const val END_OF_TRACK = 47
+        private const val TEMPO = 81
+
+        private const val JAG_NOTE_ON = 0
+        private const val JAG_NOTE_OFF = 1
+        private const val JAG_CONTROL_CHANGE = 2
+        private const val JAG_PITCH_BEND = 3
+        private const val JAG_CHANNEL_PRESSURE = 4
+        private const val JAG_POLY_PRESSURE = 5
+        private const val JAG_PROGRAM_CHANGE = 6
+        private const val JAG_END_OF_TRACK = 7
+        private const val JAG_TEMPO = 23
+
+        // Controller messages
+        private const val CONTROLLER_BANK_SELECT = 0
+        private const val CONTROLLER_MODULATION_WHEEL = 1
+        private const val CONTROLLER_CHANNEL_VOLUME = 7
+        private const val CONTROLLER_PAN = 10
+        private const val CONTROLLER_BANK_SELECT_2 = 32
+        private const val CONTROLLER_MODULATION_WHEEL2 = 33
+        private const val CONTROLLER_CHANNEL_VOLUME_2 = 39
+        private const val CONTROLLER_PAN_2 = 42
+        private const val CONTROLLER_DAMPER_PEDAL = 64
+        private const val CONTROLLER_PORTAMENTO = 65
+        private const val CONTROLLER_NON_REGISTERED_PARAMETER_NUMBER_LSB = 98
+        private const val CONTROLLER_NON_REGISTERED_PARAMETER_NUMBER_MSB = 99
+        private const val CONTROLLER_REGISTERED_PARAMETER_NUMBER_LSB = 100
+        private const val CONTROLLER_REGISTERED_PARAMETER_NUMBER_MSB = 101
+        private const val CONTROLLER_ALL_SOUND_OFF = 120
+        private const val CONTROLLER_RESET_ALL_CONTROLLERS = 121
+        private const val CONTROLLER_ALL_NOTES_OFF = 123
+
         @ExperimentalUnsignedTypes
         fun decode(buffer: ByteBuffer): MidiFile {
             buffer.position(buffer.limit() - 3)
@@ -293,52 +341,5 @@ class MidiFile(
             putInt(length)
             position(pos)
         }
-
-        // Headers
-        private const val MTHD_MAGIC = 1297377380
-        private const val MTRK_MAGIC = 1297379947
-
-        // Major MIDI Messages. Bottom 4 bits are the channel.
-        private const val NOTE_ON = 144
-        private const val NOTE_OFF = 128
-        private const val CONTROL_CHANGE = 176
-        private const val PITCH_WHEEL_CHANGE = 224
-        private const val CHANNEL_PRESSURE = 208
-        private const val POLYPHONIC_KEY_PRESSURE = 160
-        private const val PROGRAM_CHANGE = 192
-
-        // Meta Events
-        private const val META = 255
-        private const val END_OF_TRACK = 47
-        private const val TEMPO = 81
-
-        private const val JAG_NOTE_ON = 0
-        private const val JAG_NOTE_OFF = 1
-        private const val JAG_CONTROL_CHANGE = 2
-        private const val JAG_PITCH_BEND = 3
-        private const val JAG_CHANNEL_PRESSURE = 4
-        private const val JAG_POLY_PRESSURE = 5
-        private const val JAG_PROGRAM_CHANGE = 6
-        private const val JAG_END_OF_TRACK = 7
-        private const val JAG_TEMPO = 23
-
-        // Controller messages
-        private const val CONTROLLER_BANK_SELECT = 0
-        private const val CONTROLLER_MODULATION_WHEEL = 1
-        private const val CONTROLLER_CHANNEL_VOLUME = 7
-        private const val CONTROLLER_PAN = 10
-        private const val CONTROLLER_BANK_SELECT_2 = 32
-        private const val CONTROLLER_MODULATION_WHEEL2 = 33
-        private const val CONTROLLER_CHANNEL_VOLUME_2 = 39
-        private const val CONTROLLER_PAN_2 = 42
-        private const val CONTROLLER_DAMPER_PEDAL = 64
-        private const val CONTROLLER_PORTAMENTO = 65
-        private const val CONTROLLER_NON_REGISTERED_PARAMETER_NUMBER_LSB = 98
-        private const val CONTROLLER_NON_REGISTERED_PARAMETER_NUMBER_MSB = 99
-        private const val CONTROLLER_REGISTERED_PARAMETER_NUMBER_LSB = 100
-        private const val CONTROLLER_REGISTERED_PARAMETER_NUMBER_MSB = 101
-        private const val CONTROLLER_ALL_SOUND_OFF = 120
-        private const val CONTROLLER_RESET_ALL_CONTROLLERS = 121
-        private const val CONTROLLER_ALL_NOTES_OFF = 123
     }
 }
