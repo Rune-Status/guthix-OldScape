@@ -12,7 +12,7 @@ class MusicJingleDictionary(
         override val id = 11
 
         @ExperimentalUnsignedTypes
-        override fun load(cache: JagexCache): MusicTrackDictionary {
+        fun load(cache: JagexCache): MusicTrackDictionary {
             val tracks = mutableListOf<MidiFile>()
             cache.readArchives(MusicTrackDictionary.id).forEach { _, archive ->
                 archive.files.forEach { _, file ->

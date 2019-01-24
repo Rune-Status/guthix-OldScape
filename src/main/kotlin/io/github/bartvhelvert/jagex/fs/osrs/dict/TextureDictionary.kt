@@ -13,7 +13,7 @@ class TextureDictionary(
         override val id = 9
 
         @ExperimentalUnsignedTypes
-        override fun load(cache: JagexCache): TextureDictionary {
+        fun load(cache: JagexCache): TextureDictionary {
             val textures = mutableListOf<Texture>()
             cache.readArchives(TextureDictionary.id).forEach { _, archive ->
                 archive.files.forEach { _, file ->

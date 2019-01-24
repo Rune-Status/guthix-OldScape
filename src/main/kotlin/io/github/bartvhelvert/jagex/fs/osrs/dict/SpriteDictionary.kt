@@ -12,7 +12,7 @@ class SpriteDictionary(
         override val id = 8
 
         @ExperimentalUnsignedTypes
-        override fun load(cache: JagexCache): SpriteDictionary {
+        fun load(cache: JagexCache): SpriteDictionary {
             val sprites = mutableListOf<Sprite>()
             cache.readArchives(id).forEach { _, archive ->
                 archive.files.forEach { _, file ->

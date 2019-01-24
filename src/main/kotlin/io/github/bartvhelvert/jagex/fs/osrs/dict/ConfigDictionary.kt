@@ -30,7 +30,7 @@ data class ConfigDictionary(
         override val id = 2
 
         @ExperimentalUnsignedTypes
-        override fun load(cache: JagexCache): ConfigDictionary =
+        fun load(cache: JagexCache): ConfigDictionary =
             ConfigDictionary(
                 AreaConfig.load(
                     cache.readArchive(

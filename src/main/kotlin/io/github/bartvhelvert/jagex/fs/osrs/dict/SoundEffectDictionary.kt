@@ -13,7 +13,7 @@ class SoundEffectDictionary(
         override val id = 4
 
         @ExperimentalUnsignedTypes
-        override fun load(cache: JagexCache): SoundEffectDictionary {
+        fun load(cache: JagexCache): SoundEffectDictionary {
             val soundEffects = mutableListOf<SoundEffect>()
             cache.readArchives(id).forEach { _, archive ->
                 archive.files.forEach { _, file ->
