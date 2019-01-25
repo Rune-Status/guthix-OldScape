@@ -5,7 +5,7 @@ import io.github.bartvhelvert.jagex.fs.DictionaryCompanion
 import io.github.bartvhelvert.jagex.fs.JagexCache
 import io.github.bartvhelvert.jagex.fs.osrs.config.*
 
-data class ConfigDictionary(
+data class ConfigDictionary @ExperimentalUnsignedTypes constructor(
     val areaConfigs: Map<Int, AreaConfig>,
     val enumConfigs: Map<Int, EnumConfig>,
     val hitBarConfig: Map<Int, HitBarConfig>,

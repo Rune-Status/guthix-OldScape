@@ -3,7 +3,7 @@ package io.github.bartvhelvert.jagex.fs.osrs.dict
 import io.github.bartvhelvert.jagex.fs.Dictionary
 import io.github.bartvhelvert.jagex.fs.DictionaryCompanion
 import io.github.bartvhelvert.jagex.fs.JagexCache
-import io.github.bartvhelvert.jagex.fs.osrs.image.Texture
+import io.github.bartvhelvert.jagex.fs.osrs.plane.Texture
 
 class TextureDictionary(
     val textures: List<Texture>

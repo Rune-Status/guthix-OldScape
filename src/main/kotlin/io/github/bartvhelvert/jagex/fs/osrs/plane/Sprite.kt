@@ -1,4 +1,4 @@
-package io.github.bartvhelvert.jagex.fs.osrs.image
+package io.github.bartvhelvert.jagex.fs.osrs.plane
 
 import io.github.bartvhelvert.jagex.fs.io.uByte
 import io.github.bartvhelvert.jagex.fs.io.uMedium

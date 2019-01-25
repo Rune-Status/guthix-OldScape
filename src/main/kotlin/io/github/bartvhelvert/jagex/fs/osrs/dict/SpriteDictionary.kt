@@ -3,7 +3,7 @@ package io.github.bartvhelvert.jagex.fs.osrs.dict
 import io.github.bartvhelvert.jagex.fs.Dictionary
 import io.github.bartvhelvert.jagex.fs.DictionaryCompanion
 import io.github.bartvhelvert.jagex.fs.JagexCache
-import io.github.bartvhelvert.jagex.fs.osrs.image.Sprite
+import io.github.bartvhelvert.jagex.fs.osrs.plane.Sprite
 
 class SpriteDictionary(
     val sprites: List<Sprite>
