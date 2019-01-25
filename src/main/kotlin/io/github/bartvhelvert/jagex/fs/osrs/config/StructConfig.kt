@@ -8,13 +8,15 @@ import java.io.DataOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 
-data class StructConfig(override val id: Int, val params: HashMap<Int, Any>?) : Config(id) {
+data class StructConfig(override val id: Int) : Config(id) {
+    var params: HashMap<Int, Any>? = null
+
     override fun encode(): ByteBuffer {
         val byteStr = ByteArrayOutputStream()
         DataOutputStream(byteStr).use { os ->
             params?.let {
                 os.writeOpcode(249)
-                os.writeParams(params)
+                os.writeParams(params!!)
             }
             os.writeOpcode(0)
         }
@@ -26,16 +28,16 @@ data class StructConfig(override val id: Int, val params: HashMap<Int, Any>?) : 
 
         @ExperimentalUnsignedTypes
         override fun decode(id: Int, buffer: ByteBuffer): StructConfig {
-            var params: HashMap<Int, Any>? = null
+            val structConfig = StructConfig(id)
             decoder@ while (true) {
                 val opcode = buffer.uByte.toInt()
                 when (opcode) {
                     0 -> break@decoder
-                    249 -> params = buffer.params
+                    249 -> structConfig.params = buffer.params
                     else -> throw IOException("Did not recognise opcode $opcode")
                 }
             }
-            return StructConfig(id, params)
+            return structConfig
         }
     }
 }

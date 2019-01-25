@@ -9,14 +9,13 @@ import java.io.DataOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 
-data class EnumConfig(
-    override val id: Int,
-    val keyType: Char,
-    val valType: Char,
-    val defaultString: String,
-    val defaultInt: Int,
-    val keyValuePairs: Map<Int, Any>
-) : Config(id) {
+data class EnumConfig(override val id: Int) : Config(id) {
+    var keyType: Char = 0.toChar()
+    var valType: Char = 0.toChar()
+    var defaultString = "null"
+    var defaultInt = 0
+    val keyValuePairs = mutableMapOf<Int, Any>()
+
     override fun encode(): ByteBuffer {
         val byteStr = ByteArrayOutputStream()
         DataOutputStream(byteStr).use { os ->
@@ -63,37 +62,33 @@ data class EnumConfig(
 
         @ExperimentalUnsignedTypes
         override fun decode(id: Int, buffer: ByteBuffer): EnumConfig {
-            var keyType: Char = 0.toChar()
-            var valType: Char = 0.toChar()
-            var defaultString = "null"
-            var defaultInt = 0
-            val keyValuePairs = mutableMapOf<Int, Any>()
+            val enumConfig = EnumConfig(id)
             decoder@ while (true) {
                 val opcode = buffer.uByte.toInt()
                 when (opcode) {
                     0 -> break@decoder
-                    1 -> keyType = buffer.uByte.toShort().toChar()
-                    2 -> valType = buffer.uByte.toShort().toChar()
-                    3 -> defaultString = buffer.string
-                    4 -> defaultInt = buffer.int
+                    1 -> enumConfig.keyType = buffer.uByte.toShort().toChar()
+                    2 -> enumConfig.valType = buffer.uByte.toShort().toChar()
+                    3 -> enumConfig.defaultString = buffer.string
+                    4 -> enumConfig.defaultInt = buffer.int
                     5 -> {
                         val length = buffer.short.toInt()
                         for (i in 0 until length) {
                             val key = buffer.int
-                            keyValuePairs[key] = buffer.string
+                            enumConfig.keyValuePairs[key] = buffer.string
                         }
                     }
                     6 -> {
                         val length = buffer.uShort.toInt()
                         for (i in 0 until length) {
                             val key = buffer.int
-                            keyValuePairs[key] = buffer.int
+                            enumConfig.keyValuePairs[key] = buffer.int
                         }
                     }
                     else -> throw IOException("Did not recognise opcode $opcode")
                 }
             }
-            return EnumConfig(id, keyType, valType, defaultString, defaultInt, keyValuePairs)
+            return enumConfig
         }
     }
 }

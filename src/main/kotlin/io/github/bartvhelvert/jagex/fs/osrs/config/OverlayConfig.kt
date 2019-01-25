@@ -9,13 +9,13 @@ import java.io.DataOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 
-data class OverlayConfig @ExperimentalUnsignedTypes constructor(
-    override val id: Int,
-    val color: Color,
-    val texture: UByte?,
-    val isHidden: Boolean,
-    val otherColor: Color?
-) : Config(id) {
+@ExperimentalUnsignedTypes
+data class OverlayConfig(override val id: Int) : Config(id) {
+    var color = Color(0)
+    var texture: UByte? = null
+    var isHidden = true
+    var otherColor: Color? = null
+
     @ExperimentalUnsignedTypes
     override fun encode(): ByteBuffer {
         val byteStr = ByteArrayOutputStream()
@@ -26,12 +26,12 @@ data class OverlayConfig @ExperimentalUnsignedTypes constructor(
             }
             texture?.let {
                 os.writeOpcode(2)
-                os.writeByte(texture.toInt())
+                os.writeByte(texture!!.toInt())
             }
             if(!isHidden) os.writeOpcode(5)
             otherColor?.let {
                 os.writeOpcode(7)
-                os.writeMedium(otherColor.rgb)
+                os.writeMedium(otherColor!!.rgb)
             }
             os.writeOpcode(0)
         }
@@ -43,22 +43,19 @@ data class OverlayConfig @ExperimentalUnsignedTypes constructor(
 
         @ExperimentalUnsignedTypes
         override fun decode(id: Int, buffer: ByteBuffer): OverlayConfig {
-            var color = Color(0)
-            var texture: UByte? = null
-            var isHidden = true
-            var otherColor: Color? = null
+            val overlayConfig = OverlayConfig(id)
             decoder@ while (true) {
                 val opcode = buffer.uByte.toInt()
                 when (opcode) {
                     0 -> break@decoder
-                    1 -> color = Color(buffer.uMedium)
-                    2 -> texture = buffer.uByte
-                    5 -> isHidden = false
-                    7 -> otherColor = Color(buffer.uMedium)
+                    1 -> overlayConfig.color = Color(buffer.uMedium)
+                    2 -> overlayConfig.texture = buffer.uByte
+                    5 -> overlayConfig.isHidden = false
+                    7 -> overlayConfig.otherColor = Color(buffer.uMedium)
                     else -> throw IOException("Did not recognise opcode $opcode")
                 }
             }
-            return OverlayConfig(id, color, texture, isHidden, otherColor)
+            return overlayConfig
         }
 
 

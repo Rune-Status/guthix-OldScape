@@ -6,21 +6,21 @@ import java.io.DataOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 
-data class AreaConfig @ExperimentalUnsignedTypes constructor(
-    override val id: Int,
-    val spriteId: Int?,
-    val field3032: Int?,
-    val name: String?,
-    val field3033: Int?,
-    val field3034: UByte,
-    val shortArray: ShortArray?,
-    val aString1970: String?,
-    val flags: UByte,
-    val intarray35: IntArray?,
-    val anInt1980: UShort?,
-    val byteArray33: ByteArray?,
-    val stringArray: Array<String?>
-) : Config(id) {
+@ExperimentalUnsignedTypes
+data class AreaConfig(override val id: Int) : Config(id) {
+    var spriteId: Int? = null
+    var field3032: Int? = null
+    var name: String? = null
+    var field3033: Int? = null
+    var field3034: UByte = 0u
+    var shortArray: ShortArray? = null
+    var aString1970: String? = null
+    var flags: UByte = 0u
+    var intarray35: IntArray? = null
+    var anInt1980: UShort? = null
+    var byteArray33: ByteArray? = null
+    val stringArray = arrayOfNulls<String>(5)
+
     @ExperimentalUnsignedTypes
     override fun encode(): ByteBuffer {
         val byteStr = ByteArrayOutputStream()
@@ -35,11 +35,11 @@ data class AreaConfig @ExperimentalUnsignedTypes constructor(
             }
             name?.let {
                 os.writeOpcode(3)
-                os.writeString(name)
+                os.writeString(name!!)
             }
             field3033?.let {
                 os.writeOpcode(4)
-                os.writeMedium(field3033)
+                os.writeMedium(field3033!!)
             }
             if(field3034.toInt() != 0) {
                 os.writeOpcode(6)
@@ -57,20 +57,20 @@ data class AreaConfig @ExperimentalUnsignedTypes constructor(
             }
             if(shortArray != null && intarray35 != null && byteArray33 != null) {
                 os.writeOpcode(15)
-                os.writeByte(shortArray.size / 2)
-                shortArray.forEach { os.writeShort(it.toInt()) }
+                os.writeByte(shortArray!!.size / 2)
+                shortArray!!.forEach { os.writeShort(it.toInt()) }
                 os.writeInt(0)
-                os.writeByte(intarray35.size)
-                intarray35.forEach { os.writeInt(it) }
-                byteArray33.forEach { os.writeByte(it.toInt()) }
+                os.writeByte(intarray35!!.size)
+                intarray35!!.forEach { os.writeInt(it) }
+                byteArray33!!.forEach { os.writeByte(it.toInt()) }
             }
             aString1970?.let {
                 os.writeOpcode(17)
-                os.writeString(aString1970)
+                os.writeString(aString1970!!)
             }
             anInt1980?.let {
                 os.writeOpcode(19)
-                os.writeShort(anInt1980.toInt())
+                os.writeShort(anInt1980!!.toInt())
             }
             os.writeOpcode(0)
         }
@@ -88,18 +88,18 @@ data class AreaConfig @ExperimentalUnsignedTypes constructor(
         if (field3034 != other.field3034) return false
         if (shortArray != null) {
             if (other.shortArray == null) return false
-            if (!shortArray.contentEquals(other.shortArray)) return false
+            if (!shortArray!!.contentEquals(other.shortArray!!)) return false
         } else if (other.shortArray != null) return false
         if (aString1970 != other.aString1970) return false
         if (flags != other.flags) return false
         if (intarray35 != null) {
             if (other.intarray35 == null) return false
-            if (!intarray35.contentEquals(other.intarray35)) return false
+            if (!intarray35!!.contentEquals(other.intarray35!!)) return false
         } else if (other.intarray35 != null) return false
         if (anInt1980 != other.anInt1980) return false
         if (byteArray33 != null) {
             if (other.byteArray33 == null) return false
-            if (!byteArray33.contentEquals(other.byteArray33)) return false
+            if (!byteArray33!!.contentEquals(other.byteArray33!!)) return false
         } else if (other.byteArray33 != null) return false
         if (!stringArray.contentEquals(other.stringArray)) return false
         return true
@@ -127,49 +127,37 @@ data class AreaConfig @ExperimentalUnsignedTypes constructor(
 
         @ExperimentalUnsignedTypes
         override fun decode(id: Int, buffer: ByteBuffer): AreaConfig {
-            var spriteId: Int? = null
-            var field3032: Int? = null
-            var name: String? = null
-            var field3033: Int? = null
-            var field3034: UByte = 0u
-            var shortArray: ShortArray? = null
-            var aString1970: String? = null
-            var flags: UByte = 0u
-            var intarray35: IntArray? = null
-            var anInt1980: UShort? = null
-            var byteArray33: ByteArray? = null
-            val stringArray = arrayOfNulls<String>(5)
-
+            val areaConfig = AreaConfig(id)
             decoder@ while (true) {
                 val opcode = buffer.uByte.toInt()
                 when (opcode) {
                     0 -> break@decoder
-                    1 -> spriteId = buffer.nullableLargeSmart
-                    2 -> field3032 = buffer.nullableLargeSmart
-                    3 -> name = buffer.string
-                    4 -> field3033 = buffer.uMedium
+                    1 -> areaConfig.spriteId = buffer.nullableLargeSmart
+                    2 -> areaConfig.field3032 = buffer.nullableLargeSmart
+                    3 -> areaConfig.name = buffer.string
+                    4 -> areaConfig.field3033 = buffer.uMedium
                     5 -> buffer.uMedium
-                    6 -> field3034 = buffer.uByte
-                    7 -> flags = buffer.uByte
+                    6 -> areaConfig.field3034 = buffer.uByte
+                    7 -> areaConfig.flags = buffer.uByte
                     8 -> buffer.uByte
-                    in 10..14 -> stringArray[opcode - 10] = buffer.string
+                    in 10..14 -> areaConfig.stringArray[opcode - 10] = buffer.string
                     15 -> {
                         val size = buffer.uByte.toInt()
-                        shortArray = ShortArray(size * 2) {
+                        areaConfig.shortArray = ShortArray(size * 2) {
                             buffer.short
                         }
                         buffer.int
                         val size2 = buffer.uByte.toInt()
-                        intarray35 = IntArray(size2) {
+                        areaConfig.intarray35 = IntArray(size2) {
                             buffer.int
                         }
-                        byteArray33 = ByteArray(size2) {
+                        areaConfig.byteArray33 = ByteArray(size2) {
                             buffer.get()
                         }
                     }
-                    17 -> aString1970 = buffer.string
+                    17 -> areaConfig.aString1970 = buffer.string
                     18 -> buffer.largeSmart
-                    19 -> anInt1980 = buffer.uShort
+                    19 -> areaConfig.anInt1980 = buffer.uShort
                     21 -> buffer.int
                     22 -> buffer.int
                     23 -> repeat(3) { buffer.uByte }
@@ -181,10 +169,7 @@ data class AreaConfig @ExperimentalUnsignedTypes constructor(
                     else -> throw IOException("Did not recognise opcode $opcode")
                 }
             }
-
-            return AreaConfig(id, spriteId, field3032, name, field3033, field3034, shortArray, aString1970, flags,
-                intarray35, anInt1980, byteArray33, stringArray
-            )
+            return areaConfig
         }
     }
 }

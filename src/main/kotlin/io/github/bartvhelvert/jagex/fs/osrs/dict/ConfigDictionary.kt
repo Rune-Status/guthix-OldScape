@@ -11,7 +11,7 @@ data class ConfigDictionary(
     val hitBarConfig: Map<Int, HitBarConfig>,
     val hitMarkConfigss: Map<Int, HitMarkConfig>,
     val identKitConfigs: Map<Int, IdentKitConfig>,
-    val invConfigs: Map<Int, InvConfig>,
+    val inventoryConfigs: Map<Int, InventoryConfig>,
     val itemConfigs: Map<Int, ItemConfig>,
     val npcConfigs: Map<Int, NpcConfig>,
     val objectConfigs: Map<Int, ObjectConfig>,
@@ -62,10 +62,10 @@ data class ConfigDictionary(
                         IdentKitConfig.id
                     )
                 ),
-                InvConfig.load(
+                InventoryConfig.load(
                     cache.readArchive(
                         id,
-                        InvConfig.id
+                        InventoryConfig.id
                     )
                 ),
                 ItemConfig.load(

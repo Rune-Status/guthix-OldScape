@@ -9,50 +9,50 @@ import java.io.DataOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 
-data class SequenceConfig @ExperimentalUnsignedTypes constructor(
-    override val id: Int,
-    val frameIds: IntArray?,
-    val field3048: IntArray?,
-    val frameLengths: UShortArray?,
-    val interleaveLeave: IntArray?,
-    val stretches: Boolean,
-    val forcedPriority: UByte,
-    val maxLoops: UByte,
-    val field3056: IntArray?,
-    val precedenceAnimating: UByte?,
-    val leftHandItem: UShort?,
-    val rightHandItem: UShort?,
-    val replyMode: UByte,
-    val frameStep: UShort?,
-    val priority: UByte?
-) : Config(id) {
+@ExperimentalUnsignedTypes
+data class SequenceConfig(override val id: Int) : Config(id) {
+    var frameIds: IntArray? = null
+    var field3048: IntArray? = null
+    var frameLengths: UShortArray? = null
+    var interleaveLeave: IntArray? = null
+    var stretches = false
+    var forcedPriority: UByte = 5u
+    var maxLoops: UByte = 99u
+    var field3056: IntArray? = null
+    var precedenceAnimating: UByte? = null
+    var leftHandItem: UShort? = null
+    var rightHandItem: UShort? = null
+    var replyMode: UByte = 2u
+    var frameStep: UShort? = null
+    var priority: UByte? = null
+
     @ExperimentalUnsignedTypes
     override fun encode(): ByteBuffer {
         val byteStr = ByteArrayOutputStream()
         DataOutputStream(byteStr).use { os ->
             frameLengths?.let {
-                if(frameLengths.size != frameIds!!.size) throw IOException("Frame lengths don't match frame ids")
+                if(frameLengths!!.size != frameIds!!.size) throw IOException("Frame lengths don't match frame ids")
                 os.writeOpcode(1)
-                os.writeShort(frameLengths.size)
-                frameLengths.forEach { length ->
+                os.writeShort(frameLengths!!.size)
+                frameLengths!!.forEach { length ->
                     os.writeShort(length.toInt())
                 }
-                frameIds.forEach { id ->
+                frameIds!!.forEach { id ->
                     os.writeShort(id and 0xFFFF)
                 }
-                frameIds.forEach { id ->
+                frameIds!!.forEach { id ->
                     os.writeShort(id shr 16)
                 }
             }
             frameStep?.let {
                 os.writeOpcode(2)
-                os.writeShort(frameStep.toInt())
+                os.writeShort(frameStep!!.toInt())
             }
             interleaveLeave?.let {
                 os.writeOpcode(3)
-                os.writeByte(interleaveLeave.size - 1)
-                for(i in 0 until interleaveLeave.size - 1) {
-                    os.writeShort(interleaveLeave[i])
+                os.writeByte(interleaveLeave!!.size - 1)
+                for(i in 0 until interleaveLeave!!.size - 1) {
+                    os.writeShort(interleaveLeave!![i])
                 }
             }
             if(stretches) os.writeOpcode(4)
@@ -62,11 +62,11 @@ data class SequenceConfig @ExperimentalUnsignedTypes constructor(
             }
             leftHandItem?.let {
                 os.writeOpcode(6)
-                os.writeShort(leftHandItem.toInt())
+                os.writeShort(leftHandItem!!.toInt())
             }
             rightHandItem?.let {
                 os.writeOpcode(7)
-                os.writeShort(rightHandItem.toInt())
+                os.writeShort(rightHandItem!!.toInt())
             }
             if(maxLoops.toInt() != 99) {
                 os.writeOpcode(8)
@@ -74,11 +74,11 @@ data class SequenceConfig @ExperimentalUnsignedTypes constructor(
             }
             precedenceAnimating?.let {
                 os.writeOpcode(9)
-                os.writeByte(precedenceAnimating.toInt())
+                os.writeByte(precedenceAnimating!!.toInt())
             }
             priority?.let {
                 os.writeOpcode(10)
-                os.writeByte(priority.toInt())
+                os.writeByte(priority!!.toInt())
             }
             if(replyMode.toInt() != 2) {
                 os.writeOpcode(11)
@@ -86,18 +86,18 @@ data class SequenceConfig @ExperimentalUnsignedTypes constructor(
             }
             field3048?.let {
                 os.writeOpcode(12)
-                os.writeByte(field3048.size)
-                field3048.forEach { id ->
+                os.writeByte(field3048!!.size)
+                field3048!!.forEach { id ->
                     os.writeShort(id and 0xFFFF)
                 }
-                field3048.forEach { id ->
+                field3048!!.forEach { id ->
                     os.writeShort(id shr 16)
                 }
             }
             field3056?.let {
                 os.writeOpcode(13)
-                os.writeByte(field3056.size)
-                field3056.forEach { id ->
+                os.writeByte(field3056!!.size)
+                field3056!!.forEach { id ->
                     os.writeMedium(id)
                 }
             }
@@ -113,23 +113,23 @@ data class SequenceConfig @ExperimentalUnsignedTypes constructor(
         if (id != other.id) return false
         if (frameIds != null) {
             if (other.frameIds == null) return false
-            if (!frameIds.contentEquals(other.frameIds)) return false
+            if (!frameIds!!.contentEquals(other.frameIds!!)) return false
         } else if (other.frameIds != null) return false
         if (field3048 != null) {
             if (other.field3048 == null) return false
-            if (!field3048.contentEquals(other.field3048)) return false
+            if (!field3048!!.contentEquals(other.field3048!!)) return false
         } else if (other.field3048 != null) return false
         if (frameLengths != other.frameLengths) return false
         if (interleaveLeave != null) {
             if (other.interleaveLeave == null) return false
-            if (!interleaveLeave.contentEquals(other.interleaveLeave)) return false
+            if (!interleaveLeave!!.contentEquals(other.interleaveLeave!!)) return false
         } else if (other.interleaveLeave != null) return false
         if (stretches != other.stretches) return false
         if (forcedPriority != other.forcedPriority) return false
         if (maxLoops != other.maxLoops) return false
         if (field3056 != null) {
             if (other.field3056 == null) return false
-            if (!field3056.contentEquals(other.field3056)) return false
+            if (!field3056!!.contentEquals(other.field3056!!)) return false
         } else if (other.field3056 != null) return false
         if (precedenceAnimating != other.precedenceAnimating) return false
         if (leftHandItem != other.leftHandItem) return false
@@ -165,76 +165,60 @@ data class SequenceConfig @ExperimentalUnsignedTypes constructor(
 
         @ExperimentalUnsignedTypes
         override fun decode(id: Int, buffer: ByteBuffer): SequenceConfig {
-            var frameIds: IntArray? = null
-            var field3048: IntArray? = null
-            var frameLengths: UShortArray? = null
-            var interleaveLeave: IntArray? = null
-            var stretches = false
-            var forcedPriority: UByte = 5u
-            var maxLoops: UByte = 99u
-            var field3056: IntArray? = null
-            var precedenceAnimating: UByte? = null
-            var leftHandItem: UShort? = null
-            var rightHandItem: UShort? = null
-            var replyMode: UByte = 2u
-            var frameStep: UShort? = null
-            var priority: UByte? = null
-
+            val sequenceConfig = SequenceConfig(id)
             decoder@ while (true) {
                 val opcode = buffer.uByte.toInt()
                 when (opcode) {
                     0 -> break@decoder
                     1 -> {
                         val length = buffer.uShort.toInt()
-                        frameLengths = UShortArray(length) { buffer.uShort }
-                        frameIds = IntArray(length) { buffer.uShort.toInt() }
-                        frameIds.forEachIndexed { i, _ ->
-                            frameIds[i] += buffer.uShort.toInt() shl 16
+                        sequenceConfig.frameLengths = UShortArray(length) { buffer.uShort }
+                        sequenceConfig.frameIds = IntArray(length) { buffer.uShort.toInt() }
+                        sequenceConfig.frameIds!!.forEachIndexed { i, _ ->
+                            sequenceConfig.frameIds!![i] += buffer.uShort.toInt() shl 16
                         }
                     }
-                    2 -> frameStep = buffer.uShort
+                    2 -> sequenceConfig.frameStep = buffer.uShort
                     3 -> {
                         val length = buffer.uByte.toInt()
-                        interleaveLeave = IntArray(length + 1)
+                        sequenceConfig.interleaveLeave = IntArray(length + 1)
                         for(i in 0 until length) {
-                            interleaveLeave[i] = buffer.uByte.toInt()
+                            sequenceConfig.interleaveLeave!![i] = buffer.uByte.toInt()
                         }
-                        interleaveLeave[length] = 9999999
+                        sequenceConfig.interleaveLeave!![length] = 9999999
                     }
-                    4 -> stretches = true
-                    5 -> forcedPriority = buffer.uByte
-                    6 -> leftHandItem = buffer.uShort
-                    7 -> rightHandItem = buffer.uShort
-                    8 -> maxLoops = buffer.uByte
-                    9 -> precedenceAnimating = buffer.uByte
-                    10 -> priority = buffer.uByte
-                    11 -> replyMode = buffer.uByte
+                    4 -> sequenceConfig.stretches = true
+                    5 -> sequenceConfig.forcedPriority = buffer.uByte
+                    6 -> sequenceConfig.leftHandItem = buffer.uShort
+                    7 -> sequenceConfig.rightHandItem = buffer.uShort
+                    8 -> sequenceConfig.maxLoops = buffer.uByte
+                    9 -> sequenceConfig.precedenceAnimating = buffer.uByte
+                    10 -> sequenceConfig.priority = buffer.uByte
+                    11 -> sequenceConfig.replyMode = buffer.uByte
                     12 -> {
                         val length = buffer.uByte.toInt()
-                        field3048 = IntArray(length) {
+                        sequenceConfig.field3048 = IntArray(length) {
                             buffer.uShort.toInt()
                         }
                         for (index in 0 until length) {
-                            field3048[index] += buffer.uShort.toInt() shl 16
+                            sequenceConfig.field3048!![index] += buffer.uShort.toInt() shl 16
                         }
                     }
                     13 -> {
                         val length = buffer.uByte.toInt()
-                        field3056 = IntArray(length) { buffer.uMedium }
+                        sequenceConfig.field3056 = IntArray(length) { buffer.uMedium }
                     }
                     else -> throw IOException("Did not recognise opcode $opcode")
                 }
             }
-            precedenceAnimating?.let {
-                precedenceAnimating = if (interleaveLeave != null) 2u else 0u
+            sequenceConfig.precedenceAnimating?.let {
+                sequenceConfig.precedenceAnimating = if(sequenceConfig.interleaveLeave != null) 2u else 0u
 
             }
-            priority?.let {
-                priority = if (interleaveLeave != null) 2u else 0u
+            sequenceConfig.priority?.let {
+                sequenceConfig.priority = if(sequenceConfig.interleaveLeave != null) 2u else 0u
             }
-            return SequenceConfig(id, frameIds, field3048, frameLengths, interleaveLeave, stretches, forcedPriority,
-                maxLoops, field3056, precedenceAnimating, leftHandItem, rightHandItem, replyMode, frameStep, priority
-            )
+            return sequenceConfig
         }
     }
 }

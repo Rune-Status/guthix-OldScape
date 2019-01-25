@@ -7,20 +7,20 @@ import java.io.DataOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 
-data class SpotAnimConfig @ExperimentalUnsignedTypes constructor(
-    override val id: Int,
-    val animationId: UShort?,
-    val rotation: UShort,
-    val resizeY: UShort,
-    val resizeX: UShort,
-    val modelId: UShort,
-    val ambient: UByte,
-    val contrast: UByte,
-    val textureReplace: UShortArray?,
-    val textureFind: UShortArray?,
-    val colorFind: UShortArray?,
-    val colorReplace: UShortArray?
-) : Config(id) {
+@ExperimentalUnsignedTypes
+data class SpotAnimConfig(override val id: Int) : Config(id) {
+    var animationId: UShort? = null
+    var rotation: UShort = 0u
+    var resizeY: UShort = 128u
+    var resizeX: UShort = 128u
+    var modelId: UShort = 0u
+    var ambient: UByte = 0u
+    var contrast: UByte = 0u
+    var textureReplace: UShortArray? = null
+    var textureFind: UShortArray? = null
+    var colorFind: UShortArray? = null
+    var colorReplace: UShortArray? = null
+
     @ExperimentalUnsignedTypes
     override fun encode(): ByteBuffer {
         val byteStr = ByteArrayOutputStream()
@@ -31,7 +31,7 @@ data class SpotAnimConfig @ExperimentalUnsignedTypes constructor(
             }
             animationId?.let {
                 os.writeOpcode(2)
-                os.writeShort(animationId.toInt())
+                os.writeShort(animationId!!.toInt())
             }
             if(resizeX.toInt() != 128) {
                 os.writeOpcode(4)
@@ -55,18 +55,18 @@ data class SpotAnimConfig @ExperimentalUnsignedTypes constructor(
             }
             if (colorFind != null && colorReplace != null) {
                 os.writeOpcode(40)
-                os.writeByte(colorFind.size)
-                for (i in 0 until colorFind.size) {
-                    os.writeShort(colorFind[i].toInt())
-                    os.writeShort(colorReplace[i].toInt())
+                os.writeByte(colorFind!!.size)
+                for (i in 0 until colorFind!!.size) {
+                    os.writeShort(colorFind!![i].toInt())
+                    os.writeShort(colorReplace!![i].toInt())
                 }
             }
             if (textureFind != null && textureReplace != null) {
                 os.writeOpcode(41)
-                os.writeByte(textureFind.size)
-                for (i in 0 until textureReplace.size) {
-                    os.writeShort(textureFind[i].toInt())
-                    os.writeShort(textureReplace[i].toInt())
+                os.writeByte(textureFind!!.size)
+                for (i in 0 until textureReplace!!.size) {
+                    os.writeShort(textureFind!![i].toInt())
+                    os.writeShort(textureReplace!![i].toInt())
                 }
             }
             os.writeOpcode(0)
@@ -79,53 +79,40 @@ data class SpotAnimConfig @ExperimentalUnsignedTypes constructor(
 
         @ExperimentalUnsignedTypes
         override fun decode(id: Int, buffer: ByteBuffer): SpotAnimConfig {
-            var animationId: UShort? = null
-            var rotation: UShort = 0u
-            var resizeY: UShort = 128u
-            var resizeX: UShort = 128u
-            var modelId: UShort = 0u
-            var ambient: UByte = 0u
-            var contrast: UByte = 0u
-            var textureReplace: UShortArray? = null
-            var textureFind: UShortArray? = null
-            var colorFind: UShortArray? = null
-            var colorReplace: UShortArray? = null
-
+            val spotAnimConfig = SpotAnimConfig(id)
             decoder@ while (true) {
                 val opcode = buffer.uByte.toInt()
                 when (opcode) {
                     0 -> break@decoder
-                    1 -> modelId = buffer.uShort
-                    2 -> animationId = buffer.uShort
-                    4 -> resizeX = buffer.uShort
-                    5 -> resizeY = buffer.uShort
-                    6 -> rotation = buffer.uShort
-                    7 -> ambient = buffer.uByte
-                    8 -> contrast = buffer.uByte
+                    1 -> spotAnimConfig.modelId = buffer.uShort
+                    2 -> spotAnimConfig.animationId = buffer.uShort
+                    4 -> spotAnimConfig.resizeX = buffer.uShort
+                    5 -> spotAnimConfig.resizeY = buffer.uShort
+                    6 -> spotAnimConfig.rotation = buffer.uShort
+                    7 -> spotAnimConfig.ambient = buffer.uByte
+                    8 -> spotAnimConfig.contrast = buffer.uByte
                     40 -> {
                         val size = buffer.uByte.toInt()
-                        colorFind = UShortArray(size)
-                        colorReplace = UShortArray(size)
+                        spotAnimConfig.colorFind = UShortArray(size)
+                        spotAnimConfig.colorReplace = UShortArray(size)
                         for (i in 0 until size) {
-                            colorFind[i] = buffer.uShort
-                            colorReplace[i] = buffer.uShort
+                            spotAnimConfig.colorFind!![i] = buffer.uShort
+                            spotAnimConfig.colorReplace!![i] = buffer.uShort
                         }
                     }
                     41 -> {
                         val size = buffer.uByte.toInt()
-                        textureFind = UShortArray(size)
-                        textureReplace = UShortArray(size)
+                        spotAnimConfig.textureFind = UShortArray(size)
+                        spotAnimConfig.textureReplace = UShortArray(size)
                         for (i in 0 until size) {
-                            textureFind[i] = buffer.uShort
-                            textureReplace[i] = buffer.uShort
+                            spotAnimConfig.textureFind!![i] = buffer.uShort
+                            spotAnimConfig.textureReplace!![i] = buffer.uShort
                         }
                     }
                     else -> throw IOException("Did not recognise opcode $opcode")
                 }
             }
-            return SpotAnimConfig(id, animationId, rotation, resizeY, resizeX, modelId, ambient, contrast,
-                textureReplace, textureFind, colorFind, colorReplace
-            )
+            return spotAnimConfig
         }
     }
 }

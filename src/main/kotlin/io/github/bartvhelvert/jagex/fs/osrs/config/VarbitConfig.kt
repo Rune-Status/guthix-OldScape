@@ -5,12 +5,12 @@ import io.github.bartvhelvert.jagex.fs.io.uShort
 import java.io.IOException
 import java.nio.ByteBuffer
 
-data class VarbitConfig @ExperimentalUnsignedTypes constructor(
-    override val id: Int,
-    val varpId: UShort,
-    val lsb: UByte,
-    val msb: UByte
-) : Config(id) {
+@ExperimentalUnsignedTypes
+data class VarbitConfig(override val id: Int) : Config(id) {
+    var varpId: UShort = 0u
+    var lsb: UByte = 0u
+    var msb: UByte = 0u
+
     @ExperimentalUnsignedTypes
     override fun encode(): ByteBuffer  = if(varpId.toInt() != 0 && lsb.toInt() != 0 && msb.toInt() != 0) {
         ByteBuffer.allocate(6).apply {
@@ -29,23 +29,20 @@ data class VarbitConfig @ExperimentalUnsignedTypes constructor(
 
         @ExperimentalUnsignedTypes
         override fun decode(id: Int, buffer: ByteBuffer): VarbitConfig {
-            var varpId: UShort = 0u
-            var lsb: UByte = 0u
-            var msb: UByte = 0u
-
+            val varbitConfig = VarbitConfig(id)
             decoder@ while (true) {
                 val opcode = buffer.get().toInt() and 0xFF
                 when(opcode) {
                     0 -> break@decoder
                     1 -> {
-                        varpId = buffer.uShort
-                        lsb = buffer.uByte
-                        msb = buffer.uByte
+                        varbitConfig.varpId = buffer.uShort
+                        varbitConfig.lsb = buffer.uByte
+                        varbitConfig.msb = buffer.uByte
                     }
                     else -> throw IOException("Did not recognise opcode $opcode")
                 }
             }
-            return VarbitConfig(id, varpId, lsb, msb)
+            return varbitConfig
         }
     }
 }

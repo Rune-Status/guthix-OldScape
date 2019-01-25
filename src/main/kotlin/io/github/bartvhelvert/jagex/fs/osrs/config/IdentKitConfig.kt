@@ -7,45 +7,45 @@ import java.io.DataOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 
-data class IdentKitConfig @ExperimentalUnsignedTypes constructor(
-    override val id: Int,
-    val colorFind: UShortArray?,
-    val colorReplace: UShortArray?,
-    val textureFind: UShortArray?,
-    val textureReplace: UShortArray?,
-    val bodyPartId: UByte?,
-    val modelIds: UShortArray?,
-    val models: IntArray,
-    val nonSelectable: Boolean
-) : Config(id) {
+@ExperimentalUnsignedTypes
+data class IdentKitConfig(override val id: Int) : Config(id) {
+    var colorFind: UShortArray? = null
+    var colorReplace: UShortArray? = null
+    var textureFind: UShortArray? = null
+    var textureReplace: UShortArray? = null
+    var bodyPartId: UByte? = null
+    var modelIds: UShortArray? = null
+    val models = intArrayOf(-1, -1, -1, -1, -1)
+    var nonSelectable = false
+
     @ExperimentalUnsignedTypes
     override fun encode(): ByteBuffer {
         val byteStr = ByteArrayOutputStream()
         DataOutputStream(byteStr).use { os ->
             bodyPartId?.let {
                 os.writeOpcode(1)
-                os.writeByte(bodyPartId.toInt())
+                os.writeByte(bodyPartId!!.toInt())
             }
             modelIds?.let {
                 os.writeOpcode(2)
-                os.writeByte(modelIds.size)
-                modelIds.forEach { id -> os.writeShort(id.toInt()) }
+                os.writeByte(modelIds!!.size)
+                modelIds!!.forEach { id -> os.writeShort(id.toInt()) }
             }
             if(nonSelectable) os.writeOpcode(3)
             if (colorFind != null && colorReplace != null) {
                 os.writeOpcode(40)
-                os.writeByte(colorFind.size)
-                for (i in 0 until colorFind.size) {
-                    os.writeShort(colorFind[i].toInt())
-                    os.writeShort(colorReplace[i].toInt())
+                os.writeByte(colorFind!!.size)
+                for (i in 0 until colorFind!!.size) {
+                    os.writeShort(colorFind!![i].toInt())
+                    os.writeShort(colorReplace!![i].toInt())
                 }
             }
             if (textureFind != null && textureReplace != null) {
                 os.writeOpcode(41)
-                os.writeByte(textureFind.size)
-                for (i in 0 until textureReplace.size) {
-                    os.writeShort(textureFind[i].toInt())
-                    os.writeShort(textureReplace[i].toInt())
+                os.writeByte(textureFind!!.size)
+                for (i in 0 until textureReplace!!.size) {
+                    os.writeShort(textureFind!![i].toInt())
+                    os.writeShort(textureReplace!![i].toInt())
                 }
             }
             models.forEachIndexed { i, id ->
@@ -94,52 +94,42 @@ data class IdentKitConfig @ExperimentalUnsignedTypes constructor(
 
         @ExperimentalUnsignedTypes
         override fun decode(id: Int, buffer: ByteBuffer): IdentKitConfig {
-            var colorFind: UShortArray? = null
-            var colorReplace: UShortArray? = null
-            var textureFind: UShortArray? = null
-            var textureReplace: UShortArray? = null
-            var bodyPartId: UByte? = null
-            var modelIds: UShortArray? = null
-            val models = intArrayOf(-1, -1, -1, -1, -1)
-            var nonSelectable = false
-
+            val identKitConfig = IdentKitConfig(id)
             decoder@ while (true) {
                 val opcode = buffer.uByte.toInt()
                 when (opcode) {
                     0 -> break@decoder
-                    1 -> bodyPartId = buffer.uByte
+                    1 -> identKitConfig.bodyPartId = buffer.uByte
                     2 -> {
                         val length = buffer.uByte
-                        modelIds = UShortArray(length.toInt()) { buffer.uShort }
+                        identKitConfig.modelIds = UShortArray(length.toInt()) { buffer.uShort }
                     }
-                    3 -> nonSelectable = true
+                    3 -> identKitConfig.nonSelectable = true
                     40 -> {
                         val colors = buffer.uByte.toInt()
-                        colorFind = UShortArray(colors)
-                        colorReplace = UShortArray(colors)
+                        identKitConfig.colorFind = UShortArray(colors)
+                        identKitConfig.colorReplace = UShortArray(colors)
                         for (i in 0 until colors) {
-                            colorFind[i] = buffer.uShort
-                            colorReplace[i] = buffer.uShort
+                            identKitConfig.colorFind!![i] = buffer.uShort
+                            identKitConfig.colorReplace!![i] = buffer.uShort
                         }
                     }
                     41 -> {
                         val textures = buffer.uByte.toInt()
-                        textureFind = UShortArray(textures)
-                        textureReplace = UShortArray(textures)
+                        identKitConfig.textureFind = UShortArray(textures)
+                        identKitConfig.textureReplace = UShortArray(textures)
                         for (i in 0 until textures) {
-                            textureFind[i] = buffer.uShort
-                            textureReplace[i] = buffer.uShort
+                            identKitConfig.textureFind!![i] = buffer.uShort
+                            identKitConfig.textureReplace!![i] = buffer.uShort
                         }
                     }
                     in 60..69 -> {
-                        models[opcode - 60] = buffer.uShort.toInt()
+                        identKitConfig.models[opcode - 60] = buffer.uShort.toInt()
                     }
                     else -> throw IOException("Did not recognise opcode $opcode")
                 }
             }
-            return IdentKitConfig(
-                id, colorFind, colorReplace, textureFind, textureReplace, bodyPartId, modelIds, models, nonSelectable
-            )
+            return identKitConfig
         }
     }
 }

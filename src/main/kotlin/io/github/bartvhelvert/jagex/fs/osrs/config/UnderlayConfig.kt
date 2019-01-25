@@ -6,7 +6,9 @@ import io.github.bartvhelvert.jagex.fs.io.uMedium
 import java.io.IOException
 import java.nio.ByteBuffer
 
-data class UnderlayConfig(override val id: Int, val color: Int) : Config(id) {
+data class UnderlayConfig(override val id: Int) : Config(id) {
+    var color = 0
+
     override fun encode(): ByteBuffer = if(color != 0) {
         ByteBuffer.allocate(2).apply {
             put(1)
@@ -22,16 +24,16 @@ data class UnderlayConfig(override val id: Int, val color: Int) : Config(id) {
 
         @ExperimentalUnsignedTypes
         override fun decode(id: Int, buffer: ByteBuffer): UnderlayConfig {
-            var color = 0
+            val underlayConfig = UnderlayConfig(id)
             decoder@ while (true) {
                 val opcode = buffer.uByte.toInt()
                 when (opcode) {
                     0 -> break@decoder
-                    1 -> color = buffer.uMedium
+                    1 -> underlayConfig.color = buffer.uMedium
                     else -> throw IOException("Did not recognise opcode $opcode")
                 }
             }
-            return UnderlayConfig(id, color)
+            return underlayConfig
         }
     }
 }

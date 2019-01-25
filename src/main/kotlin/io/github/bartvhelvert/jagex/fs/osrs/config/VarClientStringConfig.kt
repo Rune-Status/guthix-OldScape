@@ -4,7 +4,9 @@ import io.github.bartvhelvert.jagex.fs.io.uByte
 import java.io.IOException
 import java.nio.ByteBuffer
 
-data class VarClientStringConfig(override val id: Int, val isSerializable: Boolean) : Config(id) {
+data class VarClientStringConfig(override val id: Int) : Config(id) {
+    var isSerializable = false
+
     override fun encode(): ByteBuffer = if(isSerializable) {
         ByteBuffer.allocate(2).apply {
             put(2)
@@ -19,16 +21,16 @@ data class VarClientStringConfig(override val id: Int, val isSerializable: Boole
 
         @ExperimentalUnsignedTypes
         override fun decode(id: Int, buffer: ByteBuffer): VarClientStringConfig {
-            var isSerializable = false
+            val varClientStringConfig = VarClientStringConfig(id)
             decoder@ while (true) {
                 val opcode = buffer.uByte.toInt()
                 when (opcode) {
                     0 -> break@decoder
-                    2 -> isSerializable = true
+                    2 -> varClientStringConfig.isSerializable = true
                     else -> throw IOException("Did not recognise opcode $opcode")
                 }
             }
-            return VarClientStringConfig(id, isSerializable)
+            return varClientStringConfig
         }
     }
 }
