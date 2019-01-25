@@ -4,7 +4,7 @@ import io.github.bartvhelvert.jagex.fs.io.*
 import java.nio.ByteBuffer
 
 @ExperimentalUnsignedTypes
-class Widget(id: Int) {
+data class Widget(val id: Int) {
     var hasScript = false
     var menuType = 0
     var contentType: UShort = 0u
@@ -101,15 +101,14 @@ class Widget(id: Int) {
     companion object {
         @ExperimentalUnsignedTypes
         fun decode(id: Int, buffer: ByteBuffer): Widget {
-            val peak = buffer.peak().toInt()
-            return when(peak) {
-                -1 -> decodeInterface1(id, buffer)
-                else -> decodeInterface2(id, buffer)
+            return when(buffer.peak().toInt()) {
+                -1 -> decodeActive(id, buffer)
+                else -> decodeNonActive(id, buffer)
             }
         }
 
         @ExperimentalUnsignedTypes
-        private fun decodeInterface1(id: Int, buffer: ByteBuffer): Widget {
+        private fun decodeNonActive(id: Int, buffer: ByteBuffer): Widget {
             val iFace = Widget(id)
             iFace.hasScript = false
             val type = buffer.uByte.toInt()
@@ -141,7 +140,7 @@ class Widget(id: Int) {
             iFace.cs2Instructions = if (cs2InstructionCount > 0) {
                 Array(cs2InstructionCount) {
                     val byteCodeSize = buffer.uShort.toInt()
-                    val instructions = Array<UShort?>(byteCodeSize) {
+                    val instructions = Array(byteCodeSize) {
                         var byteCode: UShort? = buffer.uShort
                         if(byteCode == UShort.MAX_VALUE) byteCode = null
                         byteCode
@@ -269,7 +268,7 @@ class Widget(id: Int) {
             return iFace
         }
 
-        private fun decodeInterface2(id: Int, buffer: ByteBuffer): Widget {
+        private fun decodeActive(id: Int, buffer: ByteBuffer): Widget {
             val iFace = Widget(id)
             buffer.uByte
             iFace.hasScript = true
