@@ -7,8 +7,7 @@ import io.github.bartvhelvert.jagex.fs.osrs.sound.MidiFile
 
 class MusicTrackDictionary(
     val tracks: List<MidiFile>
-): Dictionary {
-
+) : Dictionary {
     companion object : DictionaryCompanion<MusicTrackDictionary>() {
         override val id = 6
 

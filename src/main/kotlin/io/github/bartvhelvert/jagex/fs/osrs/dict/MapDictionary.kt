@@ -9,7 +9,7 @@ import java.io.IOException
 
 class MapDictionary (
     val regions: Map<Int, Region>
-): Dictionary {
+) : Dictionary {
     companion object : DictionaryCompanion<MapDictionary>() {
         override val id = 5
 

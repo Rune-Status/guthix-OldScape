@@ -7,7 +7,7 @@ import io.github.bartvhelvert.jagex.fs.osrs.image.Sprite
 
 class SpriteDictionary(
     val sprites: List<Sprite>
-): Dictionary {
+) : Dictionary {
     companion object : DictionaryCompanion<SpriteDictionary>() {
         override val id = 8
 

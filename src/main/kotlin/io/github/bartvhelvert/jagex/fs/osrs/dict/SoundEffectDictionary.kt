@@ -7,8 +7,7 @@ import io.github.bartvhelvert.jagex.fs.osrs.sound.SoundEffect
 
 class SoundEffectDictionary(
     val soundEffects: List<SoundEffect>
-): Dictionary {
-
+) : Dictionary {
     companion object : DictionaryCompanion<SoundEffectDictionary>() {
         override val id = 4
 

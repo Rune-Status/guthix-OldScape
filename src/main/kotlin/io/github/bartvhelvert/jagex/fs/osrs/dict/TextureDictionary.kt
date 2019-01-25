@@ -7,8 +7,7 @@ import io.github.bartvhelvert.jagex.fs.osrs.image.Texture
 
 class TextureDictionary(
     val textures: List<Texture>
-): Dictionary {
-
+) : Dictionary {
     companion object : DictionaryCompanion<TextureDictionary>() {
         override val id = 9
 
