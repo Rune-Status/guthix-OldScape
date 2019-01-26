@@ -19,8 +19,8 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package io.guthix.cache.osrs.map
 
-import io.github.bartvhelvert.jagex.fs.io.smallUSmart
-import io.github.bartvhelvert.jagex.fs.io.uByte
+import io.guthix.cache.fs.io.smallUSmart
+import io.guthix.cache.fs.io.uByte
 import java.nio.ByteBuffer
 
 class Region @ExperimentalUnsignedTypes constructor(

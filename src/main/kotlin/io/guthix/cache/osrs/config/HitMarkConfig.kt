@@ -19,7 +19,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package io.guthix.cache.osrs.config
 
-import io.github.bartvhelvert.jagex.fs.io.*
+import io.guthix.cache.fs.io.*
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.IOException

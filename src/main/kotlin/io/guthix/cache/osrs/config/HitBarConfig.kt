@@ -19,10 +19,10 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package io.guthix.cache.osrs.config
 
-import io.github.bartvhelvert.jagex.fs.io.nullableLargeSmart
-import io.github.bartvhelvert.jagex.fs.io.uByte
-import io.github.bartvhelvert.jagex.fs.io.uShort
-import io.github.bartvhelvert.jagex.fs.io.writeNullableLargeSmart
+import io.guthix.cache.fs.io.nullableLargeSmart
+import io.guthix.cache.fs.io.uByte
+import io.guthix.cache.fs.io.uShort
+import io.guthix.cache.fs.io.writeNullableLargeSmart
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.IOException

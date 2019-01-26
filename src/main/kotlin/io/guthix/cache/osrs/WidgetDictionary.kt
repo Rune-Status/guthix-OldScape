@@ -19,9 +19,9 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package io.guthix.cache.osrs
 
-import io.github.bartvhelvert.jagex.fs.Dictionary
-import io.github.bartvhelvert.jagex.fs.DictionaryCompanion
-import io.github.bartvhelvert.jagex.fs.JagexCache
+import io.guthix.cache.fs.Dictionary
+import io.guthix.cache.fs.DictionaryCompanion
+import io.guthix.cache.fs.JagexCache
 import io.guthix.cache.osrs.plane.Widget
 
 class WidgetDictionary @ExperimentalUnsignedTypes constructor(

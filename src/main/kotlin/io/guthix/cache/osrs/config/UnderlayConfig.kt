@@ -19,9 +19,9 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package io.guthix.cache.osrs.config
 
-import io.github.bartvhelvert.jagex.fs.io.putMedium
-import io.github.bartvhelvert.jagex.fs.io.uByte
-import io.github.bartvhelvert.jagex.fs.io.uMedium
+import io.guthix.cache.fs.io.putMedium
+import io.guthix.cache.fs.io.uByte
+import io.guthix.cache.fs.io.uMedium
 import java.io.IOException
 import java.nio.ByteBuffer
 
