@@ -2,7 +2,7 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.3.20'
 }
 
-group 'io.guthix.cache.osrs'
+group 'io.guthix.osrs.cache'
 version '0.1-SNAPSHOT'
 
 repositories {
