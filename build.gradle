@@ -7,12 +7,13 @@ version '0.1-DEV'
 
 repositories {
     mavenCentral()
-    mavenLocal()
+    jcenter()
+    maven { url "https://jitpack.io" }
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    implementation "io.github.bartvhelvert.jagex:Jagex-Filesystem:0.1-DEV"
+    implementation group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8'
+    implementation group: 'com.github.guthix', name: 'Jagex-Cache', version: 'master-SNAPSHOT'
 }
 
 compileKotlin {
@@ -20,4 +21,8 @@ compileKotlin {
 }
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
+}
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
