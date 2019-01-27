@@ -1,7 +1,5 @@
 /*
-GNU LGPL V3
-Copyright (C) 2019 Bart van Helvert
-B.A.J.v.Helvert@gmail.com
+Copyright (C) 2019 Guthix
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -33,7 +31,6 @@ data class HitBarConfig(override val id: Int) : Config(id) {
     var field3310: UByte = UByte.MAX_VALUE
     var field3307: UByte = UByte.MAX_VALUE
     var field3312: UShort? = null
-    val field3308: UByte = 1u
     var field3313: UShort = 70u
     var field3315: Int? = null
     var field3316: Int? = null
