@@ -23,14 +23,14 @@ import java.io.IOException
 import java.nio.ByteBuffer
 
 class Texture @ExperimentalUnsignedTypes constructor(
-    field1527: UShort,
-    field1530: Boolean,
-    fileIds: UShortArray,
-    field1535: UByteArray?,
-    field1532: UByteArray?,
-    field1536: IntArray,
-    field1537: UByte,
-    field1538: UByte
+    val field1527: UShort,
+    val field1530: Boolean,
+    val fileIds: UShortArray,
+    val field1535: UByteArray?,
+    val field1532: UByteArray?,
+    val field1536: IntArray,
+    val field1537: UByte,
+    val field1538: UByte
 ) {
     companion object {
         @ExperimentalUnsignedTypes
