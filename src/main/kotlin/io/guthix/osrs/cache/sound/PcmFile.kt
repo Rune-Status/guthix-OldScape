@@ -165,7 +165,6 @@ class AudioFilter @ExperimentalUnsignedTypes constructor(
             val pairs = UShortArray(SIZE)
             pairs[0] = (pair shr 4).toUShort()
             pairs[1] = (pair and 0xF).toUShort()
-            println("Pais: ${pairs[0]}, ${pairs[1]}")
             val phases = Array(SIZE) { Array(SIZE) { UShortArray(
                 SIZE * 2) } }
             val magnitudes = Array(SIZE) { Array(SIZE) { UShortArray(
