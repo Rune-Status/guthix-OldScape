@@ -21,7 +21,7 @@ import io.guthix.cache.fs.io.*
 import java.nio.ByteBuffer
 
 @ExperimentalUnsignedTypes
-data class Widget(val id: Int) {
+data class Component(val id: Int) {
     var hasScript = false
     var menuType = 0
     var contentType: UShort = 0u
@@ -117,7 +117,7 @@ data class Widget(val id: Int) {
 
     companion object {
         @ExperimentalUnsignedTypes
-        fun decode(id: Int, buffer: ByteBuffer): Widget {
+        fun decode(id: Int, buffer: ByteBuffer): Component {
             return when(buffer.peak().toInt()) {
                 -1 -> decodeActive(id, buffer)
                 else -> decodeNonActive(id, buffer)
@@ -125,8 +125,8 @@ data class Widget(val id: Int) {
         }
 
         @ExperimentalUnsignedTypes
-        private fun decodeNonActive(id: Int, buffer: ByteBuffer): Widget {
-            val iFace = Widget(id)
+        private fun decodeNonActive(id: Int, buffer: ByteBuffer): Component {
+            val iFace = Component(id)
             iFace.hasScript = false
             val type = buffer.uByte.toInt()
             iFace.menuType = buffer.uByte.toInt()
@@ -285,8 +285,8 @@ data class Widget(val id: Int) {
             return iFace
         }
 
-        private fun decodeActive(id: Int, buffer: ByteBuffer): Widget {
-            val iFace = Widget(id)
+        private fun decodeActive(id: Int, buffer: ByteBuffer): Component {
+            val iFace = Component(id)
             buffer.uByte
             iFace.hasScript = true
             val type = buffer.uByte.toInt()

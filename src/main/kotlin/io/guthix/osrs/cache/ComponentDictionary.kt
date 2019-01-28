@@ -20,25 +20,25 @@ package io.guthix.osrs.cache
 import io.guthix.cache.fs.Dictionary
 import io.guthix.cache.fs.DictionaryCompanion
 import io.guthix.cache.fs.JagexCache
-import io.guthix.osrs.cache.plane.Widget
+import io.guthix.osrs.cache.plane.Component
 
-class WidgetDictionary @ExperimentalUnsignedTypes constructor(
-    val interfaces: List<Widget>
+class ComponentDictionary @ExperimentalUnsignedTypes constructor(
+    val components: List<Component>
 ) : Dictionary {
 
-    companion object : DictionaryCompanion<WidgetDictionary>() {
+    companion object : DictionaryCompanion<ComponentDictionary>() {
         override val id = 3
 
         @ExperimentalUnsignedTypes
-        fun load(cache: JagexCache): WidgetDictionary {
-            val widgets = mutableListOf<Widget>()
+        fun load(cache: JagexCache): ComponentDictionary {
+            val components = mutableListOf<Component>()
             cache.readArchives(SpriteDictionary.id).forEach { archiveId, archive ->
                 archive.files.forEach { fileId, file ->
                     val widgetId = (archiveId shl 16) + fileId
-                    widgets.add(Widget.decode(widgetId, file.data)) //TODO fix decoding
+                    components.add(Component.decode(widgetId, file.data)) //TODO fix decoding
                 }
             }
-            return WidgetDictionary(widgets)
+            return ComponentDictionary(components)
         }
     }
 }
