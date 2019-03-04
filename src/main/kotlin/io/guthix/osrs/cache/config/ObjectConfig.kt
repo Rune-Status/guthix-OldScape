@@ -459,7 +459,7 @@ data class ObjectConfig(override val id: Int): Config(id) {
             if (objectConfig.anInt2088 == null) {
                 objectConfig.anInt2088 = 0u
                 if ((objectConfig.objectModels != null && (objectConfig.objectTypes == null)
-                            || objectConfig.objectTypes!![0].toInt() == 10)
+                            || objectConfig.objectTypes?.get(0)?.toInt() == 10)
                 ) {
                     objectConfig.anInt2088 = 1u
                 }
