@@ -17,8 +17,6 @@
  */
 package io.guthix.osrs.cache
 
-import io.guthix.cache.fs.Dictionary
-import io.guthix.cache.fs.DictionaryCompanion
 import io.guthix.cache.fs.JagexCache
 import io.guthix.osrs.cache.map.Region
 import io.guthix.osrs.cache.xtea.MapXtea
@@ -26,9 +24,9 @@ import java.io.IOException
 
 class MapDictionary (
     val regions: Map<Int, Region>
-) : Dictionary {
-    companion object : DictionaryCompanion<MapDictionary>() {
-        override val id = 5
+)  {
+    companion object  {
+        val id = 5
 
         @ExperimentalUnsignedTypes
         fun load(cache: JagexCache, xteas: List<MapXtea>): MapDictionary {

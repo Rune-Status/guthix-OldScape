@@ -18,6 +18,8 @@
 package io.guthix.osrs.cache.config
 
 import io.guthix.cache.fs.io.*
+import io.guthix.cache.fs.util.toEncodedChar
+import io.guthix.cache.fs.util.toJagexChar
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.IOException

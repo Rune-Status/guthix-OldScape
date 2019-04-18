@@ -17,22 +17,20 @@
  */
 package io.guthix.osrs.cache
 
-import io.guthix.cache.fs.Dictionary
-import io.guthix.cache.fs.DictionaryCompanion
 import io.guthix.cache.fs.JagexCache
 import io.guthix.osrs.cache.sound.MidiFile
 
 class MusicTrackDictionary(
     val tracks: List<MidiFile>
-) : Dictionary {
-    companion object : DictionaryCompanion<MusicTrackDictionary>() {
-        override val id = 6
+) {
+    companion object  {
+        const val id = 6
 
         @ExperimentalUnsignedTypes
         fun load(cache: JagexCache): MusicTrackDictionary {
             val tracks = mutableListOf<MidiFile>()
-            cache.readArchives(id).forEach { _, archive ->
-                archive.files.forEach { _, file ->
+            cache.readArchives(id).forEach { (_, archive) ->
+                archive.files.forEach { (_, file) ->
                     tracks.add(MidiFile.decode(file.data))
                 }
             }

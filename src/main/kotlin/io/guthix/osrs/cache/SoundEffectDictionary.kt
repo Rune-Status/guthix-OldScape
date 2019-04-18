@@ -17,22 +17,20 @@
  */
 package io.guthix.osrs.cache
 
-import io.guthix.cache.fs.Dictionary
-import io.guthix.cache.fs.DictionaryCompanion
 import io.guthix.cache.fs.JagexCache
 import io.guthix.osrs.cache.sound.SoundEffect
 
 class SoundEffectDictionary(
     val soundEffects: List<SoundEffect>
-) : Dictionary {
-    companion object : DictionaryCompanion<SoundEffectDictionary>() {
-        override val id = 4
+) {
+    companion object  {
+        const val id = 4
 
         @ExperimentalUnsignedTypes
         fun load(cache: JagexCache): SoundEffectDictionary {
             val soundEffects = mutableListOf<SoundEffect>()
-            cache.readArchives(id).forEach { _, archive ->
-                archive.files.forEach { _, file ->
+            cache.readArchives(id).forEach { (_, archive) ->
+                archive.files.forEach { (_, file) ->
                     soundEffects.add(SoundEffect.decode(file.data)) //TODO fix the decoding
                 }
             }

@@ -17,22 +17,20 @@
  */
 package io.guthix.osrs.cache
 
-import io.guthix.cache.fs.Dictionary
-import io.guthix.cache.fs.DictionaryCompanion
 import io.guthix.cache.fs.JagexCache
 import io.guthix.osrs.cache.plane.Texture
 
 class TextureDictionary(
     val textures: List<Texture>
-) : Dictionary {
-    companion object : DictionaryCompanion<TextureDictionary>() {
-        override val id = 9
+) {
+    companion object {
+        const val id = 9
 
         @ExperimentalUnsignedTypes
         fun load(cache: JagexCache): TextureDictionary {
             val textures = mutableListOf<Texture>()
-            cache.readArchives(id).forEach { _, archive ->
-                archive.files.forEach { _, file ->
+            cache.readArchives(id).forEach { (_, archive) ->
+                archive.files.forEach { (_, file) ->
                     textures.add(Texture.decode(file.data))
                 }
             }
