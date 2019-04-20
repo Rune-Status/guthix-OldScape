@@ -30,7 +30,7 @@ class AssemblyScript(
     val localStringCount: Int,
     val intStackCount: Int,
     val stringStackCount: Int,
-    val switches: Array<MutableMap<Int, Int>>
+    val switches: Array<Map<Int, Int>>
 ) {
     companion object {
         @ExperimentalUnsignedTypes
@@ -43,18 +43,13 @@ class AssemblyScript(
             val localStringCount = buffer.uShort.toInt()
             val intStackCount = buffer.uShort.toInt()
             val stringStackCount = buffer.uShort.toInt()
-            val numSwitches = buffer.uByte.toInt()
-            val switches = arrayOf<MutableMap<Int, Int>>()
-            if(numSwitches > 0) {
-                for(i in 0 until numSwitches) {
-                    switches[i] = mutableMapOf()
-                    val count = buffer.uShort.toInt()
-                    for(j in 0 until count) {
-                        val key = buffer.int
-                        val pcOffset = buffer.int
-                        switches[i][key] = pcOffset
-                    }
+            val switches = Array<Map<Int, Int>>(buffer.uByte.toInt()) {
+                val caseCount = buffer.uShort.toInt()
+                val switch = mutableMapOf<Int, Int>()
+                repeat(caseCount) {
+                    switch[buffer.int] = buffer.int
                 }
+                switch
             }
             buffer.position(0)
             buffer.nullableString
