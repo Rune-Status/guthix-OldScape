@@ -32,7 +32,9 @@ repositories {
 
 dependencies {
     implementation group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8'
-    api group: 'com.github.guthix', name: 'Jagex-Cache', version: 'master-SNAPSHOT'
+    implementation group: 'io.github.microutils', name: 'kotlin-logging', version: kotlinLoggingVersion
+    implementation group: 'org.slf4j', name: 'slf4j-simple', version: sl4jVersion
+    implementation group: 'com.github.guthix', name: 'Jagex-Cache', version: 'master-SNAPSHOT'
 }
 
 compileKotlin {
