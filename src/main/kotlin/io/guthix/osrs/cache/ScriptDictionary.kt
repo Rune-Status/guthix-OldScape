@@ -19,6 +19,7 @@ package io.guthix.osrs.cache
 
 import io.guthix.cache.fs.JagexCache
 import io.guthix.osrs.cache.script.AssemblyScript
+import java.io.File
 
 class ScriptDictionary (
     val scripts: Map<Int, AssemblyScript>
