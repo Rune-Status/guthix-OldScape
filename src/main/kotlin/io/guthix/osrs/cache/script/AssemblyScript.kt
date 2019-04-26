@@ -20,15 +20,15 @@ package io.guthix.osrs.cache.script
 import io.guthix.cache.fs.io.*
 import java.nio.ByteBuffer
 
-class AssemblyScript(
+data class AssemblyScript(
     val id: Int,
     val instructions: IntArray,
     val intOperands: Map<Int, Int>,
     val stringOperands: Map<Int, String>,
     val localIntCount: Int,
     val localStringCount: Int,
-    val intStackCount: Int,
-    val stringStackCount: Int,
+    val intArgumentCount: Int,
+    val stringArgumentCount: Int,
     val switches: Array<Map<Int, Int>>
 ) {
     companion object {
@@ -40,8 +40,8 @@ class AssemblyScript(
             val opcodeCount = buffer.int
             val localIntCount = buffer.uShort.toInt()
             val localStringCount = buffer.uShort.toInt()
-            val intStackCount = buffer.uShort.toInt()
-            val stringStackCount = buffer.uShort.toInt()
+            val intArgumentCount = buffer.uShort.toInt()
+            val stringArgumentCount = buffer.uShort.toInt()
             val switches = Array<Map<Int, Int>>(buffer.uByte.toInt()) {
                 val caseCount = buffer.uShort.toInt()
                 val switch = mutableMapOf<Int, Int>()
@@ -69,7 +69,7 @@ class AssemblyScript(
                 instructions[i++] = opcode
             }
             return AssemblyScript(id, instructions, intOperands, stringOperands, localIntCount, localStringCount,
-                intStackCount, stringStackCount, switches
+                intArgumentCount, stringArgumentCount, switches
             )
         }
     }

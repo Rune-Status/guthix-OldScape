@@ -27,6 +27,7 @@ class Disassembler {
     fun disassemble(script: AssemblyScript): String {
         val jumps = needsLabel(script)
         val writer = StringBuilder()
+        writer.writeScriptInfo(script)
         script.instructions.forEachIndexed { i, opcode ->
             val instruction = Instruction.byOpcode[opcode]
             if(instruction == null) logger.warn("Instruction with opcode $opcode not implemented")
@@ -120,6 +121,16 @@ class Disassembler {
 
         // int operand is not used, don't write it
         return false
+    }
+
+    private fun StringBuilder.writeScriptInfo(script: AssemblyScript) {
+        append("id: ${script.id}\n")
+        append("localIntCount ${script.localIntCount}\n")
+        append("localStringCount ${script.localStringCount}\n")
+        append("intArgumentCount ${script.intArgumentCount}\n")
+        append("stringArgumentCount ${script.stringArgumentCount}\n")
+        append("intops ${script.intOperands}\n")
+        append("stringops ${script.stringOperands}\n")
     }
 }
 
