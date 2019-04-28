@@ -18,20 +18,19 @@
 package io.guthix.osrs.cache
 
 import io.guthix.cache.fs.JagexCache
-import io.guthix.osrs.cache.script.AssemblyScript
-import java.io.File
+import io.guthix.osrs.cache.script.MachineScript
 
 class ScriptDictionary (
-    val scripts: Map<Int, AssemblyScript>
+    val scripts: Map<Int, MachineScript>
 )  {
     companion object  {
         const val id = 12
 
         @ExperimentalUnsignedTypes
         fun load(cache: JagexCache): ScriptDictionary {
-            val scripts = mutableMapOf<Int, AssemblyScript>()
+            val scripts = mutableMapOf<Int, MachineScript>()
             cache.readArchives(id).forEach { (archiveId, archive) ->
-                scripts[archiveId] = AssemblyScript.decode(archiveId, archive.files[0]!!.data) //TODO fix decoding
+                scripts[archiveId] = MachineScript.decode(archiveId, archive.files[0]!!.data) //TODO fix decoding
             }
             return ScriptDictionary(scripts)
         }

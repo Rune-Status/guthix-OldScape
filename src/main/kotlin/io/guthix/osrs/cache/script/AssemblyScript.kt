@@ -15,62 +15,107 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package io.guthix.osrs.cache.script
 
-import io.guthix.cache.fs.io.*
-import java.nio.ByteBuffer
+package io.guthix.osrs.cache.script
 
 data class AssemblyScript(
     val id: Int,
-    val instructions: IntArray,
-    val intOperands: Map<Int, Int>,
-    val stringOperands: Map<Int, String>,
+    val instructions: Array<InstructionDefinition>,
     val localIntCount: Int,
     val localStringCount: Int,
     val intArgumentCount: Int,
-    val stringArgumentCount: Int,
-    val switches: Array<Map<Int, Int>>
+    val stringArgumentCount: Int
 ) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is AssemblyScript) return false
+
+        if (!instructions.contentEquals(other.instructions)) return false
+        if (localIntCount != other.localIntCount) return false
+        if (localStringCount != other.localStringCount) return false
+        if (intArgumentCount != other.intArgumentCount) return false
+        if (stringArgumentCount != other.stringArgumentCount) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = instructions.contentHashCode()
+        result = 31 * result + localIntCount
+        result = 31 * result + localStringCount
+        result = 31 * result + intArgumentCount
+        result = 31 * result + stringArgumentCount
+        return result
+    }
+
+    override fun toString(): String {
+        val strBuilder = StringBuilder()
+        strBuilder.append("""
+            // id: $id
+            // localIntCount: $localIntCount
+            // localStringCount: $localStringCount
+            // intArgumentCount: $intArgumentCount
+            // stringArgumentCount: $stringArgumentCount
+        """.trimIndent())
+        strBuilder.append("\n")
+        val labels = mutableSetOf<Int>()
+        instructions.forEach { instruction ->
+            if(instruction is IntInstruction && instruction.isJump) {
+                labels.add(instruction.operand)
+            }
+            if(instruction is SwitchInstruction) {
+                instruction.operand.forEach { (_, jumpAddress) ->
+                    labels.add(jumpAddress)
+                }
+            }
+        }
+        instructions.forEachIndexed { curLine, instruction ->
+            if(labels.contains(curLine)) {
+                strBuilder.append(String.format("%-22s", "LABEL$curLine"))
+            } else {
+                strBuilder.append(String.format("%-22s", ""))
+            }
+            strBuilder.append(String.format("%-22s", instruction.name))
+            when (instruction) {
+                is IntInstruction -> strBuilder.append("${instruction.operand}\n")
+                is StringInstruction -> strBuilder.append("${instruction.operand}\n")
+                is SwitchInstruction -> {
+                    strBuilder.append("${instruction.operand.size}\n")
+                    instruction.operand.forEach { key, jumpTo ->
+                        strBuilder.append(String.format("%-22s", ""))
+                        strBuilder.append("    $key -> $jumpTo\n")
+                    }
+                }
+            }
+        }
+        return strBuilder.toString()
+    }
+
     companion object {
-        @ExperimentalUnsignedTypes
-        fun decode(id: Int, buffer: ByteBuffer): AssemblyScript {
-            val switchDataLength = buffer.getUShort(buffer.limit() - 2).toInt() // ushort
-            val opcodeEndPos = buffer.limit() - 2 - switchDataLength - 12
-            buffer.position(opcodeEndPos)
-            val opcodeCount = buffer.int
-            val localIntCount = buffer.uShort.toInt()
-            val localStringCount = buffer.uShort.toInt()
-            val intArgumentCount = buffer.uShort.toInt()
-            val stringArgumentCount = buffer.uShort.toInt()
-            val switches = Array<Map<Int, Int>>(buffer.uByte.toInt()) {
-                val caseCount = buffer.uShort.toInt()
-                val switch = mutableMapOf<Int, Int>()
-                repeat(caseCount) {
-                    switch[buffer.int] = buffer.int
+        fun disassemble(script: MachineScript): AssemblyScript {
+            val instructions = Array(script.instructions.size) { curLine ->
+                val machineInstr = script.instructions[curLine]
+                if(machineInstr is IntInstruction && machineInstr.isJump) {
+                    IntInstruction(machineInstr.opcode, machineInstr.name, curLine + machineInstr.operand + 1)
                 }
-                switch
-            }
-            buffer.position(0)
-            buffer.nullableString
-            val instructions = IntArray(opcodeCount)
-            val intOperands = mutableMapOf<Int, Int>()
-            val stringOperands = mutableMapOf<Int, String>()
-            var i = 0
-            while (buffer.position() < opcodeEndPos) {
-                val opcode = buffer.uShort.toInt()
-                if(opcode == Instruction.SCONST.opcode) {
-                    stringOperands[i] = buffer.string
-                } else if (opcode < 100 && opcode != Instruction.RETURN.opcode
-                    && opcode != Instruction.POP_INT.opcode && opcode != Instruction.POP_STRING.opcode) {
-                    intOperands[i] = buffer.int
-                } else {
-                    intOperands[i] = buffer.uByte.toInt()
+                if(machineInstr is SwitchInstruction) {
+                    val updatedMap = mutableMapOf<Int, Int>()
+                    machineInstr.operand.forEach { value, jumpDelta ->
+                        updatedMap[value] = curLine + jumpDelta + 1
+                    }
+                    SwitchInstruction(machineInstr.opcode, machineInstr.name, updatedMap.toMap())
                 }
-                instructions[i++] = opcode
+                machineInstr
             }
-            return AssemblyScript(id, instructions, intOperands, stringOperands, localIntCount, localStringCount,
-                intArgumentCount, stringArgumentCount, switches
+            return AssemblyScript(
+                script.id,
+                instructions,
+                script.localIntCount,
+                script.localStringCount,
+                script.intArgumentCount,
+                script.stringArgumentCount
             )
+
         }
     }
 }
