@@ -120,7 +120,7 @@ data class MachineScript(
                 }
                 opcodes[i++] = opcode
             }
-            val instructions = Array<InstructionDefinition>(opcodeCount) {
+            val instructions = Array(opcodeCount) {
                 val opcode = opcodes[it]
                 val instrDef = InstructionDefinition.byOpcode[opcode]
                     ?: InstructionDefinition(opcode, String.format("%03d", opcode)).apply {

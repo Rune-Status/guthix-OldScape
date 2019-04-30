@@ -70,20 +70,15 @@ data class AssemblyScript(
             }
         }
         instructions.forEachIndexed { curLine, instruction ->
-            if(labels.contains(curLine)) {
-                strBuilder.append(String.format("%-22s", "LABEL$curLine"))
-            } else {
-                strBuilder.append(String.format("%-22s", ""))
-            }
-            strBuilder.append(String.format("%-22s", instruction.name))
+            if(labels.contains(curLine)) strBuilder.append("LABEL$curLine:\n")
+            strBuilder.append(String.format("    %-22s", instruction.name))
             when (instruction) {
                 is IntInstruction -> strBuilder.append("${instruction.operand}\n")
                 is StringInstruction -> strBuilder.append("${instruction.operand}\n")
                 is SwitchInstruction -> {
                     strBuilder.append("${instruction.operand.size}\n")
-                    instruction.operand.forEach { key, jumpTo ->
-                        strBuilder.append(String.format("%-22s", ""))
-                        strBuilder.append("    $key -> $jumpTo\n")
+                    instruction.operand.forEach { (key, jumpTo) ->
+                        strBuilder.append("        $key:$jumpTo\n")
                     }
                 }
             }
