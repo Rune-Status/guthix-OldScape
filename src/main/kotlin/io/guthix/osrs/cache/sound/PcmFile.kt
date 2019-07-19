@@ -17,7 +17,7 @@
  */
 package io.guthix.osrs.cache.sound
 
-import io.guthix.cache.fs.io.*
+import io.guthix.cache.js5.io.*
 import java.nio.ByteBuffer
 
 class SoundEffect @ExperimentalUnsignedTypes constructor(

@@ -17,8 +17,8 @@
  */
 package io.guthix.osrs.cache.config
 
-import io.guthix.cache.fs.io.uByte
-import io.guthix.cache.fs.io.uShort
+import io.guthix.cache.js5.io.uByte
+import io.guthix.cache.js5.io.uShort
 import java.io.IOException
 import java.nio.ByteBuffer
 
@@ -44,11 +44,10 @@ data class VarPlayerConfig(override val id: Int) : Config(id) {
         override fun decode(id: Int, buffer: ByteBuffer): VarPlayerConfig {
             val varPlayerConfig = VarPlayerConfig(id)
             decoder@ while (true) {
-                val opcode = buffer.uByte.toInt()
-                when (opcode) {
+                when (val opcode = buffer.uByte.toInt()) {
                     0 -> break@decoder
                     5 -> varPlayerConfig.type = buffer.uShort
-                    else -> throw IOException("Did not recognise opcode $opcode")
+                    else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
             return varPlayerConfig

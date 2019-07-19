@@ -17,9 +17,9 @@
  */
 package io.guthix.osrs.cache.plane
 
-import io.guthix.cache.fs.io.uByte
-import io.guthix.cache.fs.io.uMedium
-import io.guthix.cache.fs.io.uShort
+import io.guthix.cache.js5.io.uByte
+import io.guthix.cache.js5.io.uMedium
+import io.guthix.cache.js5.io.uShort
 import java.awt.image.BufferedImage
 import java.nio.ByteBuffer
 

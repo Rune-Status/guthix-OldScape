@@ -17,7 +17,7 @@
  */
 package io.guthix.osrs.cache
 
-import io.guthix.cache.fs.JagexCache
+import io.guthix.cache.js5.Js5Cache
 import io.guthix.osrs.cache.script.MachineScript
 
 class ScriptDictionary (
@@ -27,9 +27,9 @@ class ScriptDictionary (
         const val id = 12
 
         @ExperimentalUnsignedTypes
-        fun load(cache: JagexCache): ScriptDictionary {
+        fun load(cache: Js5Cache): ScriptDictionary {
             val scripts = mutableMapOf<Int, MachineScript>()
-            cache.readArchives(id).forEach { (archiveId, archive) ->
+            cache.readGroups(id).forEach { (archiveId, archive) ->
                 scripts[archiveId] = MachineScript.decode(archiveId, archive.files[0]!!.data) //TODO fix decoding
             }
             return ScriptDictionary(scripts)

@@ -17,8 +17,8 @@
  */
 package io.guthix.osrs.cache.plane
 
-import io.guthix.cache.fs.io.uByte
-import io.guthix.cache.fs.io.uShort
+import io.guthix.cache.js5.io.uByte
+import io.guthix.cache.js5.io.uShort
 import java.io.IOException
 import java.nio.ByteBuffer
 
@@ -38,7 +38,7 @@ class Texture @ExperimentalUnsignedTypes constructor(
             val field1527 = buffer.uShort
             val field1530 = buffer.uByte.toInt() == 1
             val amount = buffer.uByte.toInt()
-            if(amount !in 0..4) throw IOException("Amount of textures should be between 0 and 4 but is $amount")
+            if(amount !in 0..4) throw IOException("Amount of textures should be between 0 and 4 but is $amount.")
             val fileIds = UShortArray(amount) {
                 buffer.uShort
             }

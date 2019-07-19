@@ -17,9 +17,9 @@
  */
 package io.guthix.osrs.cache.config
 
-import io.guthix.cache.fs.io.params
-import io.guthix.cache.fs.io.uByte
-import io.guthix.cache.fs.io.writeParams
+import io.guthix.cache.js5.io.params
+import io.guthix.cache.js5.io.uByte
+import io.guthix.cache.js5.io.writeParams
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.IOException
@@ -47,11 +47,10 @@ data class StructConfig(override val id: Int) : Config(id) {
         override fun decode(id: Int, buffer: ByteBuffer): StructConfig {
             val structConfig = StructConfig(id)
             decoder@ while (true) {
-                val opcode = buffer.uByte.toInt()
-                when (opcode) {
+                when (val opcode = buffer.uByte.toInt()) {
                     0 -> break@decoder
                     249 -> structConfig.params = buffer.params
-                    else -> throw IOException("Did not recognise opcode $opcode")
+                    else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
             return structConfig

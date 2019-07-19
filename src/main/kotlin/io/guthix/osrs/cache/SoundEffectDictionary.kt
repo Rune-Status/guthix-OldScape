@@ -17,7 +17,7 @@
  */
 package io.guthix.osrs.cache
 
-import io.guthix.cache.fs.JagexCache
+import io.guthix.cache.js5.Js5Cache
 import io.guthix.osrs.cache.sound.SoundEffect
 
 class SoundEffectDictionary(
@@ -27,9 +27,9 @@ class SoundEffectDictionary(
         const val id = 4
 
         @ExperimentalUnsignedTypes
-        fun load(cache: JagexCache): SoundEffectDictionary {
+        fun load(cache: Js5Cache): SoundEffectDictionary {
             val soundEffects = mutableListOf<SoundEffect>()
-            cache.readArchives(id).forEach { (_, archive) ->
+            cache.readGroups(id).forEach { (_, archive) ->
                 archive.files.forEach { (_, file) ->
                     soundEffects.add(SoundEffect.decode(file.data)) //TODO fix the decoding
                 }

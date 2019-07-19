@@ -17,7 +17,7 @@
  */
 package io.guthix.osrs.cache.config
 
-import io.guthix.cache.fs.io.uByte
+import io.guthix.cache.js5.io.uByte
 import java.io.IOException
 import java.nio.ByteBuffer
 
@@ -40,11 +40,10 @@ data class VarClientStringConfig(override val id: Int) : Config(id) {
         override fun decode(id: Int, buffer: ByteBuffer): VarClientStringConfig {
             val varClientStringConfig = VarClientStringConfig(id)
             decoder@ while (true) {
-                val opcode = buffer.uByte.toInt()
-                when (opcode) {
+                when (val opcode = buffer.uByte.toInt()) {
                     0 -> break@decoder
                     2 -> varClientStringConfig.isSerializable = true
-                    else -> throw IOException("Did not recognise opcode $opcode")
+                    else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
             return varClientStringConfig

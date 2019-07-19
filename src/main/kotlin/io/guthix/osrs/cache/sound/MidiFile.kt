@@ -17,7 +17,7 @@
  */
 package io.guthix.osrs.cache.sound
 
-import io.guthix.cache.fs.io.*
+import io.guthix.cache.js5.io.*
 import java.io.IOException
 import java.nio.ByteBuffer
 
@@ -104,7 +104,7 @@ class MidiFile(
                         opcode == JAG_CHANNEL_PRESSURE -> chnnlAfterTchOpcodes++
                         opcode == JAG_POLY_PRESSURE -> keyAfterTchOpcodes++
                         opcode == JAG_PROGRAM_CHANGE -> progmChangeOpcodes++
-                        else -> throw IOException("Track opcode $opcode not implemented")
+                        else -> throw IOException("Track opcode $opcode not implemented.")
                     }
                 }
             }
@@ -344,7 +344,7 @@ class MidiFile(
                             JAG_PROGRAM_CHANGE -> {
                                 if (shouldWriteOpcode) midiBuff.put((PROGRAM_CHANGE + var52).toByte())
                                 midiBuff.put(buffer.array()[programChangeIndex++])
-                            } else -> throw IOException("Did not recognise jag track opcode $curJagOpcode")
+                            } else -> throw IOException("Did not recognise jag track opcode $curJagOpcode.")
                         }
                     }
                 }

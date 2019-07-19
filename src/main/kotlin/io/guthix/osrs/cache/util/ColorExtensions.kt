@@ -19,13 +19,15 @@ package io.guthix.osrs.cache.util
 
 import java.awt.Color
 import java.lang.IllegalStateException
+import kotlin.math.max
+import kotlin.math.min
 
 fun Color.getHSLComponents(): IntArray {
     val r = red / 256.0
     val g = green / 256.0
     val b = blue / 256.0
-    val min = Math.min(Math.min(g, r), b)
-    val max = Math.max(Math.max(g, r), b)
+    val min = min(Math.min(g, r), b)
+    val max = max(Math.max(g, r), b)
     val luminace= (max + min) / 2.0
     var saturation = (if(min != max) {
         if(luminace < 0.5) {
@@ -41,7 +43,7 @@ fun Color.getHSLComponents(): IntArray {
             r -> (g - b) / (max - min)
             g -> (b - r) / (max - min) + 2.0
             b -> (r - g) / (max - min) + 4.0
-            else -> throw IllegalStateException("Max color value should be either red, green or blue")
+            else -> throw IllegalStateException("Max color value should be either red, green or blue.")
         }
     } else {
         0.toDouble()

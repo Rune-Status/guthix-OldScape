@@ -17,7 +17,7 @@
  */
 package io.guthix.osrs.cache
 
-import io.guthix.cache.fs.JagexCache
+import io.guthix.cache.js5.Js5Cache
 import io.guthix.osrs.cache.plane.Component
 
 class ComponentDictionary @ExperimentalUnsignedTypes constructor(
@@ -28,9 +28,9 @@ class ComponentDictionary @ExperimentalUnsignedTypes constructor(
         const val id = 3
 
         @ExperimentalUnsignedTypes
-        fun load(cache: JagexCache): ComponentDictionary {
+        fun load(cache: Js5Cache): ComponentDictionary {
             val components = mutableListOf<Component>()
-            cache.readArchives(SpriteDictionary.id).forEach { (archiveId, archive) ->
+            cache.readGroups(SpriteDictionary.id).forEach { (archiveId, archive) ->
                 archive.files.forEach { (fileId, file) ->
                     val widgetId = (archiveId shl 16) + fileId
                     components.add(Component.decode(widgetId, file.data)) //TODO fix decoding

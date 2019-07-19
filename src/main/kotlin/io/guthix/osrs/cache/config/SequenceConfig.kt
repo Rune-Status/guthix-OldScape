@@ -17,10 +17,10 @@
  */
 package io.guthix.osrs.cache.config
 
-import io.guthix.cache.fs.io.uByte
-import io.guthix.cache.fs.io.uMedium
-import io.guthix.cache.fs.io.uShort
-import io.guthix.cache.fs.io.writeMedium
+import io.guthix.cache.js5.io.uByte
+import io.guthix.cache.js5.io.uMedium
+import io.guthix.cache.js5.io.uShort
+import io.guthix.cache.js5.io.writeMedium
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.IOException
@@ -48,7 +48,7 @@ data class SequenceConfig(override val id: Int) : Config(id) {
         val byteStr = ByteArrayOutputStream()
         DataOutputStream(byteStr).use { os ->
             frameLengths?.let {
-                if(frameLengths!!.size != frameIds!!.size) throw IOException("Frame lengths don't match frame ids")
+                if(frameLengths!!.size != frameIds!!.size) throw IOException("Frame lengths don't match frame ids.")
                 os.writeOpcode(1)
                 os.writeShort(frameLengths!!.size)
                 frameLengths!!.forEach { length ->
@@ -184,8 +184,7 @@ data class SequenceConfig(override val id: Int) : Config(id) {
         override fun decode(id: Int, buffer: ByteBuffer): SequenceConfig {
             val sequenceConfig = SequenceConfig(id)
             decoder@ while (true) {
-                val opcode = buffer.uByte.toInt()
-                when (opcode) {
+                when (val opcode = buffer.uByte.toInt()) {
                     0 -> break@decoder
                     1 -> {
                         val length = buffer.uShort.toInt()
@@ -225,7 +224,7 @@ data class SequenceConfig(override val id: Int) : Config(id) {
                         val length = buffer.uByte.toInt()
                         sequenceConfig.field3056 = IntArray(length) { buffer.uMedium }
                     }
-                    else -> throw IOException("Did not recognise opcode $opcode")
+                    else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
             sequenceConfig.precedenceAnimating?.let {

@@ -17,10 +17,10 @@
  */
 package io.guthix.osrs.cache.config
 
-import io.guthix.cache.fs.io.string
-import io.guthix.cache.fs.io.uByte
-import io.guthix.cache.fs.io.uShort
-import io.guthix.cache.fs.io.writeString
+import io.guthix.cache.js5.io.string
+import io.guthix.cache.js5.io.uByte
+import io.guthix.cache.js5.io.uShort
+import io.guthix.cache.js5.io.writeString
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.IOException
@@ -55,19 +55,19 @@ data class EnumConfig(override val id: Int) : Config(id) {
             when {
                 keyValuePairs.all { it.value is String } -> {
                     os.writeOpcode(5)
-                    keyValuePairs.forEach { key, value ->
+                    keyValuePairs.forEach { (key, value) ->
                         os.writeInt(key)
                         os.writeString(value as String)
                     }
                 }
                 keyValuePairs.all { it.value is Int } -> {
                     os.writeOpcode(6)
-                    keyValuePairs.forEach { key, value ->
+                    keyValuePairs.forEach { (key, value) ->
                         os.writeInt(key)
                         os.writeInt(value as Int)
                     }
                 }
-                else -> throw IOException("Enum can only contain ints or strings")
+                else -> throw IOException("Enum can only contain ints or strings.")
             }
             os.writeOpcode(0)
         }
@@ -81,8 +81,7 @@ data class EnumConfig(override val id: Int) : Config(id) {
         override fun decode(id: Int, buffer: ByteBuffer): EnumConfig {
             val enumConfig = EnumConfig(id)
             decoder@ while (true) {
-                val opcode = buffer.uByte.toInt()
-                when (opcode) {
+                when (val opcode = buffer.uByte.toInt()) {
                     0 -> break@decoder
                     1 -> enumConfig.keyType = buffer.uByte.toShort().toChar()
                     2 -> enumConfig.valType = buffer.uByte.toShort().toChar()
@@ -102,7 +101,7 @@ data class EnumConfig(override val id: Int) : Config(id) {
                             enumConfig.keyValuePairs[key] = buffer.int
                         }
                     }
-                    else -> throw IOException("Did not recognise opcode $opcode")
+                    else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
             return enumConfig

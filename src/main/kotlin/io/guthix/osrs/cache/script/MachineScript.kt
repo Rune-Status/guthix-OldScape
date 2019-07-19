@@ -17,7 +17,7 @@
  */
 package io.guthix.osrs.cache.script
 
-import io.guthix.cache.fs.io.*
+import io.guthix.cache.js5.io.*
 import mu.KotlinLogging
 import java.io.IOException
 import java.nio.ByteBuffer
@@ -134,7 +134,7 @@ data class MachineScript(
                     }
                 } else {
                     val stringOp= stringOperands[it]
-                        ?: throw IOException("Could not find string operand for instruction ${instrDef.name}")
+                        ?: throw IOException("Could not find string operand for instruction ${instrDef.name}.")
                     StringInstruction(instrDef.opcode, instrDef.name, stringOp)
                 }
             }

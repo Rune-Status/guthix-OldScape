@@ -17,8 +17,8 @@
  */
 package io.guthix.osrs.cache.map
 
-import io.guthix.cache.fs.io.smallUSmart
-import io.guthix.cache.fs.io.uByte
+import io.guthix.cache.js5.io.smallUSmart
+import io.guthix.cache.js5.io.uByte
 import java.nio.ByteBuffer
 
 class Region @ExperimentalUnsignedTypes constructor(
@@ -120,14 +120,7 @@ class Land(
                     }
                 }
             }
-            return Land(
-                tileHeights,
-                renderRules,
-                overlayIds,
-                overlayPaths,
-                overlayRotations,
-                underlayIds
-            )
+            return Land(tileHeights, renderRules, overlayIds, overlayPaths, overlayRotations, underlayIds)
         }
 
         @ExperimentalUnsignedTypes
@@ -159,24 +152,9 @@ class Land(
 
         @ExperimentalUnsignedTypes
         private fun smoothNoise2d(x: Int, y: Int): Int {
-            val corners = noise(
-                x - 1,
-                y - 1
-            ) + noise(
-                x + 1,
-                y - 1
-            ) + noise(x - 1, 1 + y) +
-                    noise(x + 1, y + 1)
-            val sides = noise(
-                x - 1,
-                y
-            ) + noise(
-                1 + x,
-                y
-            ) + noise(x, y - 1) + noise(
-                x,
-                1 + y
-            )
+            val corners = noise(x - 1, y - 1) + noise(x + 1, y - 1) + noise(x - 1, 1 + y)
+                + noise(x + 1, y + 1)
+            val sides = noise(x - 1, y) + noise(1 + x, y) + noise(x, y - 1) + noise(x, 1 + y)
             val center = noise(x, y)
             return corners / 16 + sides / 8 + center / 4
         }
@@ -230,16 +208,7 @@ class ObjectLocation(
                         val attributes = buffer.uByte.toInt()
                         val orientation = attributes and 0x3
                         val type = attributes shr 2
-                        locations.add(
-                            ObjectLocation(
-                                id,
-                                z,
-                                localX,
-                                localY,
-                                type,
-                                orientation
-                            )
-                        )
+                        locations.add(ObjectLocation(id, z, localX, localY, type, orientation))
                     }
                     positionOffset = buffer.smallUSmart.toInt()
                 }

@@ -17,9 +17,9 @@
  */
 package io.guthix.osrs.cache.config
 
-import io.guthix.cache.fs.io.uByte
-import io.guthix.cache.fs.io.uMedium
-import io.guthix.cache.fs.io.writeMedium
+import io.guthix.cache.js5.io.uByte
+import io.guthix.cache.js5.io.uMedium
+import io.guthix.cache.js5.io.writeMedium
 import java.awt.Color
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
@@ -62,14 +62,13 @@ data class OverlayConfig(override val id: Int) : Config(id) {
         override fun decode(id: Int, buffer: ByteBuffer): OverlayConfig {
             val overlayConfig = OverlayConfig(id)
             decoder@ while (true) {
-                val opcode = buffer.uByte.toInt()
-                when (opcode) {
+                when (val opcode = buffer.uByte.toInt()) {
                     0 -> break@decoder
                     1 -> overlayConfig.color = Color(buffer.uMedium)
                     2 -> overlayConfig.texture = buffer.uByte
                     5 -> overlayConfig.isHidden = false
                     7 -> overlayConfig.otherColor = Color(buffer.uMedium)
-                    else -> throw IOException("Did not recognise opcode $opcode")
+                    else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
             return overlayConfig

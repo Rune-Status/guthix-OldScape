@@ -17,9 +17,9 @@
  */
 package io.guthix.osrs.cache.config
 
-import io.guthix.cache.fs.io.*
-import io.guthix.cache.fs.util.toEncodedChar
-import io.guthix.cache.fs.util.toJagexChar
+import io.guthix.cache.js5.io.*
+import io.guthix.cache.js5.util.toEncodedChar
+import io.guthix.cache.js5.util.toJagexChar
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.IOException
@@ -59,18 +59,17 @@ data class ParamConfig(override val id: Int) : Config(id) {
         override fun decode(id: Int, buffer: ByteBuffer): ParamConfig {
             val paramConfig = ParamConfig(id)
             decoder@ while (true) {
-                val opcode = buffer.uByte.toInt()
-                when(opcode) {
+                when(val opcode = buffer.uByte.toInt()) {
                     0 -> break@decoder
                     1 -> {
                         val charId = buffer.uByte
-                        if(charId.toInt() == 0) throw IOException("Char id can't be 0")
+                        if(charId.toInt() == 0) throw IOException("Char id can't be 0.")
                         paramConfig.stackType = toJagexChar(charId.toInt())
                     }
                     2 -> paramConfig.defaultInt = buffer.int
                     4 -> paramConfig.autoDisable = false
                     5 -> paramConfig.defaultString = buffer.string
-                    else -> throw IOException("Did not recognise opcode $opcode")
+                    else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
             return paramConfig

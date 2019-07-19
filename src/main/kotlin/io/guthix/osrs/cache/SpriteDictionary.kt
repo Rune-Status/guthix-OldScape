@@ -17,7 +17,7 @@
  */
 package io.guthix.osrs.cache
 
-import io.guthix.cache.fs.JagexCache
+import io.guthix.cache.js5.Js5Cache
 import io.guthix.osrs.cache.plane.Sprite
 
 class SpriteDictionary(
@@ -27,9 +27,9 @@ class SpriteDictionary(
         const val id = 8
 
         @ExperimentalUnsignedTypes
-        fun load(cache: JagexCache): SpriteDictionary {
+        fun load(cache: Js5Cache): SpriteDictionary {
             val sprites = mutableListOf<Sprite>()
-            cache.readArchives(id).forEach { (_, archive) ->
+            cache.readGroups(id).forEach { (_, archive) ->
                 archive.files.forEach { (_, file) ->
                     sprites.add(Sprite.decode(file.data))
                 }

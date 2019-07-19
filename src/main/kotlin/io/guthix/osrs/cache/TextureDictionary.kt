@@ -17,7 +17,7 @@
  */
 package io.guthix.osrs.cache
 
-import io.guthix.cache.fs.JagexCache
+import io.guthix.cache.js5.Js5Cache
 import io.guthix.osrs.cache.plane.Texture
 
 class TextureDictionary(
@@ -27,9 +27,9 @@ class TextureDictionary(
         const val id = 9
 
         @ExperimentalUnsignedTypes
-        fun load(cache: JagexCache): TextureDictionary {
+        fun load(cache: Js5Cache): TextureDictionary {
             val textures = mutableListOf<Texture>()
-            cache.readArchives(id).forEach { (_, archive) ->
+            cache.readGroups(id).forEach { (_, archive) ->
                 archive.files.forEach { (_, file) ->
                     textures.add(Texture.decode(file.data))
                 }

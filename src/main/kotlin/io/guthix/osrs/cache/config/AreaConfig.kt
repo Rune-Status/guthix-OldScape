@@ -17,7 +17,7 @@
  */
 package io.guthix.osrs.cache.config
 
-import io.guthix.cache.fs.io.*
+import io.guthix.cache.js5.io.*
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.IOException
@@ -146,8 +146,7 @@ data class AreaConfig(override val id: Int) : Config(id) {
         override fun decode(id: Int, buffer: ByteBuffer): AreaConfig {
             val areaConfig = AreaConfig(id)
             decoder@ while (true) {
-                val opcode = buffer.uByte.toInt()
-                when (opcode) {
+                when (val opcode = buffer.uByte.toInt()) {
                     0 -> break@decoder
                     1 -> areaConfig.spriteId = buffer.nullableLargeSmart
                     2 -> areaConfig.field3032 = buffer.nullableLargeSmart
@@ -183,7 +182,7 @@ data class AreaConfig(override val id: Int) : Config(id) {
                     28 -> buffer.uByte
                     29 -> buffer.uByte
                     30 -> buffer.uByte
-                    else -> throw IOException("Did not recognise opcode $opcode")
+                    else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
             return areaConfig

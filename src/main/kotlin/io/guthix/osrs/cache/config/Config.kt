@@ -17,7 +17,7 @@
  */
 package io.guthix.osrs.cache.config
 
-import io.guthix.cache.fs.Archive
+import io.guthix.cache.js5.Js5Group
 import java.io.DataOutputStream
 import java.nio.ByteBuffer
 
@@ -31,9 +31,9 @@ abstract class ConfigCompanion<out T: Config> {
     abstract val id: Int
 
     @ExperimentalUnsignedTypes
-    fun load(archive: Archive): Map<Int, T> {
+    fun load(archive: Js5Group): Map<Int, T> {
         val configs = mutableMapOf<Int, T>()
-        archive.files.forEach{ fileId, file ->
+        archive.files.forEach{ (fileId, file) ->
             configs[fileId] = decode(fileId, file.data)
         }
         return configs

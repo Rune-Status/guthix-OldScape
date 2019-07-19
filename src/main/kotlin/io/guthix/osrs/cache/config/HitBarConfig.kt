@@ -17,10 +17,10 @@
  */
 package io.guthix.osrs.cache.config
 
-import io.guthix.cache.fs.io.nullableLargeSmart
-import io.guthix.cache.fs.io.uByte
-import io.guthix.cache.fs.io.uShort
-import io.guthix.cache.fs.io.writeNullableLargeSmart
+import io.guthix.cache.js5.io.nullableLargeSmart
+import io.guthix.cache.js5.io.uByte
+import io.guthix.cache.js5.io.uShort
+import io.guthix.cache.js5.io.writeNullableLargeSmart
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.IOException
@@ -51,7 +51,7 @@ data class HitBarConfig(override val id: Int) : Config(id) {
                 os.writeByte(field3307.toInt())
             }
             field3312?.let {
-                if(field3312!!.toInt() != 0) throw IOException("Field3312 should be 0")
+                if(field3312!!.toInt() != 0) throw IOException("Field3312 should be 0.")
                 os.writeOpcode(4)
             }
             if(field3313.toInt() != 70) {
@@ -90,8 +90,7 @@ data class HitBarConfig(override val id: Int) : Config(id) {
         override fun decode(id: Int, buffer: ByteBuffer): HitBarConfig {
             val hitBarConfig = HitBarConfig(id)
             decoder@ while (true) {
-                val opcode = buffer.uByte.toInt()
-                when(opcode) {
+                when(val opcode = buffer.uByte.toInt()) {
                     0 -> break@decoder
                     1 -> buffer.uShort
                     2 -> hitBarConfig.field3310 = buffer.uByte
@@ -104,7 +103,7 @@ data class HitBarConfig(override val id: Int) : Config(id) {
                     11 -> hitBarConfig.field3312 = buffer.uShort
                     14 -> hitBarConfig.healthScale = buffer.uByte
                     15 -> hitBarConfig.field3318 = buffer.uByte
-                    else -> throw IOException("Did not recognise opcode $opcode")
+                    else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
             return HitBarConfig(id)

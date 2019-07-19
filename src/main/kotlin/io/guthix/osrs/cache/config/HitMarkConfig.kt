@@ -17,7 +17,7 @@
  */
 package io.guthix.osrs.cache.config
 
-import io.guthix.cache.fs.io.*
+import io.guthix.cache.js5.io.*
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.IOException
@@ -176,8 +176,7 @@ data class HitMarkConfig(override val id: Int) : Config(id) {
         override fun decode(id: Int, buffer: ByteBuffer): HitMarkConfig {
             val hitmarkConfig = HitMarkConfig(id)
             decoder@ while (true) {
-                val opcode = buffer.uByte.toInt()
-                when(opcode) {
+                when(val opcode = buffer.uByte.toInt()) {
                     0 -> break@decoder
                     1 -> hitmarkConfig.field3353 = buffer.nullableLargeSmart
                     2 -> hitmarkConfig.field3364 = buffer.uMedium
@@ -213,7 +212,7 @@ data class HitMarkConfig(override val id: Int) : Config(id) {
                             hitmarkConfig. configs!![size + 1] = lastEntry
                         }
                     }
-                    else -> throw IOException("Did not recognise opcode $opcode")
+                    else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
             return hitmarkConfig

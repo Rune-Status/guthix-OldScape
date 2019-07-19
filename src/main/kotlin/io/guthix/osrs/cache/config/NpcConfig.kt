@@ -17,7 +17,7 @@
  */
 package io.guthix.osrs.cache.config
 
-import io.guthix.cache.fs.io.*
+import io.guthix.cache.js5.io.*
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.IOException
@@ -277,8 +277,7 @@ data class NpcConfig(override val id: Int) : Config(id) {
         override fun decode(id: Int, buffer: ByteBuffer): NpcConfig {
             val npcConfig = NpcConfig(id)
             decoder@ while (true) {
-                val opcode = buffer.uByte.toInt()
-                when (opcode) {
+                when (val opcode = buffer.uByte.toInt()) {
                     0 -> break@decoder
                     1 -> {
                         val length = buffer.uByte.toInt()
@@ -355,7 +354,7 @@ data class NpcConfig(override val id: Int) : Config(id) {
                     109 -> npcConfig.isClickable = false
                     111 -> npcConfig.aBool2190 = true
                     249 -> npcConfig.params = buffer.params
-                    else -> throw IOException("Did not recognise opcode $opcode")
+                    else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
             return npcConfig

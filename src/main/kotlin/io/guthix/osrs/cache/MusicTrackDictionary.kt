@@ -17,7 +17,7 @@
  */
 package io.guthix.osrs.cache
 
-import io.guthix.cache.fs.JagexCache
+import io.guthix.cache.js5.Js5Cache
 import io.guthix.osrs.cache.sound.MidiFile
 
 class MusicTrackDictionary(
@@ -27,9 +27,9 @@ class MusicTrackDictionary(
         const val id = 6
 
         @ExperimentalUnsignedTypes
-        fun load(cache: JagexCache): MusicTrackDictionary {
+        fun load(cache: Js5Cache): MusicTrackDictionary {
             val tracks = mutableListOf<MidiFile>()
-            cache.readArchives(id).forEach { (_, archive) ->
+            cache.readGroups(id).forEach { (_, archive) ->
                 archive.files.forEach { (_, file) ->
                     tracks.add(MidiFile.decode(file.data))
                 }

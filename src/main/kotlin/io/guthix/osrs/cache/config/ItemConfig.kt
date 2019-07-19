@@ -17,7 +17,7 @@
  */
 package io.guthix.osrs.cache.config
 
-import io.guthix.cache.fs.io.*
+import io.guthix.cache.js5.io.*
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.IOException
@@ -368,8 +368,7 @@ data class ItemConfig(override val id: Int) : Config(id) {
         override fun decode(id: Int, buffer: ByteBuffer): ItemConfig {
             val itemConfig = ItemConfig(id)
             decoder@ while (true) {
-                val opcode = buffer.uByte.toInt()
-                when (opcode) {
+                when (val opcode = buffer.uByte.toInt()) {
                     0 -> break@decoder
                     1 -> itemConfig.model = buffer.uShort
                     2 -> itemConfig.name = buffer.string
@@ -455,7 +454,7 @@ data class ItemConfig(override val id: Int) : Config(id) {
                     148 -> itemConfig.placeholderId = buffer.uShort
                     149 -> itemConfig.placeholderTemplateId = buffer.uShort
                     249 -> itemConfig.params = buffer.params
-                    else -> throw IOException("Did not recognise opcode $opcode")
+                    else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
             return itemConfig

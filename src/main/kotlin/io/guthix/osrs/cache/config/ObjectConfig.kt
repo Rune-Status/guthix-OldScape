@@ -17,7 +17,7 @@
  */
 package io.guthix.osrs.cache.config
 
-import io.guthix.cache.fs.io.*
+import io.guthix.cache.js5.io.*
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.IOException
@@ -346,8 +346,7 @@ data class ObjectConfig(override val id: Int): Config(id) {
         override fun decode(id: Int, buffer: ByteBuffer): ObjectConfig {
             val objectConfig = ObjectConfig(id)
             decoder@ while (true) {
-                val opcode = buffer.uByte.toInt()
-                when (opcode) {
+                when (val opcode = buffer.uByte.toInt()) {
                     0 -> break@decoder
                     1 -> {
                         val size = buffer.uByte.toInt()
@@ -381,7 +380,9 @@ data class ObjectConfig(override val id: Int): Config(id) {
                     23 -> objectConfig.modelClipped = true
                     24 -> {
                         objectConfig.animationId = buffer.uShort
-                        if(objectConfig.animationId!!.toInt() == UShort.MAX_VALUE.toInt()) objectConfig.animationId = null
+                        if(objectConfig.animationId!!.toInt() == UShort.MAX_VALUE.toInt()) {
+                            objectConfig.animationId = null
+                        }
                     }
                     27 -> objectConfig.clipType = 1
                     28 -> objectConfig.decorDisplacement = buffer.uByte
@@ -453,7 +454,7 @@ data class ObjectConfig(override val id: Int): Config(id) {
                     81 -> objectConfig.contouredGround = buffer.uByte.toInt() * 256
                     82 -> objectConfig.mapIconId = buffer.uShort
                     249 -> objectConfig.params = buffer.params
-                    else -> throw IOException("Did not recognise opcode $opcode")
+                    else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
             if (objectConfig.anInt2088 == null) {

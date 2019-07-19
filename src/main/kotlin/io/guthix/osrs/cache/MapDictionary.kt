@@ -17,7 +17,7 @@
  */
 package io.guthix.osrs.cache
 
-import io.guthix.cache.fs.JagexCache
+import io.guthix.cache.js5.Js5Cache
 import io.guthix.osrs.cache.map.Region
 import io.guthix.osrs.cache.xtea.MapXtea
 import java.io.IOException
@@ -29,13 +29,13 @@ class MapDictionary (
         val id = 5
 
         @ExperimentalUnsignedTypes
-        fun load(cache: JagexCache, xteas: List<MapXtea>): MapDictionary {
+        fun load(cache: Js5Cache, xteas: List<MapXtea>): MapDictionary {
             val regions = mutableMapOf<Int, Region>()
             xteas.forEach {
-                val landData = cache.readArchive(id, "m${it.x}_${it.y}")
-                val mapData = cache.readArchive(id, "l${it.x}_${it.y}", it.key)
+                val landData = cache.readGroup(id, "m${it.x}_${it.y}")
+                val mapData = cache.readGroup(id, "l${it.x}_${it.y}", it.key)
                 if(landData.files.size != 1 || mapData.files.size != 1) {
-                    throw IOException("Map archive has ${landData.files.size} files but can only have 1")
+                    throw IOException("Map archive has ${landData.files.size} files but can only have 1.")
                 }
                 regions[it.id] = Region.decode(landData.files[0]!!.data, mapData.files[0]!!.data, it.x, it.y)
             }
