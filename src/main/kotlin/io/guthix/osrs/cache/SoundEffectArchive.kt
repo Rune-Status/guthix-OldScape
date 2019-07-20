@@ -31,7 +31,7 @@ class SoundEffectArchive(
             val soundEffects = mutableListOf<SoundEffect>()
             cache.readGroups(id).forEach { (_, group) ->
                 group.files.forEach { (_, file) ->
-                    soundEffects.add(SoundEffect.decode(file.data)) //TODO fix the decoding
+                    soundEffects.add(SoundEffect.decode(file.data))
                 }
             }
             return SoundEffectArchive(soundEffects)

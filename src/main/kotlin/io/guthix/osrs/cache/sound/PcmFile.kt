@@ -33,7 +33,9 @@ class SoundEffect @ExperimentalUnsignedTypes constructor(
         fun decode(buffer: ByteBuffer): SoundEffect {
             val instruments = arrayOfNulls<AudioInstrument>(INSTRUMENT_COUNT)
             for (i in 0 until INSTRUMENT_COUNT) {
-                if (buffer.uPeak().toInt() != 0) {
+                val volume = buffer.uByte.toInt()
+                if (volume != 0) {
+                    buffer.position(buffer.position() - 1)
                     instruments[i] = AudioInstrument.decode(buffer)
                 }
             }
@@ -70,19 +72,22 @@ class AudioInstrument @ExperimentalUnsignedTypes constructor(
         fun decode(buffer: ByteBuffer): AudioInstrument {
             val pitch = AudioEnvelope.decode(buffer)
             val volume = AudioEnvelope.decode(buffer)
-            val (pitchModifier, pitchModifierAmplitude) = if (buffer.uPeak().toInt() != 0) {
+            val (pitchModifier, pitchModifierAmplitude) = if (buffer.uByte.toInt() != 0) {
+                buffer.position(buffer.position() - 1)
                 Pair(
                     AudioEnvelope.decode(buffer),
                     AudioEnvelope.decode(buffer)
                 )
             } else Pair(null, null)
-            val (volumeMultiplier, volumeMultiplierAmplitude) = if (buffer.uPeak().toInt() != 0) {
+            val (volumeMultiplier, volumeMultiplierAmplitude) = if (buffer.uByte.toInt() != 0) {
+                buffer.position(buffer.position() - 1)
                 Pair(
                     AudioEnvelope.decode(buffer),
                     AudioEnvelope.decode(buffer)
                 )
             } else Pair(null, null)
-            val (release, field1397) = if (buffer.uPeak().toInt() != 0) {
+            val (release, field1397) = if (buffer.uByte.toInt() != 0) {
+                buffer.position(buffer.position() - 1)
                 Pair(
                     AudioEnvelope.decode(buffer),
                     AudioEnvelope.decode(buffer)
