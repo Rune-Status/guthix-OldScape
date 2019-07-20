@@ -32,7 +32,7 @@ data class Component(val id: Int) {
     var opacity: UByte = 0u
     var parentId: Int? = null
     var hoveredSiblingId: UShort? = null
-    var cs2Instructions: Array<Array<UShort?>>? = null
+    var cs1InstructionCount: Array<Array<UShort?>>? = null
     var scrollHeight: UShort = 0u
     var scrollWidth: UShort = 0u
     var isHidden: Boolean = false
@@ -119,13 +119,13 @@ data class Component(val id: Int) {
         @ExperimentalUnsignedTypes
         fun decode(id: Int, buffer: ByteBuffer): Component {
             return when(buffer.peak().toInt()) {
-                -1 -> decodeActive(id, buffer)
-                else -> decodeNonActive(id, buffer)
+                -1 -> decodeIf3(id, buffer)
+                else -> decodeIf1(id, buffer)
             }
         }
 
         @ExperimentalUnsignedTypes
-        private fun decodeNonActive(id: Int, buffer: ByteBuffer): Component {
+        private fun decodeIf1(id: Int, buffer: ByteBuffer): Component {
             val iFace = Component(id)
             iFace.hasScript = false
             val type = buffer.uByte.toInt()
@@ -140,7 +140,7 @@ data class Component(val id: Int) {
             iFace.parentId = if(iFace.parentId == UShort.MAX_VALUE.toInt()) {
                 null
             } else {
-                iFace.parentId!! + (id and -0x10000)
+                iFace.parentId!! + (id and 0xFFFF.inv())
             }
             iFace.hoveredSiblingId = buffer.uShort
             if(iFace.hoveredSiblingId  == UShort.MAX_VALUE) iFace.hoveredSiblingId = null
@@ -153,9 +153,9 @@ data class Component(val id: Int) {
                     alternateRhs[i] = buffer.uShort
                 }
             }
-            val cs2InstructionCount = buffer.uByte.toInt()
-            iFace.cs2Instructions = if (cs2InstructionCount > 0) {
-                Array(cs2InstructionCount) {
+            val cs1InstructionCount = buffer.uByte.toInt()
+            iFace.cs1InstructionCount = if (cs1InstructionCount > 0) {
+                Array(cs1InstructionCount) {
                     val byteCodeSize = buffer.uShort.toInt()
                     val instructions = Array(byteCodeSize) {
                         var byteCode: UShort? = buffer.uShort
@@ -285,7 +285,7 @@ data class Component(val id: Int) {
             return iFace
         }
 
-        private fun decodeActive(id: Int, buffer: ByteBuffer): Component {
+        private fun decodeIf3(id: Int, buffer: ByteBuffer): Component {
             val iFace = Component(id)
             buffer.uByte
             iFace.hasScript = true

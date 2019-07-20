@@ -23,17 +23,16 @@ import io.guthix.osrs.cache.plane.Component
 class ComponentArchive @ExperimentalUnsignedTypes constructor(
     val components: List<Component>
 ) {
-
     companion object {
         const val id = 3
 
         @ExperimentalUnsignedTypes
         fun load(cache: Js5Cache): ComponentArchive {
             val components = mutableListOf<Component>()
-            cache.readGroups(SpriteArchive.id).forEach { (groupId, group) ->
+            cache.readGroups(id).forEach { (groupId, group) ->
                 group.files.forEach { (fileId, file) ->
                     val widgetId = (groupId shl 16) + fileId
-                    components.add(Component.decode(widgetId, file.data)) //TODO fix decoding
+                    components.add(Component.decode(widgetId, file.data))
                 }
             }
             return ComponentArchive(components)
