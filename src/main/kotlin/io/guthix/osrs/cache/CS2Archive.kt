@@ -18,25 +18,21 @@
 package io.guthix.osrs.cache
 
 import io.guthix.cache.js5.Js5Cache
-import io.guthix.osrs.cache.plane.Component
+import io.guthix.osrs.cache.script.MachineScript
 
-class ComponentDictionary @ExperimentalUnsignedTypes constructor(
-    val components: List<Component>
-) {
-
-    companion object {
-        const val id = 3
+class CS2Archive (
+    val scripts: Map<Int, MachineScript>
+)  {
+    companion object  {
+        const val id = 12
 
         @ExperimentalUnsignedTypes
-        fun load(cache: Js5Cache): ComponentDictionary {
-            val components = mutableListOf<Component>()
-            cache.readGroups(SpriteDictionary.id).forEach { (archiveId, archive) ->
-                archive.files.forEach { (fileId, file) ->
-                    val widgetId = (archiveId shl 16) + fileId
-                    components.add(Component.decode(widgetId, file.data)) //TODO fix decoding
-                }
+        fun load(cache: Js5Cache): CS2Archive {
+            val scripts = mutableMapOf<Int, MachineScript>()
+            cache.readGroups(id).forEach { (groupId, group) ->
+                scripts[groupId] = MachineScript.decode(groupId, group.files[0]!!.data) //TODO fix decoding
             }
-            return ComponentDictionary(components)
+            return CS2Archive(scripts)
         }
     }
 }

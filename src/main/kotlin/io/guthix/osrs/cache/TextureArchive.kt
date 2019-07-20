@@ -18,23 +18,23 @@
 package io.guthix.osrs.cache
 
 import io.guthix.cache.js5.Js5Cache
-import io.guthix.osrs.cache.plane.Sprite
+import io.guthix.osrs.cache.plane.Texture
 
-class SpriteDictionary(
-    val sprites: List<Sprite>
+class TextureArchive(
+    val textures: List<Texture>
 ) {
     companion object {
-        const val id = 8
+        const val id = 9
 
         @ExperimentalUnsignedTypes
-        fun load(cache: Js5Cache): SpriteDictionary {
-            val sprites = mutableListOf<Sprite>()
-            cache.readGroups(id).forEach { (_, archive) ->
-                archive.files.forEach { (_, file) ->
-                    sprites.add(Sprite.decode(file.data))
+        fun load(cache: Js5Cache): TextureArchive {
+            val textures = mutableListOf<Texture>()
+            cache.readGroups(id).forEach { (_, group) ->
+                group.files.forEach { (_, file) ->
+                    textures.add(Texture.decode(file.data))
                 }
             }
-            return SpriteDictionary(sprites)
+            return TextureArchive(textures)
         }
     }
 }

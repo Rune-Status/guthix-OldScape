@@ -18,28 +18,23 @@
 package io.guthix.osrs.cache
 
 import io.guthix.cache.js5.Js5Cache
-import io.guthix.osrs.cache.map.Region
-import io.guthix.osrs.cache.xtea.MapXtea
-import java.io.IOException
+import io.guthix.osrs.cache.sound.MidiFile
 
-class MapDictionary (
-    val regions: Map<Int, Region>
-)  {
-    companion object  {
-        val id = 5
+class MusicJingleArchive(
+    val tracks: List<MidiFile>
+) {
+    companion object {
+        const val id = 11
 
         @ExperimentalUnsignedTypes
-        fun load(cache: Js5Cache, xteas: List<MapXtea>): MapDictionary {
-            val regions = mutableMapOf<Int, Region>()
-            xteas.forEach {
-                val landData = cache.readGroup(id, "m${it.x}_${it.y}")
-                val mapData = cache.readGroup(id, "l${it.x}_${it.y}", it.key)
-                if(landData.files.size != 1 || mapData.files.size != 1) {
-                    throw IOException("Map archive has ${landData.files.size} files but can only have 1.")
+        fun load(cache: Js5Cache): MusicTrackArchive {
+            val tracks = mutableListOf<MidiFile>()
+            cache.readGroups(MusicTrackArchive.id).forEach { (_, group) ->
+                group.files.forEach { (_, file) ->
+                    tracks.add(MidiFile.decode(file.data))
                 }
-                regions[it.id] = Region.decode(landData.files[0]!!.data, mapData.files[0]!!.data, it.x, it.y)
             }
-            return MapDictionary(regions)
+            return MusicTrackArchive(tracks)
         }
     }
 }

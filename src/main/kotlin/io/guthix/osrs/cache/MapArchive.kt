@@ -18,21 +18,28 @@
 package io.guthix.osrs.cache
 
 import io.guthix.cache.js5.Js5Cache
-import io.guthix.osrs.cache.script.MachineScript
+import io.guthix.osrs.cache.map.Region
+import io.guthix.osrs.cache.xtea.MapXtea
+import java.io.IOException
 
-class ScriptDictionary (
-    val scripts: Map<Int, MachineScript>
+class MapArchive (
+    val regions: Map<Int, Region>
 )  {
     companion object  {
-        const val id = 12
+        val id = 5
 
         @ExperimentalUnsignedTypes
-        fun load(cache: Js5Cache): ScriptDictionary {
-            val scripts = mutableMapOf<Int, MachineScript>()
-            cache.readGroups(id).forEach { (archiveId, archive) ->
-                scripts[archiveId] = MachineScript.decode(archiveId, archive.files[0]!!.data) //TODO fix decoding
+        fun load(cache: Js5Cache, xteas: List<MapXtea>): MapArchive {
+            val regions = mutableMapOf<Int, Region>()
+            xteas.forEach {
+                val landData = cache.readGroup(id, "m${it.x}_${it.y}")
+                val mapData = cache.readGroup(id, "l${it.x}_${it.y}", it.key)
+                if(landData.files.size != 1 || mapData.files.size != 1) {
+                    throw IOException("Map archive has ${landData.files.size} files but can only have 1.")
+                }
+                regions[it.id] = Region.decode(landData.files[0]!!.data, mapData.files[0]!!.data, it.x, it.y)
             }
-            return ScriptDictionary(scripts)
+            return MapArchive(regions)
         }
     }
 }

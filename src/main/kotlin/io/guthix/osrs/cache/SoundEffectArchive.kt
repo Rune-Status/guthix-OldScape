@@ -18,23 +18,23 @@
 package io.guthix.osrs.cache
 
 import io.guthix.cache.js5.Js5Cache
-import io.guthix.osrs.cache.plane.Texture
+import io.guthix.osrs.cache.sound.SoundEffect
 
-class TextureDictionary(
-    val textures: List<Texture>
+class SoundEffectArchive(
+    val soundEffects: List<SoundEffect>
 ) {
-    companion object {
-        const val id = 9
+    companion object  {
+        const val id = 4
 
         @ExperimentalUnsignedTypes
-        fun load(cache: Js5Cache): TextureDictionary {
-            val textures = mutableListOf<Texture>()
-            cache.readGroups(id).forEach { (_, archive) ->
-                archive.files.forEach { (_, file) ->
-                    textures.add(Texture.decode(file.data))
+        fun load(cache: Js5Cache): SoundEffectArchive {
+            val soundEffects = mutableListOf<SoundEffect>()
+            cache.readGroups(id).forEach { (_, group) ->
+                group.files.forEach { (_, file) ->
+                    soundEffects.add(SoundEffect.decode(file.data)) //TODO fix the decoding
                 }
             }
-            return TextureDictionary(textures)
+            return SoundEffectArchive(soundEffects)
         }
     }
 }

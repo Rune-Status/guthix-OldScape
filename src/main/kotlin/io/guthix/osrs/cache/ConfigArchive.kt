@@ -21,7 +21,7 @@ import io.guthix.cache.js5.Js5Cache
 import io.guthix.osrs.cache.config.*
 
 @ExperimentalUnsignedTypes
-data class ConfigDictionary constructor(
+data class ConfigArchive constructor(
     val areaConfigs: Map<Int, AreaConfig>,
     val enumConfigs: Map<Int, EnumConfig>,
     val hitBarConfig: Map<Int, HitBarConfig>,
@@ -45,8 +45,8 @@ data class ConfigDictionary constructor(
         const val id = 2
 
         @ExperimentalUnsignedTypes
-        fun load(cache: Js5Cache): ConfigDictionary =
-            ConfigDictionary(
+        fun load(cache: Js5Cache): ConfigArchive =
+            ConfigArchive(
                 AreaConfig.load(cache.readGroup(id, AreaConfig.id)),
                 EnumConfig.load(cache.readGroup(id, EnumConfig.id)),
                 HitBarConfig.load(cache.readGroup(id, HitBarConfig.id)),

@@ -20,21 +20,21 @@ package io.guthix.osrs.cache
 import io.guthix.cache.js5.Js5Cache
 import io.guthix.osrs.cache.sound.MidiFile
 
-class MusicTrackDictionary(
+class MusicTrackArchive(
     val tracks: List<MidiFile>
 ) {
     companion object  {
         const val id = 6
 
         @ExperimentalUnsignedTypes
-        fun load(cache: Js5Cache): MusicTrackDictionary {
+        fun load(cache: Js5Cache): MusicTrackArchive {
             val tracks = mutableListOf<MidiFile>()
-            cache.readGroups(id).forEach { (_, archive) ->
-                archive.files.forEach { (_, file) ->
+            cache.readGroups(id).forEach { (_, group) ->
+                group.files.forEach { (_, file) ->
                     tracks.add(MidiFile.decode(file.data))
                 }
             }
-            return MusicTrackDictionary(tracks)
+            return MusicTrackArchive(tracks)
         }
     }
 }

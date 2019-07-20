@@ -18,23 +18,25 @@
 package io.guthix.osrs.cache
 
 import io.guthix.cache.js5.Js5Cache
-import io.guthix.osrs.cache.sound.MidiFile
+import io.guthix.osrs.cache.plane.Component
 
-class MusicJingleDictionary(
-    val tracks: List<MidiFile>
+class ComponentArchive @ExperimentalUnsignedTypes constructor(
+    val components: List<Component>
 ) {
+
     companion object {
-        const val id = 11
+        const val id = 3
 
         @ExperimentalUnsignedTypes
-        fun load(cache: Js5Cache): MusicTrackDictionary {
-            val tracks = mutableListOf<MidiFile>()
-            cache.readGroups(MusicTrackDictionary.id).forEach { (_, archive) ->
-                archive.files.forEach { (_, file) ->
-                    tracks.add(MidiFile.decode(file.data))
+        fun load(cache: Js5Cache): ComponentArchive {
+            val components = mutableListOf<Component>()
+            cache.readGroups(SpriteArchive.id).forEach { (groupId, group) ->
+                group.files.forEach { (fileId, file) ->
+                    val widgetId = (groupId shl 16) + fileId
+                    components.add(Component.decode(widgetId, file.data)) //TODO fix decoding
                 }
             }
-            return MusicTrackDictionary(tracks)
+            return ComponentArchive(components)
         }
     }
 }

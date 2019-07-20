@@ -18,23 +18,23 @@
 package io.guthix.osrs.cache
 
 import io.guthix.cache.js5.Js5Cache
-import io.guthix.osrs.cache.sound.SoundEffect
+import io.guthix.osrs.cache.plane.Sprite
 
-class SoundEffectDictionary(
-    val soundEffects: List<SoundEffect>
+class SpriteArchive(
+    val sprites: List<Sprite>
 ) {
-    companion object  {
-        const val id = 4
+    companion object {
+        const val id = 8
 
         @ExperimentalUnsignedTypes
-        fun load(cache: Js5Cache): SoundEffectDictionary {
-            val soundEffects = mutableListOf<SoundEffect>()
-            cache.readGroups(id).forEach { (_, archive) ->
-                archive.files.forEach { (_, file) ->
-                    soundEffects.add(SoundEffect.decode(file.data)) //TODO fix the decoding
+        fun load(cache: Js5Cache): SpriteArchive {
+            val sprites = mutableListOf<Sprite>()
+            cache.readGroups(id).forEach { (_, group) ->
+                group.files.forEach { (_, file) ->
+                    sprites.add(Sprite.decode(file.data))
                 }
             }
-            return SoundEffectDictionary(soundEffects)
+            return SpriteArchive(sprites)
         }
     }
 }
