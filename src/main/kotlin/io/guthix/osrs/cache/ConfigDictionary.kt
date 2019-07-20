@@ -20,7 +20,8 @@ package io.guthix.osrs.cache
 import io.guthix.cache.js5.Js5Cache
 import io.guthix.osrs.cache.config.*
 
-data class ConfigDictionary @ExperimentalUnsignedTypes constructor(
+@ExperimentalUnsignedTypes
+data class ConfigDictionary constructor(
     val areaConfigs: Map<Int, AreaConfig>,
     val enumConfigs: Map<Int, EnumConfig>,
     val hitBarConfig: Map<Int, HitBarConfig>,
@@ -37,8 +38,7 @@ data class ConfigDictionary @ExperimentalUnsignedTypes constructor(
     val structConfigs: Map<Int, StructConfig>,
     val underlayConfigs: Map<Int, UnderlayConfig>,
     val varbitConfigs: Map<Int, VarbitConfig>,
-    val varClientIntConfigs: Map<Int, VarClientIntConfig>,
-    val varClientStringConfigs: Map<Int, VarClientStringConfig>,
+    val varClientConfigs: Map<Int, VarClientConfig>,
     val varPlayerConfigs: Map<Int, VarPlayerConfig>
 ) {
     companion object {
@@ -63,8 +63,7 @@ data class ConfigDictionary @ExperimentalUnsignedTypes constructor(
                 StructConfig.load(cache.readGroup(id, StructConfig.id)),
                 UnderlayConfig.load(cache.readGroup(id, UnderlayConfig.id)),
                 VarbitConfig.load(cache.readGroup(id, VarbitConfig.id)),
-                VarClientIntConfig.load(cache.readGroup(id, VarClientIntConfig.id)),
-                VarClientStringConfig.load(cache.readGroup(id, VarClientStringConfig.id)),
+                VarClientConfig.load(cache.readGroup(id, VarClientConfig.id)),
                 VarPlayerConfig.load(cache.readGroup(id, VarPlayerConfig.id))
             )
     }

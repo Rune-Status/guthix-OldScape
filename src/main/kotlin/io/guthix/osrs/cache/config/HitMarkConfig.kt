@@ -185,7 +185,7 @@ data class HitMarkConfig(override val id: Int) : Config(id) {
                     5 -> hitmarkConfig.field3357 = buffer.nullableLargeSmart
                     6 -> hitmarkConfig.field3359 = buffer.nullableLargeSmart
                     7 -> hitmarkConfig.field3365 = buffer.short
-                    8 -> hitmarkConfig.field3363 = buffer.nullableString
+                    8 -> hitmarkConfig.field3363 = buffer.prefixedString
                     9 -> hitmarkConfig.field3355 = buffer.uShort
                     10 -> hitmarkConfig.field3361 = buffer.short
                     11 -> hitmarkConfig.field3354 = 0u
