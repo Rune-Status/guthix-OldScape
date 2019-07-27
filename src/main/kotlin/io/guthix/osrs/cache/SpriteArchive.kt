@@ -29,9 +29,9 @@ class SpriteArchive(
         @ExperimentalUnsignedTypes
         fun load(cache: Js5Cache): SpriteArchive {
             val sprites = mutableListOf<Sprite>()
-            cache.readGroups(id).forEach { (_, group) ->
+            cache.readGroups(id).forEach { (groupId, group) ->
                 group.files.forEach { (_, file) ->
-                    sprites.add(Sprite.decode(file.data))
+                    sprites.add(Sprite.decode(groupId, file.data))
                 }
             }
             return SpriteArchive(sprites)

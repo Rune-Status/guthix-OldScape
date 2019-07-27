@@ -24,6 +24,7 @@ import java.awt.image.BufferedImage
 import java.nio.ByteBuffer
 
 class Sprite(
+    val id: Int,
     val width: Int,
     val height: Int,
     val images: Array<BufferedImage>
@@ -33,7 +34,7 @@ class Sprite(
         private const val FLAG_ALPHA = 0x02
 
         @ExperimentalUnsignedTypes
-        fun decode(buffer: ByteBuffer): Sprite {
+        fun decode(id: Int, buffer: ByteBuffer): Sprite {
             buffer.position(buffer.limit() - 2)
             val spriteCount = buffer.uShort.toInt()
             val offsetsX = IntArray(spriteCount)
@@ -117,7 +118,7 @@ class Sprite(
                 }
                 image
             }
-            return Sprite(width, height, images)
+            return Sprite(id, width, height, images)
         }
     }
 }
