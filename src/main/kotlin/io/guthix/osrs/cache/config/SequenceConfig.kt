@@ -181,7 +181,8 @@ data class SequenceConfig(override val id: Int) : Config(id) {
         override val id = 12
 
         @ExperimentalUnsignedTypes
-        override fun decode(id: Int, buffer: ByteBuffer): SequenceConfig {
+        override fun decode(id: Int, data: ByteArray): SequenceConfig {
+            val buffer = ByteBuffer.wrap(data)
             val sequenceConfig = SequenceConfig(id)
             decoder@ while (true) {
                 when (val opcode = buffer.uByte.toInt()) {

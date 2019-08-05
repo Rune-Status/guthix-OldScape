@@ -74,7 +74,8 @@ class MidiFile(
         private const val CONTROLLER_ALL_NOTES_OFF = 123
 
         @ExperimentalUnsignedTypes
-        fun decode(buffer: ByteBuffer): MidiFile {
+        fun decode(data: ByteArray): MidiFile {
+            val buffer = ByteBuffer.wrap(data)
             buffer.position(buffer.limit() - 3)
             val tracks = buffer.uByte.toInt()
             val division = buffer.uShort.toInt()

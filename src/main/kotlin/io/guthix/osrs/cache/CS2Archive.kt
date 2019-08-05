@@ -29,7 +29,7 @@ class CS2Archive (
         @ExperimentalUnsignedTypes
         fun load(cache: Js5Cache): CS2Archive {
             val scripts = mutableMapOf<Int, MachineScript>()
-            cache.readGroups(id).forEach { (groupId, group) ->
+            cache.readArchive(id).forEach { (groupId, group) ->
                 scripts[groupId] = MachineScript.decode(groupId, group.files[0]!!.data) //TODO fix decoding
             }
             return CS2Archive(scripts)

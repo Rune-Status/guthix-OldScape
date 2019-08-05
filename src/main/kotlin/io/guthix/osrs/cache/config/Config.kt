@@ -40,5 +40,5 @@ abstract class ConfigCompanion<out T: Config> {
     }
 
     @ExperimentalUnsignedTypes
-    abstract fun decode(id: Int, buffer: ByteBuffer): T
+    abstract fun decode(id: Int, data: ByteArray): T
 }

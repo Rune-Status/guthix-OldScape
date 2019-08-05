@@ -78,7 +78,8 @@ data class EnumConfig(override val id: Int) : Config(id) {
         override val id = 8
 
         @ExperimentalUnsignedTypes
-        override fun decode(id: Int, buffer: ByteBuffer): EnumConfig {
+        override fun decode(id: Int, data: ByteArray): EnumConfig {
+            val buffer = ByteBuffer.wrap(data)
             val enumConfig = EnumConfig(id)
             decoder@ while (true) {
                 when (val opcode = buffer.uByte.toInt()) {

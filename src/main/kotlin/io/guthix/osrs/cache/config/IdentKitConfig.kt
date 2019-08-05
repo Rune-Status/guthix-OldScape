@@ -110,7 +110,8 @@ data class IdentKitConfig(override val id: Int) : Config(id) {
         override val id = 3
 
         @ExperimentalUnsignedTypes
-        override fun decode(id: Int, buffer: ByteBuffer): IdentKitConfig {
+        override fun decode(id: Int, data: ByteArray): IdentKitConfig {
+            val buffer = ByteBuffer.wrap(data)
             val identKitConfig = IdentKitConfig(id)
             decoder@ while (true) {
                 when (val opcode = buffer.uByte.toInt()) {

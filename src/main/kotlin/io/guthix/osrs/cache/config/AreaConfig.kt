@@ -143,7 +143,8 @@ data class AreaConfig(override val id: Int) : Config(id) {
         override val id = 35
 
         @ExperimentalUnsignedTypes
-        override fun decode(id: Int, buffer: ByteBuffer): AreaConfig {
+        override fun decode(id: Int, data: ByteArray): AreaConfig {
+            val buffer = ByteBuffer.wrap(data)
             val areaConfig = AreaConfig(id)
             decoder@ while (true) {
                 when (val opcode = buffer.uByte.toInt()) {

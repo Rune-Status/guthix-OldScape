@@ -45,7 +45,8 @@ data class VarbitConfig(override val id: Int) : Config(id) {
         override val id = 14
 
         @ExperimentalUnsignedTypes
-        override fun decode(id: Int, buffer: ByteBuffer): VarbitConfig {
+        override fun decode(id: Int, data: ByteArray): VarbitConfig {
+            val buffer = ByteBuffer.wrap(data)
             val varbitConfig = VarbitConfig(id)
             decoder@ while (true) {
                 when(val opcode = buffer.get().toInt() and 0xFF) {

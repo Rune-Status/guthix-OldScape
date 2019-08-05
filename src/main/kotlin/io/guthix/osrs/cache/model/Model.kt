@@ -197,7 +197,8 @@ class Model(var id: Int) {
     }
 
     companion object {
-        fun decode(id: Int, buffer: ByteBuffer): Model {
+        fun decode(id: Int, data: ByteArray): Model {
+            val buffer = ByteBuffer.wrap(data)
             val model = Model(id)
             return if (buffer.get(buffer.limit() - 1).toInt() == -1 && buffer.get(buffer.limit() - 2).toInt() == -1) {
                 decodeNew(model, buffer)

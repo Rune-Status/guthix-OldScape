@@ -274,7 +274,8 @@ data class NpcConfig(override val id: Int) : Config(id) {
         override val id = 9
 
         @ExperimentalUnsignedTypes
-        override fun decode(id: Int, buffer: ByteBuffer): NpcConfig {
+        override fun decode(id: Int, data: ByteArray): NpcConfig {
+            val buffer = ByteBuffer.wrap(data)
             val npcConfig = NpcConfig(id)
             decoder@ while (true) {
                 when (val opcode = buffer.uByte.toInt()) {

@@ -44,7 +44,8 @@ data class StructConfig(override val id: Int) : Config(id) {
         override val id = 34
 
         @ExperimentalUnsignedTypes
-        override fun decode(id: Int, buffer: ByteBuffer): StructConfig {
+        override fun decode(id: Int, data: ByteArray): StructConfig {
+            val buffer = ByteBuffer.wrap(data)
             val structConfig = StructConfig(id)
             decoder@ while (true) {
                 when (val opcode = buffer.uByte.toInt()) {

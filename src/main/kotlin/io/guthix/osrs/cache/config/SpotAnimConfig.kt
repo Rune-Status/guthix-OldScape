@@ -95,7 +95,8 @@ data class SpotAnimConfig(override val id: Int) : Config(id) {
         override val id = 13
 
         @ExperimentalUnsignedTypes
-        override fun decode(id: Int, buffer: ByteBuffer): SpotAnimConfig {
+        override fun decode(id: Int, data: ByteArray): SpotAnimConfig {
+            val buffer = ByteBuffer.wrap(data)
             val spotAnimConfig = SpotAnimConfig(id)
             decoder@ while (true) {
                 when (val opcode = buffer.uByte.toInt()) {

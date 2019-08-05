@@ -37,7 +37,8 @@ data class VarClientConfig(override val id: Int) : Config(id) {
         override val id = 19
 
         @ExperimentalUnsignedTypes
-        override fun decode(id: Int, buffer: ByteBuffer): VarClientConfig {
+        override fun decode(id: Int, data: ByteArray): VarClientConfig {
+            val buffer = ByteBuffer.wrap(data)
             val varClientConfig = VarClientConfig(id)
             decoder@ while (true) {
                 when (val opcode = buffer.uByte.toInt()) {

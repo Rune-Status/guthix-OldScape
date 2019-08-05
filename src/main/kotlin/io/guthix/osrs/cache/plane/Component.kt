@@ -117,7 +117,8 @@ data class Component(val id: Int) {
 
     companion object {
         @ExperimentalUnsignedTypes
-        fun decode(id: Int, buffer: ByteBuffer): Component {
+        fun decode(id: Int, data: ByteArray): Component {
+            val buffer = ByteBuffer.wrap(data)
             return when(buffer.peak().toInt()) {
                 -1 -> decodeIf3(id, buffer)
                 else -> decodeIf1(id, buffer)

@@ -29,7 +29,7 @@ class ComponentArchive @ExperimentalUnsignedTypes constructor(
         @ExperimentalUnsignedTypes
         fun load(cache: Js5Cache): ComponentArchive {
             val components = mutableListOf<Component>()
-            cache.readGroups(id).forEach { (groupId, group) ->
+            cache.readArchive(id).forEach { (groupId, group) ->
                 group.files.forEach { (fileId, file) ->
                     val widgetId = (groupId shl 16) + fileId
                     components.add(Component.decode(widgetId, file.data))

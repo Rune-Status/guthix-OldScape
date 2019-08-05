@@ -85,7 +85,8 @@ data class MachineScript(
 
     companion object {
         @ExperimentalUnsignedTypes
-        fun decode(id: Int, buffer: ByteBuffer): MachineScript {
+        fun decode(id: Int, data: ByteArray): MachineScript {
+            val buffer = ByteBuffer.wrap(data)
             val switchDataLength = buffer.getUShort(buffer.limit() - 2).toInt() // ushort
             val opcodeEndPos = buffer.limit() - 2 - switchDataLength - 12
             buffer.position(opcodeEndPos)

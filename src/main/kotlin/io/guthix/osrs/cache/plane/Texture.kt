@@ -34,7 +34,8 @@ class Texture @ExperimentalUnsignedTypes constructor(
 ) {
     companion object {
         @ExperimentalUnsignedTypes
-        fun decode(buffer: ByteBuffer): Texture {
+        fun decode(data: ByteArray): Texture {
+            val buffer = ByteBuffer.wrap(data)
             val field1527 = buffer.uShort
             val field1530 = buffer.uByte.toInt() == 1
             val amount = buffer.uByte.toInt()

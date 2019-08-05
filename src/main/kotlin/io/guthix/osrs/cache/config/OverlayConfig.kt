@@ -59,7 +59,8 @@ data class OverlayConfig(override val id: Int) : Config(id) {
         override val id = 4
 
         @ExperimentalUnsignedTypes
-        override fun decode(id: Int, buffer: ByteBuffer): OverlayConfig {
+        override fun decode(id: Int, data: ByteArray): OverlayConfig {
+            val buffer = ByteBuffer.wrap(data)
             val overlayConfig = OverlayConfig(id)
             decoder@ while (true) {
                 when (val opcode = buffer.uByte.toInt()) {

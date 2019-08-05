@@ -37,7 +37,9 @@ class Region @ExperimentalUnsignedTypes constructor(
         const val SIZE = 64
 
         @ExperimentalUnsignedTypes
-        fun decode(landBuffer: ByteBuffer, mapBuffer: ByteBuffer, baseX: Int, baseY: Int): Region {
+        fun decode(landData: ByteArray, mapData: ByteArray, baseX: Int, baseY: Int): Region {
+            val landBuffer = ByteBuffer.wrap(landData)
+            val mapBuffer = ByteBuffer.wrap(mapData)
             val land = Land.decode(landBuffer, baseX, baseY)
             val objectLocations = ObjectLocation.decode(mapBuffer, land.renderRules)
             return Region(

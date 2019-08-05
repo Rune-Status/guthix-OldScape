@@ -41,7 +41,8 @@ data class VarPlayerConfig(override val id: Int) : Config(id) {
         override val id = 16
 
         @ExperimentalUnsignedTypes
-        override fun decode(id: Int, buffer: ByteBuffer): VarPlayerConfig {
+        override fun decode(id: Int, data: ByteArray): VarPlayerConfig {
+            val buffer = ByteBuffer.wrap(data)
             val varPlayerConfig = VarPlayerConfig(id)
             decoder@ while (true) {
                 when (val opcode = buffer.uByte.toInt()) {

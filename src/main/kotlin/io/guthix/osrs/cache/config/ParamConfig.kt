@@ -56,7 +56,8 @@ data class ParamConfig(override val id: Int) : Config(id) {
         override val id = 11
 
         @ExperimentalUnsignedTypes
-        override fun decode(id: Int, buffer: ByteBuffer): ParamConfig {
+        override fun decode(id: Int, data: ByteArray): ParamConfig {
+            val buffer = ByteBuffer.wrap(data)
             val paramConfig = ParamConfig(id)
             decoder@ while (true) {
                 when(val opcode = buffer.uByte.toInt()) {

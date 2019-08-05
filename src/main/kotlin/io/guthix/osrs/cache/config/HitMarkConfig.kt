@@ -173,7 +173,8 @@ data class HitMarkConfig(override val id: Int) : Config(id) {
         override val id = 32
 
         @ExperimentalUnsignedTypes
-        override fun decode(id: Int, buffer: ByteBuffer): HitMarkConfig {
+        override fun decode(id: Int, data: ByteArray): HitMarkConfig {
+            val buffer = ByteBuffer.wrap(data)
             val hitmarkConfig = HitMarkConfig(id)
             decoder@ while (true) {
                 when(val opcode = buffer.uByte.toInt()) {

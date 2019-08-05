@@ -34,7 +34,8 @@ class Sprite(
         private const val FLAG_ALPHA = 0x02
 
         @ExperimentalUnsignedTypes
-        fun decode(id: Int, buffer: ByteBuffer): Sprite {
+        fun decode(id: Int, data: ByteArray): Sprite {
+            val buffer = ByteBuffer.wrap(data)
             buffer.position(buffer.limit() - 2)
             val spriteCount = buffer.uShort.toInt()
             val offsetsX = IntArray(spriteCount)

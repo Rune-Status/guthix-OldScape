@@ -30,7 +30,8 @@ class SoundEffect @ExperimentalUnsignedTypes constructor(
         private const val INSTRUMENT_COUNT = 10
 
         @ExperimentalUnsignedTypes
-        fun decode(buffer: ByteBuffer): SoundEffect {
+        fun decode(data: ByteArray): SoundEffect {
+            val buffer = ByteBuffer.wrap(data)
             val instruments = arrayOfNulls<AudioInstrument>(INSTRUMENT_COUNT)
             for (i in 0 until INSTRUMENT_COUNT) {
                 val volume = buffer.uByte.toInt()

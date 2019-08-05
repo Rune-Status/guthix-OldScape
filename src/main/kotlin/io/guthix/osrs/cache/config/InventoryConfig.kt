@@ -43,7 +43,8 @@ data class InventoryConfig(override val id: Int) : Config(id) {
         override val id = 5
 
         @ExperimentalUnsignedTypes
-        override fun decode(id: Int, buffer: ByteBuffer): InventoryConfig {
+        override fun decode(id: Int, data: ByteArray): InventoryConfig {
+            val buffer = ByteBuffer.wrap(data)
             val inventoryConfig = InventoryConfig(id)
             decoder@ while (true) {
                 when (val opcode = buffer.uByte.toInt()) {

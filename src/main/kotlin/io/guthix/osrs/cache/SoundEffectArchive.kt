@@ -29,7 +29,7 @@ class SoundEffectArchive(
         @ExperimentalUnsignedTypes
         fun load(cache: Js5Cache): SoundEffectArchive {
             val soundEffects = mutableListOf<SoundEffect>()
-            cache.readGroups(id).forEach { (_, group) ->
+            cache.readArchive(id).forEach { (_, group) ->
                 group.files.forEach { (_, file) ->
                     soundEffects.add(SoundEffect.decode(file.data))
                 }

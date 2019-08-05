@@ -87,7 +87,8 @@ data class HitBarConfig(override val id: Int) : Config(id) {
         override val id = 33
 
         @ExperimentalUnsignedTypes
-        override fun decode(id: Int, buffer: ByteBuffer): HitBarConfig {
+        override fun decode(id: Int, data: ByteArray): HitBarConfig {
+            val buffer = ByteBuffer.wrap(data)
             val hitBarConfig = HitBarConfig(id)
             decoder@ while (true) {
                 when(val opcode = buffer.uByte.toInt()) {

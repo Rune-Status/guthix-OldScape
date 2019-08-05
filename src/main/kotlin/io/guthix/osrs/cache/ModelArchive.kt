@@ -29,7 +29,7 @@ class ModelArchive(
 
         fun load(cache: Js5Cache): ModelArchive {
             val models = mutableListOf<Model>()
-            cache.readGroups(id).forEach { (groupId, group) ->
+            cache.readArchive(id).forEach { (groupId, group) ->
                 group.files.forEach { (_, file) ->
                     models.add(Model.decode(groupId, file.data))
                 }
