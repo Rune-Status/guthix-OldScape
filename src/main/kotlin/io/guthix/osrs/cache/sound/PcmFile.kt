@@ -57,7 +57,7 @@ class AudioInstrument @ExperimentalUnsignedTypes constructor(
     val release: AudioEnvelope?,
     val field1397: AudioEnvelope?,
     val oscillatorVolume: UShortArray,
-    val oscillatorPitch: UShortArray,
+    val oscillatorPitch: ShortArray,
     val oscillatorDelays: UShortArray,
     val delayTime: UShort,
     val delayDecay: UShort,
@@ -95,7 +95,7 @@ class AudioInstrument @ExperimentalUnsignedTypes constructor(
                 )
             } else Pair(null, null)
             val oscillatorVolume = UShortArray(OSCILLATOR_COUNT)
-            val oscillatorPitch = UShortArray(OSCILLATOR_COUNT)
+            val oscillatorPitch = ShortArray(OSCILLATOR_COUNT)
             val oscillatorDelays = UShortArray(OSCILLATOR_COUNT)
             for (i in 0 until OSCILLATOR_COUNT) {
                 val oscVolume = buffer.smallUSmart
