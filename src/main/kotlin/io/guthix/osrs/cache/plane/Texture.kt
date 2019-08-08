@@ -23,6 +23,7 @@ import java.io.IOException
 import java.nio.ByteBuffer
 
 class Texture @ExperimentalUnsignedTypes constructor(
+    val id: Int,
     val field1527: UShort,
     val field1530: Boolean,
     val fileIds: UShortArray,
@@ -34,7 +35,7 @@ class Texture @ExperimentalUnsignedTypes constructor(
 ) {
     companion object {
         @ExperimentalUnsignedTypes
-        fun decode(data: ByteArray): Texture {
+        fun decode(id: Int, data: ByteArray): Texture {
             val buffer = ByteBuffer.wrap(data)
             val field1527 = buffer.uShort
             val field1530 = buffer.uByte.toInt() == 1
@@ -59,6 +60,7 @@ class Texture @ExperimentalUnsignedTypes constructor(
             val field1537 = buffer.uByte
             val field1538 = buffer.uByte
             return Texture(
+                id,
                 field1527,
                 field1530,
                 fileIds,

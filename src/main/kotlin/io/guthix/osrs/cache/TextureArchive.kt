@@ -30,8 +30,8 @@ class TextureArchive(
         fun load(cache: Js5Cache): TextureArchive {
             val textures = mutableListOf<Texture>()
             cache.readArchive(id).forEach { (_, group) ->
-                group.files.forEach { (_, file) ->
-                    textures.add(Texture.decode(file.data))
+                group.files.forEach { (fileId, file) ->
+                    textures.add(Texture.decode(fileId, file.data))
                 }
             }
             return TextureArchive(textures)

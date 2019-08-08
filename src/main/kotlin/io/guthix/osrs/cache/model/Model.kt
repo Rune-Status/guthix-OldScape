@@ -39,16 +39,16 @@ class Model(var id: Int) {
     var triangleVertex2: IntArray? = null
     var triangleVertex3: IntArray? = null
     var triangleAlphas: ByteArray? = null
-    var triangleColors: UShortArray? = null
+    var triangleColors: ShortArray? = null
     var triangleRenderPriorities: ByteArray? = null
     var triangleRenderTypes: ByteArray? = null
-    var triangleTextures: Array<UShort?>? = null
+    var triangleTextures: ShortArray? = null
     var triangleSkins: IntArray? = null
 
     var textureTriangleVertex1: UShortArray? = null
     var textureTriangleVertex2: UShortArray? = null
     var textureTriangleVertex3: UShortArray? = null
-    var textureCoordinates: Array<UByte?>? = null
+    var textureCoordinates: ByteArray? = null
     var textureRenderTypes: ByteArray? = null
 
     var vertexNormals: Array<VertexNormal>? = null
@@ -125,8 +125,8 @@ class Model(var id: Int) {
         faceTextureVCoordinates = arrayOfNulls(triangleCount)
 
         for (i in 0 until triangleCount) {
-            val textureCoordinate = if (textureCoordinates == null) -1 else textureCoordinates!![i]!!.toInt()
-            val textureId = if (triangleTextures == null) -1 else triangleTextures!![i]!!
+            val textureCoordinate = if (textureCoordinates == null) -1 else textureCoordinates!![i].toInt()
+            val textureId = if (triangleTextures == null) -1 else (triangleTextures!![i].toInt() and 0xFFFF)
             if (textureId != -1) {
                 val u = FloatArray(3)
                 val v = FloatArray(3)
@@ -291,13 +291,13 @@ class Model(var id: Int) {
             model.triangleVertex1 = IntArray(triangleCount)
             model.triangleVertex2 = IntArray(triangleCount)
             model.triangleVertex3 = IntArray(triangleCount)
-            model.triangleColors = UShortArray(triangleCount)
+            model.triangleColors = ShortArray(triangleCount)
             if (hasVertexSkins == 1) model.vertexSkins = IntArray(vertexCount)
             if (hasFaceRenderTypes == 1) model.triangleRenderTypes = ByteArray(triangleCount)
             if (hasFaceAlphas == 1) model.triangleAlphas = ByteArray(triangleCount)
             if (hasFaceSkins == 1) model.triangleSkins = IntArray(triangleCount)
-            if (hasTexture == 1) model.triangleTextures = arrayOfNulls(triangleCount)
-            if (hasTexture == 1 && textureTriangleCount > 0) model.textureCoordinates = arrayOfNulls(triangleCount)
+            if (hasTexture == 1) model.triangleTextures = ShortArray(triangleCount)
+            if (hasTexture == 1 && textureTriangleCount > 0) model.textureCoordinates = ByteArray(triangleCount)
             if (modelPriority == UByte.MAX_VALUE) {
                 model.triangleRenderPriorities = ByteArray(triangleCount)
             } else {
@@ -320,14 +320,14 @@ class Model(var id: Int) {
             buf6.position(texturePos)
             buf7.position(textureCoordPos)
             for (i in 0 until triangleCount) {
-                model.triangleColors!![i] = buf1.uShort
+                model.triangleColors!![i] = buf1.uShort.toShort()
                 if (modelPriority == UByte.MAX_VALUE) model.triangleRenderPriorities!![i] = buf3.get()
                 if (hasFaceRenderTypes == 1) model.triangleRenderTypes!![i] = buf2.get()
                 if (hasFaceAlphas == 1) model.triangleAlphas!![i] = buf4.get()
                 if (hasFaceSkins == 1) model.triangleSkins!![i] = buf5.uByte.toInt()
-                if (hasTexture == 1) model.triangleTextures!![i] = (buf6.uShort.toInt() - 1).toUShort()
-                if (model.textureCoordinates != null && model.triangleTextures!![i] != null) {
-                    model.textureCoordinates!![i] = (buf7.uByte.toInt() - 1).toUByte()
+                if (hasTexture == 1)  model.triangleTextures!![i] = (buf6.uShort.toInt() - 1).toShort()
+                if (model.textureCoordinates != null && model.triangleTextures!![i].toInt() != -1) {
+                    model.textureCoordinates!![i] = (buf7.uByte.toInt() - 1).toByte()
                 }
             }
             decodeTriangles(model, buffer, vertexIdPos, triangleTypePos)
@@ -387,7 +387,7 @@ class Model(var id: Int) {
             model.triangleVertex1 = IntArray(triangleCount)
             model.triangleVertex2 = IntArray(triangleCount)
             model.triangleVertex3 = IntArray(triangleCount)
-            model.triangleColors = UShortArray(triangleCount)
+            model.triangleColors = ShortArray(triangleCount)
             if (hasVertexSkins == 1) model.vertexSkins = IntArray(verticeCount)
             if (hasFaceAlphas == 1) model.triangleAlphas = ByteArray(triangleCount)
             if (hasFaceSkins == 1) model.triangleSkins = IntArray(triangleCount)
@@ -399,8 +399,8 @@ class Model(var id: Int) {
             }
             if (shouldCreateTextures == 1) {
                 model.triangleRenderTypes = ByteArray(triangleCount)
-                model.textureCoordinates = arrayOfNulls(triangleCount)
-                model.triangleTextures = arrayOfNulls(triangleCount)
+                model.textureCoordinates = ByteArray(triangleCount)
+                model.triangleTextures = ShortArray(triangleCount)
             }
             if (modelPriority == UByte.MAX_VALUE) {
                 model.triangleRenderPriorities = ByteArray(triangleCount)
@@ -418,7 +418,7 @@ class Model(var id: Int) {
             buf4.position(alphaPos)
             buf5.position(triangleSkinPos)
             for (i in 0 until triangleCount) {
-                model.triangleColors!![i] = buf1.uShort
+                model.triangleColors!![i] = buf1.uShort.toShort()
                 if (shouldCreateTextures == 1) {
                     val trianglePointY = buf2.uByte.toInt()
                     if (trianglePointY and 1 == 1) {
@@ -429,15 +429,15 @@ class Model(var id: Int) {
                     }
 
                     if (trianglePointY and 2 == 2) {
-                        model.textureCoordinates!![i] = (trianglePointY shr 2).toUByte()
+                        model.textureCoordinates!![i] = (trianglePointY shr 2).toByte()
                         model.triangleTextures!![i] = model.triangleColors!![i]
-                        model.triangleColors!![i] = 127u
-                        if (model.triangleTextures!![i] != null) {
+                        model.triangleColors!![i] = 127
+                        if (model.triangleTextures!![i].toInt() != -1) {
                             hasFaceTextures = true
                         }
                     } else {
-                        model.textureCoordinates!![i] = null
-                        model.triangleTextures!![i] = null
+                        model.textureCoordinates!![i] = -1
+                        model.triangleTextures!![i] = -1
                     }
                 }
                 if (modelPriority == UByte.MAX_VALUE) {
@@ -455,8 +455,8 @@ class Model(var id: Int) {
             if (model.textureCoordinates != null) {
                 var hasTextureCoordinates = false
                 for (i in 0 until triangleCount) {
-                    if (model.textureCoordinates!![i] != null) {
-                        val var21 = model.textureCoordinates!![i]!!.toInt()
+                    if (model.textureCoordinates!![i].toInt() and 255 != 255) {
+                        val var21 = model.textureCoordinates!![i].toInt()
                         if (model.textureTriangleVertex1!![var21].toInt() and '\uffff'.toInt() ==
                             model.triangleVertex1!![i]
                             && model.textureTriangleVertex2!![var21].toInt() and '\uffff'.toInt() ==
@@ -464,7 +464,7 @@ class Model(var id: Int) {
                             && model.textureTriangleVertex3!![var21].toInt() and '\uffff'.toInt() ==
                             model.triangleVertex3!![i]
                         ) {
-                            model.textureCoordinates!![i] = null
+                            model.textureCoordinates!![i] = -1
                         } else {
                             hasTextureCoordinates = true
                         }
