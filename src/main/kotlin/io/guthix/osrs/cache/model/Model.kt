@@ -83,14 +83,13 @@ class Model(var id: Int) {
                 zN = zN shr 1
             }
 
-            var mN = sqrt((xN * xN + yN * yN + zN * zN).toDouble()).toInt()
-            if (mN <= 0) {
-                mN = 1
+            var vectorLength = sqrt((xN * xN + yN * yN + zN * zN).toDouble()).toInt()
+            if (vectorLength <= 0) {
+                vectorLength = 1
             }
-
-            xN = xN * 256 / mN
-            yN = yN * 256 / mN
-            zN = zN * 256 / mN
+            xN = xN * 256 / vectorLength
+            yN = yN * 256 / vectorLength
+            zN = zN * 256 / vectorLength
 
             val renderType = if(triangleRenderTypes == null) 0 else triangleRenderTypes!![i].toInt()
             if (renderType == 0) {
@@ -347,14 +346,14 @@ class Model(var id: Int) {
             val verticeCount = buf1.uShort.toInt()
             val triangleCount = buf1.uShort.toInt()
             val textureTriangleCount = buf1.uByte.toInt()
-            val shouldCreateTextures = buf1.uByte.toInt()
+            val hasTextures = buf1.uByte.toInt()
             val modelPriority = buf1.uByte
             val hasFaceAlphas = buf1.uByte.toInt()
             val hasFaceSkins = buf1.uByte.toInt()
             val hasVertexSkins = buf1.uByte.toInt()
             val var27 = buf1.uShort.toInt()
             val var20 = buf1.uShort.toInt()
-            val var36 = buf1.uShort.toInt()
+            buf1.uShort.toInt()
             val var23 = buf1.uShort.toInt()
             var vertexZOffsetPos = verticeCount
             vertexZOffsetPos += triangleCount
@@ -363,7 +362,7 @@ class Model(var id: Int) {
             val triangleSkinPos = vertexZOffsetPos
             if (hasFaceSkins == 1) vertexZOffsetPos += triangleCount
             val var42 = vertexZOffsetPos
-            if (shouldCreateTextures == 1) vertexZOffsetPos += triangleCount
+            if (hasTextures == 1) vertexZOffsetPos += triangleCount
             val vertexSkinsPos = vertexZOffsetPos
             if (hasVertexSkins == 1) vertexZOffsetPos += verticeCount
             val alphaPos = vertexZOffsetPos
@@ -397,7 +396,7 @@ class Model(var id: Int) {
                 model.textureTriangleVertex2 = UShortArray(textureTriangleCount)
                 model.textureTriangleVertex3 = UShortArray(textureTriangleCount)
             }
-            if (shouldCreateTextures == 1) {
+            if (hasTextures == 1) {
                 model.triangleRenderTypes = ByteArray(triangleCount)
                 model.textureCoordinates = ByteArray(triangleCount)
                 model.triangleTextures = ShortArray(triangleCount)
@@ -409,7 +408,7 @@ class Model(var id: Int) {
             }
 
             decodeVertexPositions(
-                model, hasVertexSkins, buffer, textureTriangleCount, vertexXOffsetsPos, vertexYOffsetPos,
+                model, hasVertexSkins, buffer, 0, vertexXOffsetsPos, vertexYOffsetPos,
                 vertexZOffsetPos, vertexSkinsPos
             )
             buf1.position(colorPos)
@@ -419,7 +418,7 @@ class Model(var id: Int) {
             buf5.position(triangleSkinPos)
             for (i in 0 until triangleCount) {
                 model.triangleColors!![i] = buf1.uShort.toShort()
-                if (shouldCreateTextures == 1) {
+                if (hasTextures == 1) {
                     val trianglePointY = buf2.uByte.toInt()
                     if (trianglePointY and 1 == 1) {
                         model.triangleRenderTypes!![i] = 1
