@@ -7,7 +7,6 @@ import java.io.PrintWriter
 
 @ExperimentalUnsignedTypes
 fun exportObj(model: Model, textureArchive: TextureArchive, objWriter: PrintWriter, mtlWriter: PrintWriter) {
-    println("Exporting ${model.id}")
     model.computeNormals()
     model.computeTextureUVCoordinates()
 
@@ -30,7 +29,7 @@ fun exportObj(model: Model, textureArchive: TextureArchive, objWriter: PrintWrit
         }
     }
     for (normal in model.vertexNormals!!) {
-        objWriter.println("vn " + normal.x + " " + normal.y + " " + normal.z)
+        objWriter.println("vn " + normal.x + " " + normal.y * -1 + " " + normal.z * -1)
     }
 
     for (i in 0 until model.triangleCount) {
@@ -58,7 +57,7 @@ fun exportObj(model: Model, textureArchive: TextureArchive, objWriter: PrintWrit
             mtlWriter.println("Kd $r $g $b")
         } else {
             val texture = textureArchive.textures.first { it.id == textureId }
-            mtlWriter.println("map_Kd textures/" + texture.fileIds[0] + "-0.png")
+            mtlWriter.println("map_Kd ../textures/" + texture.fileIds[0] + "-0.png")
         }
 
         var alpha = 0
@@ -73,7 +72,7 @@ fun exportObj(model: Model, textureArchive: TextureArchive, objWriter: PrintWrit
     }
 }
 
-private fun rs2hsbToColor(hsb: Int): Color {
+fun rs2hsbToColor(hsb: Int): Color {
     val decode_hue = hsb shr 10 and 0x3f
     val decode_saturation = hsb shr 7 and 0x07
     val decode_brightness = hsb and 0x7f
