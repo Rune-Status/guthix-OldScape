@@ -243,6 +243,7 @@ private fun createMaterials(gltf: GlTF, model: Model, textures: Map<Int, Int>): 
                     baseColorTexture = TextureInfo().apply {
                         index = texturIndex
                     }
+                    alphaMode = "MASK"
                 }
             }
             gltf.addMaterials(material)
