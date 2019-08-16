@@ -17,7 +17,7 @@
  */
 
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.3.20'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.41'
     id 'java-library'
 }
 
@@ -35,6 +35,8 @@ dependencies {
     implementation group: 'io.github.microutils', name: 'kotlin-logging', version: kotlinLoggingVersion
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: sl4jVersion
     implementation group: 'com.github.guthix', name: 'Jagex-Store-5', version: 'master-SNAPSHOT'
+    implementation group: 'de.javagl', name: 'jgltf-model', version: '2.0.0'
+
 }
 
 compileKotlin {
