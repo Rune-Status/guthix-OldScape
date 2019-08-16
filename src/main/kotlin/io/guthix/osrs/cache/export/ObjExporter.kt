@@ -19,8 +19,8 @@ fun exportObj(model: Model, textureArchive: TextureArchive, objWriter: PrintWrit
         )
     }
     if (model.triangleTextures != null) {
-        val u = model.faceTextureUCoordinates!!
-        val v = model.faceTextureVCoordinates!!
+        val u = model.triangleTextUCo!!
+        val v = model.triangleTextVCo!!
 
         for (i in 0 until model.triangleCount) {
             objWriter.println("vt " + u[i]!![0] + " " + v[i]!![0])
@@ -38,7 +38,7 @@ fun exportObj(model: Model, textureArchive: TextureArchive, objWriter: PrintWrit
         val z = model.triangleVertex3!![i] + 1
 
         objWriter.println("usemtl m$i")
-        if (model.triangleTextures != null) {
+        if(model.triangleTextures != null) {
             objWriter.println(("f " + x + "/" + (i * 3 + 1) + " " + y + "/" + (i * 3 + 2) + " " + z + "/" + (i * 3 + 3)))
         } else {
             objWriter.println("f $x $y $z")
@@ -57,7 +57,7 @@ fun exportObj(model: Model, textureArchive: TextureArchive, objWriter: PrintWrit
             mtlWriter.println("Kd $r $g $b")
         } else {
             val texture = textureArchive.textures.first { it.id == textureId }
-            mtlWriter.println("map_Kd ../textures/" + texture.fileIds[0] + "-0.png")
+            mtlWriter.println("map_Kd " + texture.id + ".png")
         }
 
         var alpha = 0

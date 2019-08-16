@@ -54,8 +54,8 @@ class Model(var id: Int) {
     var vertexNormals: Array<VertexNormal>? = null
     var faceNormals: Array<FaceNormal?>? = null
 
-    var faceTextureUCoordinates: Array<FloatArray?>? = null
-    var faceTextureVCoordinates: Array<FloatArray?>? = null
+    var triangleTextUCo: Array<FloatArray?>? = null
+    var triangleTextVCo: Array<FloatArray?>? = null
 
     fun computeNormals() {
         vertexNormals = Array(vertexCount) { VertexNormal() }
@@ -120,8 +120,8 @@ class Model(var id: Int) {
     }
 
     fun computeTextureUVCoordinates() {
-        faceTextureUCoordinates = arrayOfNulls(triangleCount)
-        faceTextureVCoordinates = arrayOfNulls(triangleCount)
+        triangleTextUCo = arrayOfNulls(triangleCount)
+        triangleTextVCo = arrayOfNulls(triangleCount)
 
         for (i in 0 until triangleCount) {
             val textureCoordinate = if (textureCoordinates == null) -1 else textureCoordinates!![i].toInt()
@@ -189,8 +189,8 @@ class Model(var id: Int) {
                         v[2] = (f_900_ * f_894_ + f_901_ * f_895_ + f_902_ * f_896_) * f_903_
                     }
                 }
-                faceTextureUCoordinates!![i] = u
-                faceTextureVCoordinates!![i] = v
+                triangleTextUCo!![i] = u
+                triangleTextVCo!![i] = v
             }
         }
     }
