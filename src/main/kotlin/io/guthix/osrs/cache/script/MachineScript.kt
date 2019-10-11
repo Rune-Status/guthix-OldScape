@@ -17,10 +17,11 @@
  */
 package io.guthix.osrs.cache.script
 
-import io.guthix.cache.js5.io.*
+import io.guthix.buffer.readStringCP1252
+import io.guthix.buffer.readStringCP1252Nullable
+import io.netty.buffer.ByteBuf
 import mu.KotlinLogging
 import java.io.IOException
-import java.nio.ByteBuffer
 import kotlin.text.StringBuilder
 
 private val logger = KotlinLogging.logger {}
@@ -84,40 +85,38 @@ data class MachineScript(
     }
 
     companion object {
-        @ExperimentalUnsignedTypes
-        fun decode(id: Int, data: ByteArray): MachineScript {
-            val buffer = ByteBuffer.wrap(data)
-            val switchDataLength = buffer.getUShort(buffer.limit() - 2).toInt() // ushort
-            val opcodeEndPos = buffer.limit() - 2 - switchDataLength - 12
-            buffer.position(opcodeEndPos)
-            val opcodeCount = buffer.int
-            val localIntCount = buffer.uShort.toInt()
-            val localStringCount = buffer.uShort.toInt()
-            val intArgumentCount = buffer.uShort.toInt()
-            val stringArgumentCount = buffer.uShort.toInt()
-            val switches = Array<Map<Int, Int>>(buffer.uByte.toInt()) {
-                val caseCount = buffer.uShort.toInt()
+        fun decode(id: Int, data: ByteBuf): MachineScript {
+            val switchDataLength = data.getUnsignedShort(data.writerIndex() - 2).toInt()
+            val opcodeEndPos = data.writerIndex() - 2 - switchDataLength - 12
+            data.readerIndex(opcodeEndPos)
+            val opcodeCount = data.readInt()
+            val localIntCount = data.readUnsignedShort()
+            val localStringCount = data.readUnsignedShort()
+            val intArgumentCount = data.readUnsignedShort()
+            val stringArgumentCount = data.readUnsignedShort()
+            val switches = Array<Map<Int, Int>>(data.readUnsignedByte().toInt()) {
+                val caseCount = data.readUnsignedShort()
                 val switch = mutableMapOf<Int, Int>()
                 repeat(caseCount) {
-                    switch[buffer.int] = buffer.int
+                    switch[data.readInt()] = data.readInt()
                 }
                 switch
             }
-            buffer.position(0)
-            buffer.nullableString
+            data.readerIndex(0)
+            data.readStringCP1252Nullable()
             val opcodes = IntArray(opcodeCount)
             val intOperands = mutableMapOf<Int, Int>()
             val stringOperands = mutableMapOf<Int, String>()
             var i = 0
-            while (buffer.position() < opcodeEndPos) {
-                val opcode = buffer.uShort.toInt()
+            while (data.readerIndex() < opcodeEndPos) {
+                val opcode = data.readUnsignedShort()
                 if(opcode == InstructionDefinition.SCONST.opcode) {
-                    stringOperands[i] = buffer.string
+                    stringOperands[i] = data.readStringCP1252()
                 } else if (opcode < 100 && opcode != InstructionDefinition.RETURN.opcode
                     && opcode != InstructionDefinition.POP_INT.opcode && opcode != InstructionDefinition.POP_STRING.opcode) {
-                    intOperands[i] = buffer.int
+                    intOperands[i] = data.readInt()
                 } else {
-                    intOperands[i] = buffer.uByte.toInt()
+                    intOperands[i] = data.readUnsignedByte().toInt()
                 }
                 opcodes[i++] = opcode
             }

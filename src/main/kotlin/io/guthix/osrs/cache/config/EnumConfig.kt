@@ -17,89 +17,82 @@
  */
 package io.guthix.osrs.cache.config
 
-import io.guthix.cache.js5.io.string
-import io.guthix.cache.js5.io.uByte
-import io.guthix.cache.js5.io.uShort
-import io.guthix.cache.js5.io.writeString
-import java.io.ByteArrayOutputStream
-import java.io.DataOutputStream
+import io.guthix.buffer.readStringCP1252
+import io.guthix.buffer.writeStringCP1252
+import io.netty.buffer.ByteBuf
+import io.netty.buffer.Unpooled
 import java.io.IOException
-import java.nio.ByteBuffer
 
 data class EnumConfig(override val id: Int) : Config(id) {
-    var keyType: Char = 0.toChar()
-    var valType: Char = 0.toChar()
+    var keyType: Char? = null
+    var valType: Char? = null
     var defaultString = "null"
-    var defaultInt = 0
+    var defaultInt: Int? = null
     val keyValuePairs = mutableMapOf<Int, Any>()
 
-    override fun encode(): ByteBuffer {
-        val byteStr = ByteArrayOutputStream()
-        DataOutputStream(byteStr).use { os ->
-            if (keyType.toInt() != 0) {
-                os.writeOpcode(1)
-                os.writeByte(keyType.toInt())
-            }
-            if (valType.toInt() != 0) {
-                os.writeOpcode(2)
-                os.writeByte(valType.toInt())
-            }
-            if(defaultString != "null") {
-                os.writeOpcode(3)
-                os.writeString(defaultString)
-            }
-            if(defaultInt != 0) {
-                os.writeOpcode(4)
-                os.writeInt(defaultInt)
-            }
-            when {
-                keyValuePairs.all { it.value is String } -> {
-                    os.writeOpcode(5)
-                    keyValuePairs.forEach { (key, value) ->
-                        os.writeInt(key)
-                        os.writeString(value as String)
-                    }
-                }
-                keyValuePairs.all { it.value is Int } -> {
-                    os.writeOpcode(6)
-                    keyValuePairs.forEach { (key, value) ->
-                        os.writeInt(key)
-                        os.writeInt(value as Int)
-                    }
-                }
-                else -> throw IOException("Enum can only contain ints or strings.")
-            }
-            os.writeOpcode(0)
+    override fun encode(): ByteBuf {
+        val data = Unpooled.buffer()
+        keyType?.let {
+            data.writeOpcode(1)
+            data.writeByte(it.toInt())
         }
-        return ByteBuffer.wrap(byteStr.toByteArray())
+        valType?.let {
+            data.writeOpcode(2)
+            data.writeByte(it.toInt())
+        }
+        if(defaultString != "null") {
+            data.writeOpcode(3)
+            data.writeStringCP1252(defaultString)
+        }
+        defaultInt?.let {
+            data.writeOpcode(4)
+            data.writeInt(defaultInt!!)
+        }
+        when {
+            keyValuePairs.all { it.value is String } -> {
+                data.writeOpcode(5)
+                keyValuePairs.forEach { (key, value) ->
+                    data.writeInt(key)
+                    data.writeStringCP1252(value as String)
+                }
+            }
+            keyValuePairs.all { it.value is Int } -> {
+                data.writeOpcode(6)
+                keyValuePairs.forEach { (key, value) ->
+                    data.writeInt(key)
+                    data.writeInt(value as Int)
+                }
+            }
+            else -> throw IOException("Enum can only contain ints or strings.")
+        }
+        data.writeOpcode(0)
+        return data
     }
 
     companion object : ConfigCompanion<EnumConfig>() {
         override val id = 8
 
-        @ExperimentalUnsignedTypes
-        override fun decode(id: Int, data: ByteArray): EnumConfig {
-            val buffer = ByteBuffer.wrap(data)
+        override fun decode(id: Int, data: ByteBuf): EnumConfig {
             val enumConfig = EnumConfig(id)
             decoder@ while (true) {
-                when (val opcode = buffer.uByte.toInt()) {
+                when (val opcode = data.readUnsignedByte().toInt()) {
                     0 -> break@decoder
-                    1 -> enumConfig.keyType = buffer.uByte.toShort().toChar()
-                    2 -> enumConfig.valType = buffer.uByte.toShort().toChar()
-                    3 -> enumConfig.defaultString = buffer.string
-                    4 -> enumConfig.defaultInt = buffer.int
+                    1 -> enumConfig.keyType = data.readUnsignedByte().toChar()
+                    2 -> enumConfig.valType = data.readUnsignedByte().toChar()
+                    3 -> enumConfig.defaultString = data.readStringCP1252()
+                    4 -> enumConfig.defaultInt = data.readInt()
                     5 -> {
-                        val length = buffer.short.toInt()
+                        val length = data.readUnsignedShort()
                         for (i in 0 until length) {
-                            val key = buffer.int
-                            enumConfig.keyValuePairs[key] = buffer.string
+                            val key = data.readInt()
+                            enumConfig.keyValuePairs[key] = data.readStringCP1252()
                         }
                     }
                     6 -> {
-                        val length = buffer.uShort.toInt()
+                        val length = data.readUnsignedShort()
                         for (i in 0 until length) {
-                            val key = buffer.int
-                            enumConfig.keyValuePairs[key] = buffer.int
+                            val key = data.readInt()
+                            enumConfig.keyValuePairs[key] = data.readInt()
                         }
                     }
                     else -> throw IOException("Did not recognise opcode $opcode.")

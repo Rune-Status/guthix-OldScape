@@ -17,13 +17,10 @@
  */
 package io.guthix.osrs.cache.model
 
-import io.guthix.cache.js5.io.smallSmart
-import io.guthix.cache.js5.io.uByte
-import io.guthix.cache.js5.io.uShort
-import java.nio.ByteBuffer
+import io.guthix.buffer.readSmallSmart
+import io.netty.buffer.ByteBuf
 import kotlin.math.sqrt
 
-@ExperimentalUnsignedTypes
 class Model(var id: Int) {
     var vertexCount = 0
     var triangleCount = 0
@@ -39,15 +36,15 @@ class Model(var id: Int) {
     var triangleVertex2: IntArray? = null
     var triangleVertex3: IntArray? = null
     var triangleAlphas: ByteArray? = null
-    var triangleColors: ShortArray? = null
+    var triangleColors: IntArray? = null
     var triangleRenderPriorities: ByteArray? = null
     var triangleRenderTypes: ByteArray? = null
-    var triangleTextures: ShortArray? = null
+    var triangleTextures: IntArray? = null
     var triangleSkins: IntArray? = null
 
-    var textureTriangleVertex1: UShortArray? = null
-    var textureTriangleVertex2: UShortArray? = null
-    var textureTriangleVertex3: UShortArray? = null
+    var textureTriangleVertex1: IntArray? = null
+    var textureTriangleVertex2: IntArray? = null
+    var textureTriangleVertex3: IntArray? = null
     var textureCoordinates: ByteArray? = null
     var textureRenderTypes: ByteArray? = null
 
@@ -125,7 +122,7 @@ class Model(var id: Int) {
 
         for (i in 0 until triangleCount) {
             val textureCoordinate = if (textureCoordinates == null) -1 else textureCoordinates!![i].toInt()
-            val textureId = if (triangleTextures == null) -1 else (triangleTextures!![i].toInt() and 0xFFFF)
+            val textureId = if (triangleTextures == null) -1 else (triangleTextures!![i] and 0xFFFF)
             if (textureId != -1) {
                 val u = FloatArray(3)
                 val v = FloatArray(3)
@@ -143,9 +140,9 @@ class Model(var id: Int) {
                         val vertexId2 = triangleVertex2!![i]
                         val vertexId3 = triangleVertex3!![i]
 
-                        val textureVertexId1 = textureTriangleVertex1!![textureCoordinate].toInt()
-                        val textureVertexId2 = textureTriangleVertex2!![textureCoordinate].toInt()
-                        val textureVertexId3 = textureTriangleVertex3!![textureCoordinate].toInt()
+                        val textureVertexId1 = textureTriangleVertex1!![textureCoordinate]
+                        val textureVertexId2 = textureTriangleVertex2!![textureCoordinate]
+                        val textureVertexId3 = textureTriangleVertex3!![textureCoordinate]
 
                         val triangleX = vertexPositionsX!![textureVertexId1].toFloat()
                         val triangleY = vertexPositionsY!![textureVertexId1].toFloat()
@@ -196,48 +193,48 @@ class Model(var id: Int) {
     }
 
     companion object {
-        fun decode(id: Int, data: ByteArray): Model {
-            val buffer = ByteBuffer.wrap(data)
+        fun decode(id: Int, data: ByteBuf): Model {
             val model = Model(id)
-            return if (buffer.get(buffer.limit() - 1).toInt() == -1 && buffer.get(buffer.limit() - 2).toInt() == -1) {
-                decodeNew(model, buffer)
+            return if (data.getByte(data.writerIndex() - 1).toInt() == -1 &&
+                data.getByte(data.writerIndex() - 2).toInt() == -1
+            ) {
+                decodeNew(model, data)
             } else {
-                decodeOld(model, buffer)
+                decodeOld(model, data)
             }
         }
 
-        @ExperimentalUnsignedTypes
-        fun decodeNew(model: Model, buffer: ByteBuffer): Model {
-            val buf1 = buffer.duplicate()
-            val buf2 = buffer.duplicate()
-            val buf3 = buffer.duplicate()
-            val buf4 = buffer.duplicate()
-            val buf5 = buffer.duplicate()
-            val buf6 = buffer.duplicate()
-            val buf7 = buffer.duplicate()
-            buf1.position(buf1.limit() - 23)
-            val vertexCount = buf1.uShort.toInt()
-            val triangleCount = buf1.uShort.toInt()
-            val textureTriangleCount = buf1.uByte.toInt()
-            val hasFaceRenderTypes = buf1.uByte.toInt()
-            val modelPriority = buf1.uByte
-            val hasFaceAlphas = buf1.uByte.toInt()
-            val hasFaceSkins = buf1.uByte.toInt()
-            val hasTexture = buf1.uByte.toInt()
-            val hasVertexSkins = buf1.uByte.toInt()
-            val var20 = buf1.uShort.toInt()
-            val var21 = buf1.uShort.toInt()
-            val var42 = buf1.uShort.toInt()
-            val var22 = buf1.uShort.toInt()
-            val var38 = buf1.uShort.toInt()
+        fun decodeNew(model: Model, data: ByteBuf): Model {
+            val buf1 = data.duplicate()
+            val buf2 = data.duplicate()
+            val buf3 = data.duplicate()
+            val buf4 = data.duplicate()
+            val buf5 = data.duplicate()
+            val buf6 = data.duplicate()
+            val buf7 = data.duplicate()
+            buf1.readerIndex(buf1.writerIndex() - 23)
+            val vertexCount = buf1.readUnsignedShort()
+            val triangleCount = buf1.readUnsignedShort()
+            val textureTriangleCount = buf1.readUnsignedByte().toInt()
+            val hasFaceRenderTypes = buf1.readUnsignedByte().toInt()
+            val modelPriority = buf1.readUnsignedByte().toInt()
+            val hasFaceAlphas = buf1.readUnsignedByte().toInt()
+            val hasFaceSkins = buf1.readUnsignedByte().toInt()
+            val hasTexture = buf1.readUnsignedByte().toInt()
+            val hasVertexSkins = buf1.readUnsignedByte().toInt()
+            val var20 = buf1.readUnsignedShort()
+            val var21 = buf1.readUnsignedShort()
+            val var42 = buf1.readUnsignedShort()
+            val var22 = buf1.readUnsignedShort()
+            val var38 = buf1.readUnsignedShort()
             var textureAmount = 0
             var var23 = 0
             var var29 = 0
             if (textureTriangleCount > 0) {
                 model.textureRenderTypes = ByteArray(textureTriangleCount)
-                buf1.position(0)
+                buf1.readerIndex(0)
                 for (i in 0 until textureTriangleCount) {
-                    model.textureRenderTypes!![i] = buf1.get()
+                    model.textureRenderTypes!![i] = buf1.readByte()
                     val renderType = model.textureRenderTypes!![i]
                     if (renderType.toInt() == 0) {
                         textureAmount++
@@ -256,7 +253,7 @@ class Model(var id: Int) {
             val triangleTypePos = position
             position += triangleCount
             val priorityPos = position
-            if (modelPriority == UByte.MAX_VALUE) position += triangleCount
+            if (modelPriority == 0xFF) position += triangleCount
             val triangleSkinPos = position
             if (hasFaceSkins == 1) position += triangleCount
             val vertexSkinsPos = position
@@ -290,75 +287,75 @@ class Model(var id: Int) {
             model.triangleVertex1 = IntArray(triangleCount)
             model.triangleVertex2 = IntArray(triangleCount)
             model.triangleVertex3 = IntArray(triangleCount)
-            model.triangleColors = ShortArray(triangleCount)
+            model.triangleColors = IntArray(triangleCount)
             if (hasVertexSkins == 1) model.vertexSkins = IntArray(vertexCount)
             if (hasFaceRenderTypes == 1) model.triangleRenderTypes = ByteArray(triangleCount)
             if (hasFaceAlphas == 1) model.triangleAlphas = ByteArray(triangleCount)
             if (hasFaceSkins == 1) model.triangleSkins = IntArray(triangleCount)
-            if (hasTexture == 1) model.triangleTextures = ShortArray(triangleCount)
+            if (hasTexture == 1) model.triangleTextures = IntArray(triangleCount)
             if (hasTexture == 1 && textureTriangleCount > 0) model.textureCoordinates = ByteArray(triangleCount)
-            if (modelPriority == UByte.MAX_VALUE) {
+            if (modelPriority == 0xFF) {
                 model.triangleRenderPriorities = ByteArray(triangleCount)
             } else {
                 model.renderPriority = modelPriority.toByte()
             }
             if (textureTriangleCount > 0) {
-                model.textureTriangleVertex1 = UShortArray(textureTriangleCount)
-                model.textureTriangleVertex2 = UShortArray(textureTriangleCount)
-                model.textureTriangleVertex3 = UShortArray(textureTriangleCount)
+                model.textureTriangleVertex1 = IntArray(textureTriangleCount)
+                model.textureTriangleVertex2 = IntArray(textureTriangleCount)
+                model.textureTriangleVertex3 = IntArray(textureTriangleCount)
             }
             decodeVertexPositions(
-                model, hasVertexSkins, buffer, textureTriangleCount, vertexXOffsetsPos, vertexYOffsetPos,
+                model, hasVertexSkins, data, textureTriangleCount, vertexXOffsetsPos, vertexYOffsetPos,
                 vertexZOffsetPos, vertexSkinsPos
             )
-            buf1.position(colorPos)
-            buf2.position(renderTypePos)
-            buf3.position(priorityPos)
-            buf4.position(alphaPos)
-            buf5.position(triangleSkinPos)
-            buf6.position(texturePos)
-            buf7.position(textureCoordPos)
+            buf1.readerIndex(colorPos)
+            buf2.readerIndex(renderTypePos)
+            buf3.readerIndex(priorityPos)
+            buf4.readerIndex(alphaPos)
+            buf5.readerIndex(triangleSkinPos)
+            buf6.readerIndex(texturePos)
+            buf7.readerIndex(textureCoordPos)
             for (i in 0 until triangleCount) {
-                model.triangleColors!![i] = buf1.uShort.toShort()
-                if (modelPriority == UByte.MAX_VALUE) model.triangleRenderPriorities!![i] = buf3.get()
-                if (hasFaceRenderTypes == 1) model.triangleRenderTypes!![i] = buf2.get()
-                if (hasFaceAlphas == 1) model.triangleAlphas!![i] = buf4.get()
-                if (hasFaceSkins == 1) model.triangleSkins!![i] = buf5.uByte.toInt()
-                if (hasTexture == 1)  model.triangleTextures!![i] = (buf6.uShort.toInt() - 1).toShort()
-                if (model.textureCoordinates != null && model.triangleTextures!![i].toInt() != -1) {
-                    model.textureCoordinates!![i] = (buf7.uByte.toInt() - 1).toByte()
+                model.triangleColors!![i] = buf1.readUnsignedShort()
+                if (modelPriority == 0xFF) model.triangleRenderPriorities!![i] = buf3.readByte()
+                if (hasFaceRenderTypes == 1) model.triangleRenderTypes!![i] = buf2.readByte()
+                if (hasFaceAlphas == 1) model.triangleAlphas!![i] = buf4.readByte()
+                if (hasFaceSkins == 1) model.triangleSkins!![i] = buf5.readUnsignedByte().toInt()
+                if (hasTexture == 1)  model.triangleTextures!![i] = buf6.readUnsignedShort() - 1
+                if (model.textureCoordinates != null && model.triangleTextures!![i] != -1) {
+                    model.textureCoordinates!![i] = (buf7.readUnsignedByte().toInt() - 1).toByte()
                 }
             }
-            decodeTriangles(model, buffer, vertexIdPos, triangleTypePos)
-            decodeTextureVertexPositionsNew(model, textureTriangleCount, buffer, textureTriangleVertexPos)
+            decodeTriangles(model, data, vertexIdPos, triangleTypePos)
+            decodeTextureVertexPositionsNew(model, textureTriangleCount, data, textureTriangleVertexPos)
             return model
         }
 
-        fun decodeOld(model: Model, buffer: ByteBuffer): Model {
+        fun decodeOld(model: Model, data: ByteBuf): Model {
             var hasFaceRenderTypes = false
             var hasFaceTextures = false
-            val buf1 = buffer.duplicate()
-            val buf2 = buffer.duplicate()
-            val buf3 = buffer.duplicate()
-            val buf4 = buffer.duplicate()
-            val buf5 = buffer.duplicate()
-            buf1.position(buffer.limit() - 18)
-            val verticeCount = buf1.uShort.toInt()
-            val triangleCount = buf1.uShort.toInt()
-            val textureTriangleCount = buf1.uByte.toInt()
-            val hasTextures = buf1.uByte.toInt()
-            val modelPriority = buf1.uByte
-            val hasFaceAlphas = buf1.uByte.toInt()
-            val hasFaceSkins = buf1.uByte.toInt()
-            val hasVertexSkins = buf1.uByte.toInt()
-            val var27 = buf1.uShort.toInt()
-            val var20 = buf1.uShort.toInt()
-            buf1.uShort.toInt()
-            val var23 = buf1.uShort.toInt()
+            val buf1 = data.duplicate()
+            val buf2 = data.duplicate()
+            val buf3 = data.duplicate()
+            val buf4 = data.duplicate()
+            val buf5 = data.duplicate()
+            buf1.readerIndex(data.writerIndex() - 18)
+            val verticeCount = buf1.readUnsignedShort()
+            val triangleCount = buf1.readUnsignedShort()
+            val textureTriangleCount = buf1.readUnsignedByte().toInt()
+            val hasTextures = buf1.readUnsignedByte().toInt()
+            val modelPriority = buf1.readUnsignedByte().toInt()
+            val hasFaceAlphas = buf1.readUnsignedByte().toInt()
+            val hasFaceSkins = buf1.readUnsignedByte().toInt()
+            val hasVertexSkins = buf1.readUnsignedByte().toInt()
+            val var27 = buf1.readUnsignedShort()
+            val var20 = buf1.readUnsignedShort()
+            buf1.readUnsignedShort()
+            val var23 = buf1.readUnsignedShort()
             var vertexZOffsetPos = verticeCount
             vertexZOffsetPos += triangleCount
             val var25 = vertexZOffsetPos
-            if (modelPriority == UByte.MAX_VALUE) vertexZOffsetPos += triangleCount
+            if (modelPriority == 0xFF) vertexZOffsetPos += triangleCount
             val triangleSkinPos = vertexZOffsetPos
             if (hasFaceSkins == 1) vertexZOffsetPos += triangleCount
             val var42 = vertexZOffsetPos
@@ -386,40 +383,40 @@ class Model(var id: Int) {
             model.triangleVertex1 = IntArray(triangleCount)
             model.triangleVertex2 = IntArray(triangleCount)
             model.triangleVertex3 = IntArray(triangleCount)
-            model.triangleColors = ShortArray(triangleCount)
+            model.triangleColors = IntArray(triangleCount)
             if (hasVertexSkins == 1) model.vertexSkins = IntArray(verticeCount)
             if (hasFaceAlphas == 1) model.triangleAlphas = ByteArray(triangleCount)
             if (hasFaceSkins == 1) model.triangleSkins = IntArray(triangleCount)
             if (textureTriangleCount > 0) {
                 model.textureRenderTypes = ByteArray(textureTriangleCount)
-                model.textureTriangleVertex1 = UShortArray(textureTriangleCount)
-                model.textureTriangleVertex2 = UShortArray(textureTriangleCount)
-                model.textureTriangleVertex3 = UShortArray(textureTriangleCount)
+                model.textureTriangleVertex1 = IntArray(textureTriangleCount)
+                model.textureTriangleVertex2 = IntArray(textureTriangleCount)
+                model.textureTriangleVertex3 = IntArray(textureTriangleCount)
             }
             if (hasTextures == 1) {
                 model.triangleRenderTypes = ByteArray(triangleCount)
                 model.textureCoordinates = ByteArray(triangleCount)
-                model.triangleTextures = ShortArray(triangleCount)
+                model.triangleTextures = IntArray(triangleCount)
             }
-            if (modelPriority == UByte.MAX_VALUE) {
+            if (modelPriority == 0xFF) {
                 model.triangleRenderPriorities = ByteArray(triangleCount)
             } else {
                 model.renderPriority = modelPriority.toByte()
             }
 
             decodeVertexPositions(
-                model, hasVertexSkins, buffer, 0, vertexXOffsetsPos, vertexYOffsetPos,
+                model, hasVertexSkins, data, 0, vertexXOffsetsPos, vertexYOffsetPos,
                 vertexZOffsetPos, vertexSkinsPos
             )
-            buf1.position(colorPos)
-            buf2.position(var42)
-            buf3.position(var25)
-            buf4.position(alphaPos)
-            buf5.position(triangleSkinPos)
+            buf1.readerIndex(colorPos)
+            buf2.readerIndex(var42)
+            buf3.readerIndex(var25)
+            buf4.readerIndex(alphaPos)
+            buf5.readerIndex(triangleSkinPos)
             for (i in 0 until triangleCount) {
-                model.triangleColors!![i] = buf1.uShort.toShort()
+                model.triangleColors!![i] = buf1.readUnsignedShort()
                 if (hasTextures == 1) {
-                    val trianglePointY = buf2.uByte.toInt()
+                    val trianglePointY = buf2.readUnsignedByte().toInt()
                     if (trianglePointY and 1 == 1) {
                         model.triangleRenderTypes!![i] = 1
                         hasFaceRenderTypes = true
@@ -431,7 +428,7 @@ class Model(var id: Int) {
                         model.textureCoordinates!![i] = (trianglePointY shr 2).toByte()
                         model.triangleTextures!![i] = model.triangleColors!![i]
                         model.triangleColors!![i] = 127
-                        if (model.triangleTextures!![i].toInt() != -1) {
+                        if (model.triangleTextures!![i] != -1) {
                             hasFaceTextures = true
                         }
                     } else {
@@ -439,28 +436,28 @@ class Model(var id: Int) {
                         model.triangleTextures!![i] = -1
                     }
                 }
-                if (modelPriority == UByte.MAX_VALUE) {
-                    model.triangleRenderPriorities!![i] = buf3.get()
+                if (modelPriority == 0xFF) {
+                    model.triangleRenderPriorities!![i] = buf3.readByte()
                 }
                 if (hasFaceAlphas == 1) {
-                    model.triangleAlphas!![i] = buf4.get()
+                    model.triangleAlphas!![i] = buf4.readByte()
                 }
                 if (hasFaceSkins == 1) {
-                    model.triangleSkins!![i] = buf5.uByte.toInt()
+                    model.triangleSkins!![i] = buf5.readUnsignedByte().toInt()
                 }
             }
-            decodeTriangles(model, buffer, vertexIdPos, verticeCount)
-            decodeTextureVertexPositionsOld(model, textureTriangleCount, buffer, textureTriangleVertexPos)
+            decodeTriangles(model, data, vertexIdPos, verticeCount)
+            decodeTextureVertexPositionsOld(model, textureTriangleCount, data, textureTriangleVertexPos)
             if (model.textureCoordinates != null) {
                 var hasTextureCoordinates = false
                 for (i in 0 until triangleCount) {
                     if (model.textureCoordinates!![i].toInt() and 255 != 255) {
                         val var21 = model.textureCoordinates!![i].toInt()
-                        if (model.textureTriangleVertex1!![var21].toInt() and '\uffff'.toInt() ==
+                        if (model.textureTriangleVertex1!![var21] and '\uffff'.toInt() ==
                             model.triangleVertex1!![i]
-                            && model.textureTriangleVertex2!![var21].toInt() and '\uffff'.toInt() ==
+                            && model.textureTriangleVertex2!![var21] and '\uffff'.toInt() ==
                             model.triangleVertex2!![i]
-                            && model.textureTriangleVertex3!![var21].toInt() and '\uffff'.toInt() ==
+                            && model.textureTriangleVertex3!![var21] and '\uffff'.toInt() ==
                             model.triangleVertex3!![i]
                         ) {
                             model.textureCoordinates!![i] = -1
@@ -482,19 +479,19 @@ class Model(var id: Int) {
             return model
         }
 
-        fun decodeTriangles(model: Model, buffer: ByteBuffer, vertexIdPos: Int, triangleTypePos: Int) {
-            val vertexIdBuffer = buffer.duplicate().position(vertexIdPos)
-            val triangleTypeBuffer = buffer.duplicate().position(triangleTypePos)
+        fun decodeTriangles(model: Model, data: ByteBuf, vertexIdPos: Int, triangleTypePos: Int) {
+            val vertexIdBuffer = data.duplicate().readerIndex(vertexIdPos)
+            val triangleTypeBuffer = data.duplicate().readerIndex(triangleTypePos)
             var vertexId1 = 0
             var vertexId2 = 0
             var vertexId3 = 0
             var lastVertexId = 0
             for (triangleId in 0 until model.triangleCount) {
-                when (triangleTypeBuffer.uByte.toInt()) {
+                when (triangleTypeBuffer.readUnsignedByte().toInt()) {
                     1 -> { // read unconnected triangle
-                        vertexId1 = vertexIdBuffer.smallSmart.toInt() + lastVertexId
-                        vertexId2 = vertexIdBuffer.smallSmart.toInt() + vertexId1
-                        vertexId3 = vertexIdBuffer.smallSmart.toInt() + vertexId2
+                        vertexId1 = vertexIdBuffer.readSmallSmart() + lastVertexId
+                        vertexId2 = vertexIdBuffer.readSmallSmart() + vertexId1
+                        vertexId3 = vertexIdBuffer.readSmallSmart()  + vertexId2
                         lastVertexId = vertexId3
                         model.triangleVertex1!![triangleId] = vertexId1
                         model.triangleVertex2!![triangleId] = vertexId2
@@ -502,7 +499,7 @@ class Model(var id: Int) {
                     }
                     2 -> { // read triangle connected to previously read vertices
                         vertexId2 = vertexId3
-                        vertexId3 = vertexIdBuffer.smallSmart.toInt() + lastVertexId
+                        vertexId3 = vertexIdBuffer.readSmallSmart()  + lastVertexId
                         lastVertexId = vertexId3
                         model.triangleVertex1!![triangleId] = vertexId1
                         model.triangleVertex2!![triangleId] = vertexId2
@@ -510,7 +507,7 @@ class Model(var id: Int) {
                     }
                     3 -> { // read triangle connected to previously read vertices
                         vertexId1 = vertexId3
-                        vertexId3 = vertexIdBuffer.smallSmart.toInt() + lastVertexId
+                        vertexId3 = vertexIdBuffer.readSmallSmart()  + lastVertexId
                         lastVertexId = vertexId3
                         model.triangleVertex1!![triangleId] = vertexId1
                         model.triangleVertex2!![triangleId] = vertexId2
@@ -520,7 +517,7 @@ class Model(var id: Int) {
                         val resVertexId = vertexId1
                         vertexId1 = vertexId2
                         vertexId2 = resVertexId
-                        vertexId3 = vertexIdBuffer.smallSmart.toInt() + lastVertexId
+                        vertexId3 = vertexIdBuffer.readSmallSmart()  + lastVertexId
                         lastVertexId = vertexId3
                         model.triangleVertex1!![triangleId] = vertexId1
                         model.triangleVertex2!![triangleId] = resVertexId
@@ -533,37 +530,37 @@ class Model(var id: Int) {
         fun decodeVertexPositions(
             model: Model,
             hasVertexSkins: Int,
-            buffer: ByteBuffer,
+            data: ByteBuf,
             vertexFlagsPos: Int,
             vertexXOffsetsPos: Int,
             vertexYOffsetsPos: Int,
             vertexZOffsetsPos: Int,
             vertexSkinsPos: Int
         ) {
-            val vertexFlagBuffer = buffer.duplicate().position(vertexFlagsPos)
-            val vertexXOffsetBuffer = buffer.duplicate().position(vertexXOffsetsPos)
-            val vertexYOffsetBuffer = buffer.duplicate().position(vertexYOffsetsPos)
-            val vertexZOffsetsBuffer = buffer.duplicate().position(vertexZOffsetsPos)
-            val vertexSkinsBuffer = buffer.duplicate().position(vertexSkinsPos)
+            val vertexFlagBuffer = data.duplicate().readerIndex(vertexFlagsPos)
+            val vertexXOffsetBuffer = data.duplicate().readerIndex(vertexXOffsetsPos)
+            val vertexYOffsetBuffer = data.duplicate().readerIndex(vertexYOffsetsPos)
+            val vertexZOffsetsBuffer = data.duplicate().readerIndex(vertexZOffsetsPos)
+            val vertexSkinsBuffer = data.duplicate().readerIndex(vertexSkinsPos)
             var vX = 0
             var vY = 0
             var vZ = 0
             for (i in 0 until model.vertexCount) {
-                val vertexFlags = vertexFlagBuffer.uByte.toInt()
+                val vertexFlags = vertexFlagBuffer.readUnsignedByte().toInt()
                 model.vertexPositionsX!![i] = vX + if (vertexFlags and 1 != 0) {
-                    vertexXOffsetBuffer.smallSmart.toInt()
+                    vertexXOffsetBuffer.readSmallSmart()
                 } else 0
                 model.vertexPositionsY!![i] = vY + if (vertexFlags and 2 != 0) {
-                    vertexYOffsetBuffer.smallSmart.toInt()
+                    vertexYOffsetBuffer.readSmallSmart()
                 } else 0
                 model.vertexPositionsZ!![i] = vZ + if (vertexFlags and 4 != 0) {
-                    vertexZOffsetsBuffer.smallSmart.toInt()
+                    vertexZOffsetsBuffer.readSmallSmart()
                 } else 0
                 vX = model.vertexPositionsX!![i]
                 vY = model.vertexPositionsY!![i]
                 vZ = model.vertexPositionsZ!![i]
                 if (hasVertexSkins == 1) {
-                    model.vertexSkins!![i] = vertexSkinsBuffer.uByte.toInt()
+                    model.vertexSkins!![i] = vertexSkinsBuffer.readUnsignedByte().toInt()
                 }
             }
         }
@@ -571,15 +568,15 @@ class Model(var id: Int) {
         fun decodeTextureVertexPositionsNew(
             model: Model,
             textureTriangleCount: Int,
-            buffer: ByteBuffer,
+            data: ByteBuf,
             textureTriangleVertexPos: Int
         ) {
-            val textureTriangleVertexBuffer = buffer.duplicate().position(textureTriangleVertexPos)
+            val textureTriangleVertexBuffer = data.duplicate().readerIndex(textureTriangleVertexPos)
             for (i in 0 until textureTriangleCount) {
                 if(model.textureRenderTypes!![i].toInt() and 255 == 0) {
-                    model.textureTriangleVertex1!![i] = textureTriangleVertexBuffer.uShort
-                    model.textureTriangleVertex2!![i] = textureTriangleVertexBuffer.uShort
-                    model.textureTriangleVertex3!![i] = textureTriangleVertexBuffer.uShort
+                    model.textureTriangleVertex1!![i] = textureTriangleVertexBuffer.readUnsignedShort()
+                    model.textureTriangleVertex2!![i] = textureTriangleVertexBuffer.readUnsignedShort()
+                    model.textureTriangleVertex3!![i] = textureTriangleVertexBuffer.readUnsignedShort()
                 }
             }
         }
@@ -587,15 +584,15 @@ class Model(var id: Int) {
         fun decodeTextureVertexPositionsOld(
             model: Model,
             textureTriangleCount: Int,
-            buffer: ByteBuffer,
+            data: ByteBuf,
             textureTriangleVertexPos: Int
         ) {
-            val textureTriangleVertexBuffer = buffer.duplicate().position(textureTriangleVertexPos)
+            val textureTriangleVertexBuffer = data.duplicate().readerIndex(textureTriangleVertexPos)
             for (i in 0 until textureTriangleCount) {
                 model.textureRenderTypes!![i] = 0
-                model.textureTriangleVertex1!![i] = textureTriangleVertexBuffer.uShort
-                model.textureTriangleVertex2!![i] = textureTriangleVertexBuffer.uShort
-                model.textureTriangleVertex3!![i] = textureTriangleVertexBuffer.uShort
+                model.textureTriangleVertex1!![i] = textureTriangleVertexBuffer.readUnsignedShort()
+                model.textureTriangleVertex2!![i] = textureTriangleVertexBuffer.readUnsignedShort()
+                model.textureTriangleVertex3!![i] = textureTriangleVertexBuffer.readUnsignedShort()
             }
         }
     }

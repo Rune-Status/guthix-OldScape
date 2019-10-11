@@ -17,19 +17,17 @@
  */
 package io.guthix.osrs.cache
 
-import io.guthix.cache.js5.Js5Cache
+import io.guthix.cache.js5.Js5Archive
 import io.guthix.osrs.cache.plane.Sprite
 
-class SpriteArchive(
-    val sprites: List<Sprite>
-) {
+class SpriteArchive(val sprites: List<Sprite>) {
     companion object {
         const val id = 8
 
-        @ExperimentalUnsignedTypes
-        fun load(cache: Js5Cache): SpriteArchive {
+        fun load(archive: Js5Archive): SpriteArchive {
             val sprites = mutableListOf<Sprite>()
-            cache.readArchive(id).forEach { (groupId, group) ->
+            archive.groupSettings.forEach { (groupId, _) ->
+                val group = archive.readGroup(groupId)
                 group.files.forEach { (_, file) ->
                     sprites.add(Sprite.decode(groupId, file.data))
                 }

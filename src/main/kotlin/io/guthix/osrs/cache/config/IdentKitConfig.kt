@@ -17,131 +17,97 @@
  */
 package io.guthix.osrs.cache.config
 
-import io.guthix.cache.js5.io.uByte
-import io.guthix.cache.js5.io.uShort
-import java.io.ByteArrayOutputStream
-import java.io.DataOutputStream
+import io.netty.buffer.ByteBuf
+import io.netty.buffer.Unpooled
 import java.io.IOException
-import java.nio.ByteBuffer
 
-@ExperimentalUnsignedTypes
 data class IdentKitConfig(override val id: Int) : Config(id) {
-    var colorFind: UShortArray? = null
-    var colorReplace: UShortArray? = null
-    var textureFind: UShortArray? = null
-    var textureReplace: UShortArray? = null
-    var bodyPartId: UByte? = null
-    var modelIds: UShortArray? = null
+    var colorFind: IntArray? = null
+    var colorReplace: IntArray? = null
+    var textureFind: IntArray? = null
+    var textureReplace: IntArray? = null
+    var bodyPartId: Short? = null
+    var modelIds: IntArray? = null
     val models = intArrayOf(-1, -1, -1, -1, -1)
     var nonSelectable = false
 
     @ExperimentalUnsignedTypes
-    override fun encode(): ByteBuffer {
-        val byteStr = ByteArrayOutputStream()
-        DataOutputStream(byteStr).use { os ->
-            bodyPartId?.let {
-                os.writeOpcode(1)
-                os.writeByte(bodyPartId!!.toInt())
-            }
-            modelIds?.let {
-                os.writeOpcode(2)
-                os.writeByte(modelIds!!.size)
-                modelIds!!.forEach { id -> os.writeShort(id.toInt()) }
-            }
-            if(nonSelectable) os.writeOpcode(3)
-            if (colorFind != null && colorReplace != null) {
-                os.writeOpcode(40)
-                os.writeByte(colorFind!!.size)
-                for (i in 0 until colorFind!!.size) {
-                    os.writeShort(colorFind!![i].toInt())
-                    os.writeShort(colorReplace!![i].toInt())
-                }
-            }
-            if (textureFind != null && textureReplace != null) {
-                os.writeOpcode(41)
-                os.writeByte(textureFind!!.size)
-                for (i in 0 until textureReplace!!.size) {
-                    os.writeShort(textureFind!![i].toInt())
-                    os.writeShort(textureReplace!![i].toInt())
-                }
-            }
-            models.forEachIndexed { i, id ->
-                if(id != -1) {
-                    os.writeOpcode(60 + i)
-                    os.writeShort(id)
-                }
-            }
-            os.writeOpcode(0)
+    override fun encode(): ByteBuf {
+        val data = Unpooled.buffer()
+        bodyPartId?.let {
+            data.writeOpcode(1)
+            data.writeByte(it.toInt())
         }
-        return ByteBuffer.wrap(byteStr.toByteArray())
-    }
-
-    @ExperimentalUnsignedTypes
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is IdentKitConfig) return false
-        if (id != other.id) return false
-        if (colorFind != other.colorFind) return false
-        if (colorReplace != other.colorReplace) return false
-        if (textureFind != other.textureFind) return false
-        if (textureReplace != other.textureReplace) return false
-        if (bodyPartId != other.bodyPartId) return false
-        if (modelIds != other.modelIds) return false
-        if (!models.contentEquals(other.models)) return false
-        if (nonSelectable != other.nonSelectable) return false
-        return true
-    }
-
-    @ExperimentalUnsignedTypes
-    override fun hashCode(): Int {
-        var result = id
-        result = 31 * result + (colorFind?.hashCode() ?: 0)
-        result = 31 * result + (colorReplace?.hashCode() ?: 0)
-        result = 31 * result + (textureFind?.hashCode() ?: 0)
-        result = 31 * result + (textureReplace?.hashCode() ?: 0)
-        result = 31 * result + (bodyPartId?.hashCode() ?: 0)
-        result = 31 * result + (modelIds?.hashCode() ?: 0)
-        result = 31 * result + models.contentHashCode()
-        result = 31 * result + nonSelectable.hashCode()
-        return result
+        modelIds?.let {
+            data.writeOpcode(2)
+            data.writeByte(it.size)
+            it.forEach { id -> data.writeShort(id) }
+        }
+        if(nonSelectable) data.writeOpcode(3)
+        colorFind?.let { colorFind -> colorReplace?.let { colorReplace->
+            data.writeOpcode(40)
+            data.writeByte(colorFind.size)
+            for (i in colorFind.indices) {
+                data.writeShort(colorFind[i])
+                data.writeShort(colorReplace[i])
+            }
+        } }
+        textureFind?.let { textureFind -> textureReplace?.let { textureReplace->
+            data.writeOpcode(41)
+            data.writeByte(textureFind.size)
+            for (i in textureFind.indices) {
+                data.writeShort(textureFind[i])
+                data.writeShort(textureReplace[i])
+            }
+        } }
+        models.forEachIndexed { i, id ->
+            if(id != -1) {
+                data.writeOpcode(60 + i)
+                data.writeShort(id)
+            }
+        }
+        data.writeOpcode(0)
+        return data
     }
 
     companion object : ConfigCompanion<IdentKitConfig>() {
         override val id = 3
 
-        @ExperimentalUnsignedTypes
-        override fun decode(id: Int, data: ByteArray): IdentKitConfig {
-            val buffer = ByteBuffer.wrap(data)
+        override fun decode(id: Int, data: ByteBuf): IdentKitConfig {
             val identKitConfig = IdentKitConfig(id)
             decoder@ while (true) {
-                when (val opcode = buffer.uByte.toInt()) {
+                when (val opcode = data.readUnsignedByte().toInt()) {
                     0 -> break@decoder
-                    1 -> identKitConfig.bodyPartId = buffer.uByte
+                    1 -> identKitConfig.bodyPartId = data.readUnsignedByte()
                     2 -> {
-                        val length = buffer.uByte
-                        identKitConfig.modelIds = UShortArray(length.toInt()) { buffer.uShort }
+                        val length = data.readUnsignedByte().toInt()
+                        identKitConfig.modelIds = IntArray(length) { data.readUnsignedShort() }
                     }
                     3 -> identKitConfig.nonSelectable = true
                     40 -> {
-                        val colors = buffer.uByte.toInt()
-                        identKitConfig.colorFind = UShortArray(colors)
-                        identKitConfig.colorReplace = UShortArray(colors)
-                        for (i in 0 until colors) {
-                            identKitConfig.colorFind!![i] = buffer.uShort
-                            identKitConfig.colorReplace!![i] = buffer.uShort
+                        val colorsSize = data.readUnsignedByte().toInt()
+                        val colorFind = IntArray(colorsSize)
+                        val colorReplace = IntArray(colorsSize)
+                        for (i in 0 until colorsSize) {
+                            colorFind[i] = data.readUnsignedShort()
+                            colorReplace[i] = data.readUnsignedShort()
                         }
+                        identKitConfig.colorFind = colorFind
+                        identKitConfig.colorReplace = colorReplace
                     }
                     41 -> {
-                        val textures = buffer.uByte.toInt()
-                        identKitConfig.textureFind = UShortArray(textures)
-                        identKitConfig.textureReplace = UShortArray(textures)
-                        for (i in 0 until textures) {
-                            identKitConfig.textureFind!![i] = buffer.uShort
-                            identKitConfig.textureReplace!![i] = buffer.uShort
+                        val texturesSize = data.readUnsignedByte().toInt()
+                        val textureFind = IntArray(texturesSize)
+                        val textureReplace = IntArray(texturesSize)
+                        for (i in 0 until texturesSize) {
+                            textureFind[i] = data.readUnsignedShort()
+                            textureReplace[i] = data.readUnsignedShort()
                         }
+                        identKitConfig.textureFind = textureFind
+                        identKitConfig.textureReplace = textureReplace
                     }
                     in 60..69 -> {
-                        identKitConfig.models[opcode - 60] = buffer.uShort.toInt()
+                        identKitConfig.models[opcode - 60] = data.readUnsignedShort()
                     }
                     else -> throw IOException("Did not recognise opcode $opcode.")
                 }

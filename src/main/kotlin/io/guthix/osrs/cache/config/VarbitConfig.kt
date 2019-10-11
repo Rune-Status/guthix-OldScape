@@ -17,44 +17,39 @@
  */
 package io.guthix.osrs.cache.config
 
-import io.guthix.cache.js5.io.uByte
-import io.guthix.cache.js5.io.uShort
+import io.netty.buffer.ByteBuf
+import io.netty.buffer.Unpooled
 import java.io.IOException
-import java.nio.ByteBuffer
 
-@ExperimentalUnsignedTypes
 data class VarbitConfig(override val id: Int) : Config(id) {
-    var varpId: UShort = 0u
-    var lsb: UByte = 0u
-    var msb: UByte = 0u
+    var varpId: Int = 0
+    var lsb: Short = 0
+    var msb: Short = 0
 
-    @ExperimentalUnsignedTypes
-    override fun encode(): ByteBuffer  = if(varpId.toInt() != 0 && lsb.toInt() != 0 && msb.toInt() != 0) {
-        ByteBuffer.allocate(6).apply {
-            put(1)
-            putShort(varpId.toShort())
-            put(lsb.toByte())
-            put(msb.toByte())
-            put(0)
+    override fun encode(): ByteBuf  = if(varpId != 0 && lsb.toInt() != 0 && msb.toInt() != 0) {
+        Unpooled.buffer(6).apply {
+            writeOpcode(1)
+            writeShort(varpId)
+            writeByte(lsb.toInt())
+            writeByte(msb.toInt())
+            writeOpcode(0)
         }
     } else {
-        ByteBuffer.allocate(1).apply { put(0) }
+        Unpooled.buffer(1).apply { writeOpcode(0) }
     }
 
     companion object : ConfigCompanion<VarbitConfig>() {
         override val id = 14
 
-        @ExperimentalUnsignedTypes
-        override fun decode(id: Int, data: ByteArray): VarbitConfig {
-            val buffer = ByteBuffer.wrap(data)
+        override fun decode(id: Int, data: ByteBuf): VarbitConfig {
             val varbitConfig = VarbitConfig(id)
             decoder@ while (true) {
-                when(val opcode = buffer.get().toInt() and 0xFF) {
+                when(val opcode = data.readUnsignedByte().toInt()) {
                     0 -> break@decoder
                     1 -> {
-                        varbitConfig.varpId = buffer.uShort
-                        varbitConfig.lsb = buffer.uByte
-                        varbitConfig.msb = buffer.uByte
+                        varbitConfig.varpId = data.readUnsignedShort()
+                        varbitConfig.lsb = data.readUnsignedByte()
+                        varbitConfig.msb = data.readUnsignedByte()
                     }
                     else -> throw IOException("Did not recognise opcode $opcode.")
                 }

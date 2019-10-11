@@ -8,11 +8,11 @@ class VertexNormal {
     var z: Int = 0
     var magnitude: Int = 0
 
-    fun normalize(): Vector3f {
+    fun normalize(): Vec3f {
         var length = sqrt((x * x + y * y + z * z).toDouble())
         if (length == 0.toDouble()) {
             length = 1.toDouble()
         }
-        return Vector3f((x / length).toFloat(), (y / length).toFloat(), (z / length).toFloat())
+        return Vec3f((x / length).toFloat(), (y / length).toFloat(), (z / length).toFloat())
     }
 }

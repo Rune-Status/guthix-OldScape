@@ -17,37 +17,32 @@
  */
 package io.guthix.osrs.cache.config
 
-import io.guthix.cache.js5.io.uByte
-import io.guthix.cache.js5.io.uShort
+import io.netty.buffer.ByteBuf
+import io.netty.buffer.Unpooled
 import java.io.IOException
-import java.nio.ByteBuffer
 
-@ExperimentalUnsignedTypes
 data class VarPlayerConfig(override val id: Int) : Config(id) {
-    var type: UShort = 0u
+    var type: Int = 0
 
-    @ExperimentalUnsignedTypes
-    override fun encode(): ByteBuffer = if(type.toInt() != 0) {
-        ByteBuffer.allocate(2).apply {
-            put(5)
-            putShort(type.toShort())
-            put(0)
+    override fun encode(): ByteBuf = if(type != 0) {
+        Unpooled.buffer(2).apply {
+            writeOpcode(5)
+            writeShort(type)
+            writeOpcode(0)
         }
     } else {
-        ByteBuffer.allocate(1).apply { put(0) }
+        Unpooled.buffer(1).apply { writeOpcode(0) }
     }
 
     companion object : ConfigCompanion<VarPlayerConfig>() {
         override val id = 16
 
-        @ExperimentalUnsignedTypes
-        override fun decode(id: Int, data: ByteArray): VarPlayerConfig {
-            val buffer = ByteBuffer.wrap(data)
+        override fun decode(id: Int, data: ByteBuf): VarPlayerConfig {
             val varPlayerConfig = VarPlayerConfig(id)
             decoder@ while (true) {
-                when (val opcode = buffer.uByte.toInt()) {
+                when (val opcode = data.readUnsignedByte().toInt()) {
                     0 -> break@decoder
-                    5 -> varPlayerConfig.type = buffer.uShort
+                    5 -> varPlayerConfig.type = data.readUnsignedShort()
                     else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }

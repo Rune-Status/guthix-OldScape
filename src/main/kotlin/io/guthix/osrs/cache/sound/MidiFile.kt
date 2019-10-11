@@ -17,15 +17,14 @@
  */
 package io.guthix.osrs.cache.sound
 
-import io.guthix.cache.js5.io.*
+import io.guthix.buffer.readVarInt
+import io.guthix.buffer.writeVarInt
+import io.netty.buffer.ByteBuf
+import io.netty.buffer.Unpooled
 import java.io.IOException
-import java.nio.ByteBuffer
 
-class MidiFile(
-    val midi: ByteArray
-) {
+class MidiFile(val midi: ByteArray) {
     companion object {
-
         // Headers
         private const val MTHD_MAGIC = 1297377380
         private const val MTRK_MAGIC = 1297379947
@@ -73,14 +72,12 @@ class MidiFile(
         private const val CONTROLLER_RESET_ALL_CONTROLLERS = 121
         private const val CONTROLLER_ALL_NOTES_OFF = 123
 
-        @ExperimentalUnsignedTypes
-        fun decode(data: ByteArray): MidiFile {
-            val buffer = ByteBuffer.wrap(data)
-            buffer.position(buffer.limit() - 3)
-            val tracks = buffer.uByte.toInt()
-            val division = buffer.uShort.toInt()
+        fun decode(data: ByteBuf): MidiFile {
+            data.readerIndex(data.writerIndex() - 3)
+            val tracks = data.readUnsignedByte().toInt()
+            val division = data.readUnsignedShort()
             var offset = 14 + tracks * 10
-            buffer.position(0)
+            data.readerIndex(0)
             var tempoOpcodes = 0
             var ctrlChangeOpcodes = 0
             var noteOnOpcodes = 0
@@ -92,7 +89,7 @@ class MidiFile(
             for(track in 0 until tracks) {
                 var opcode = -1
                 while (true) {
-                    val controlChangeIndex = buffer.uByte.toInt()
+                    val controlChangeIndex = data.readUnsignedByte().toInt()
                     if (controlChangeIndex != opcode) offset++
                     opcode = controlChangeIndex and 0xF
                     if (controlChangeIndex == JAG_END_OF_TRACK) break
@@ -113,15 +110,15 @@ class MidiFile(
             offset += 5 * tempoOpcodes
             offset += 2 * (noteOnOpcodes + noteOffOpcodes + ctrlChangeOpcodes + wheelChangeOpcodes + keyAfterTchOpcodes)
             offset += chnnlAfterTchOpcodes + progmChangeOpcodes
-            val marker1 = buffer.position()
+            val marker1 = data.readerIndex()
             val opcode = tracks + tempoOpcodes + ctrlChangeOpcodes + noteOnOpcodes + noteOffOpcodes +
                     wheelChangeOpcodes + chnnlAfterTchOpcodes + keyAfterTchOpcodes + progmChangeOpcodes
 
             for(i in 0 until opcode) {
-                buffer.varInt
+                data.readVarInt()
             }
-            offset += buffer.position() - marker1
-            var controlChangeIndex = buffer.position()
+            offset += data.readerIndex() - marker1
+            var controlChangeIndex = data.readerIndex()
             var modulationWheelSize = 0
             var modulationWheel2Size = 0
             var channelVolumeSize = 0
@@ -136,7 +133,7 @@ class MidiFile(
             var otherSize = 0
             var controllerNumber = 0
             for(i in 0 until ctrlChangeOpcodes) {
-                controllerNumber = controllerNumber + buffer.get() and Byte.MAX_VALUE.toInt()
+                controllerNumber = controllerNumber + data.readByte() and Byte.MAX_VALUE.toInt()
                 if (controllerNumber == CONTROLLER_BANK_SELECT || controllerNumber == CONTROLLER_BANK_SELECT_2) {
                     progmChangeOpcodes++
                 } else if (controllerNumber == CONTROLLER_MODULATION_WHEEL) {
@@ -171,56 +168,56 @@ class MidiFile(
                 }
             }
 
-            var commandsIndex = buffer.position()
-            buffer.skip(commandsSize)
-            var polyPressureIndex = buffer.position()
-            buffer.skip(keyAfterTchOpcodes)
-            var channelPressureIndex = buffer.position()
-            buffer.skip(chnnlAfterTchOpcodes)
-            var pitchWheelHighIndex = buffer.position()
-            buffer.skip(wheelChangeOpcodes)
-            var modulationWheelOffset = buffer.position()
-            buffer.skip(modulationWheelSize)
-            var channelVolumeOffset = buffer.position()
-            buffer.skip(channelVolumeSize)
-            var panOffset = buffer.position()
-            buffer.skip(panSize)
-            var notesIndex = buffer.position()
-            buffer.skip(noteOnOpcodes + noteOffOpcodes + keyAfterTchOpcodes)
-            var notesOnIndex = buffer.position()
-            buffer.skip(noteOnOpcodes)
-            var otherIndex = buffer.position()
-            buffer.skip(otherSize)
-            var notesOffIndex = buffer.position()
-            buffer.skip(noteOffOpcodes)
-            var modulationWheel2Offset = buffer.position()
-            buffer.skip(modulationWheel2Size)
-            var channelVolume2Offset = buffer.position()
-            buffer.skip(channelVolume2Size)
-            var pan2Offset = buffer.position()
-            buffer.skip(pan2Size)
-            var programChangeIndex = buffer.position()
-            buffer.skip(progmChangeOpcodes)
-            var pitchWheelLowIndex = buffer.position()
-            buffer.skip(wheelChangeOpcodes)
-            var nonRegisteredMsbIndex = buffer.position()
-            buffer.skip(nonRegisteredMsbSize)
-            var nonRegisteredLsbIndex = buffer.position()
-            buffer.skip(nonRegisteredLsbSize)
-            var registeredMsbIndex = buffer.position()
-            buffer.skip(registeredNumberMsb)
-            var registeredLsbIndex = buffer.position()
-            buffer.skip(registeredLsbSize)
-            var tempoOffset = buffer.position()
-            buffer.skip((tempoOpcodes * 3))
+            var commandsIndex = data.readerIndex()
+            data.skipBytes(commandsSize)
+            var polyPressureIndex = data.readerIndex()
+            data.skipBytes(keyAfterTchOpcodes)
+            var channelPressureIndex = data.readerIndex()
+            data.skipBytes(chnnlAfterTchOpcodes)
+            var pitchWheelHighIndex = data.readerIndex()
+            data.skipBytes(wheelChangeOpcodes)
+            var modulationWheelOffset = data.readerIndex()
+            data.skipBytes(modulationWheelSize)
+            var channelVolumeOffset = data.readerIndex()
+            data.skipBytes(channelVolumeSize)
+            var panOffset = data.readerIndex()
+            data.skipBytes(panSize)
+            var notesIndex = data.readerIndex()
+            data.skipBytes(noteOnOpcodes + noteOffOpcodes + keyAfterTchOpcodes)
+            var notesOnIndex = data.readerIndex()
+            data.skipBytes(noteOnOpcodes)
+            var otherIndex = data.readerIndex()
+            data.skipBytes(otherSize)
+            var notesOffIndex = data.readerIndex()
+            data.skipBytes(noteOffOpcodes)
+            var modulationWheel2Offset = data.readerIndex()
+            data.skipBytes(modulationWheel2Size)
+            var channelVolume2Offset = data.readerIndex()
+            data.skipBytes(channelVolume2Size)
+            var pan2Offset = data.readerIndex()
+            data.skipBytes(pan2Size)
+            var programChangeIndex = data.readerIndex()
+            data.skipBytes(progmChangeOpcodes)
+            var pitchWheelLowIndex = data.readerIndex()
+            data.skipBytes(wheelChangeOpcodes)
+            var nonRegisteredMsbIndex = data.readerIndex()
+            data.skipBytes(nonRegisteredMsbSize)
+            var nonRegisteredLsbIndex = data.readerIndex()
+            data.skipBytes(nonRegisteredLsbSize)
+            var registeredMsbIndex = data.readerIndex()
+            data.skipBytes(registeredNumberMsb)
+            var registeredLsbIndex = data.readerIndex()
+            data.skipBytes(registeredLsbSize)
+            var tempoOffset = data.readerIndex()
+            data.skipBytes(tempoOpcodes * 3)
 
-            val midiBuff = ByteBuffer.allocate(offset + 1)
-            midiBuff.putInt(MTHD_MAGIC) // MThd header
-            midiBuff.putInt(6) // length of header
-            midiBuff.putShort(if (tracks > 1) 1 else 0) // format
-            midiBuff.putShort(tracks.toShort()) // tracks
-            midiBuff.putShort(division.toShort()) // division
-            buffer.position(marker1)
+            val midiBuff = Unpooled.buffer(offset + 1)
+            midiBuff.writeInt(MTHD_MAGIC) // MThd header
+            midiBuff.writeInt(6) // length of header
+            midiBuff.writeShort(if (tracks > 1) 1 else 0) // format
+            midiBuff.writeShort(tracks) // tracks
+            midiBuff.writeShort(division) // division
+            data.readerIndex(marker1)
             var var52 = 0
             var var53 = 0
             var var54 = 0
@@ -232,81 +229,78 @@ class MidiFile(
             controllerNumber  = 0
             var var29 = 0
             writer@ for (var60 in 0 until tracks) {
-                midiBuff.putInt(MTRK_MAGIC)
-                midiBuff.skip(4) // length gets written here later
-                val var61 = midiBuff.position()
+                midiBuff.writeInt(MTRK_MAGIC)
+                midiBuff.skipBytes(4) // length gets written here later
+                val var61 = midiBuff.readerIndex()
                 var curJagOpcode = -1
 
                 while (true) {
-                    val deltaTick = buffer.varInt
-                    midiBuff.putVarInt(deltaTick)
-                    val status = buffer.array()[var29++].toInt() and UByte.MAX_VALUE.toInt()
+                    val deltaTick = data.readVarInt()
+                    midiBuff.writeVarInt(deltaTick)
+                    val status = data.getUnsignedByte(var29++).toInt()
                     val shouldWriteOpcode = status != curJagOpcode
                     curJagOpcode = status and 0xF
                     if (status == JAG_END_OF_TRACK) {
-                        midiBuff.put(META.toByte())
-                        midiBuff.put(END_OF_TRACK.toByte()) // type - end of track
-                        midiBuff.put(0.toByte()) // length
-                        midiBuff.writeLength(midiBuff.position() - var61)
+                        midiBuff.writeByte(META)
+                        midiBuff.writeByte(END_OF_TRACK) // type - end of track
+                        midiBuff.writeByte(0) // length
+                        midiBuff.writeLength(midiBuff.readerIndex() - var61)
                         continue@writer
                     }
-
                     if (status == JAG_TEMPO) {
-                        midiBuff.put(META.toByte()) // meta event FF
-                        midiBuff.put(TEMPO.toByte()) // type - set tempo
-                        midiBuff.put(3.toByte()) // length
-                        midiBuff.put(buffer.array()[tempoOffset++])
-                        midiBuff.put(buffer.array()[tempoOffset++])
-                        midiBuff.put(buffer.array()[tempoOffset++])
+                        midiBuff.writeByte(META) // meta event FF
+                        midiBuff.writeByte(TEMPO) // type - set tempo
+                        midiBuff.writeByte(3) // length
+                        midiBuff.writeByte(data.getByte(tempoOffset++).toInt())
+                        midiBuff.writeByte(data.getByte(tempoOffset++).toInt())
+                        midiBuff.writeByte(data.getByte(tempoOffset++).toInt())
                     } else {
                         var52 = var52 xor (status shr 4)
                         when(curJagOpcode) {
                             JAG_NOTE_ON -> {
-                                if (shouldWriteOpcode) midiBuff.put((NOTE_ON + var52).toByte())
-                                var53 += buffer.array()[notesIndex++].toInt()
-                                var54 += buffer.array()[notesOnIndex++].toInt()
-                                midiBuff.put((var53 and Byte.MAX_VALUE.toInt()).toByte())
-                                midiBuff.put((var54 and Byte.MAX_VALUE.toInt()).toByte())
+                                if (shouldWriteOpcode) midiBuff.writeByte(NOTE_ON + var52)
+                                var53 += data.getByte(notesIndex++).toInt()
+                                var54 += data.getByte(notesOnIndex++).toInt()
+                                midiBuff.writeByte(var53 and Byte.MAX_VALUE.toInt())
+                                midiBuff.writeByte(var54 and Byte.MAX_VALUE.toInt())
                             }
                             JAG_NOTE_OFF -> {
-                                if (shouldWriteOpcode) midiBuff.put((NOTE_OFF + var52).toByte())
-                                var53 += buffer.array()[notesIndex++].toInt()
-                                var55 += buffer.array()[notesOffIndex++].toInt()
-                                midiBuff.put((var53 and Byte.MAX_VALUE.toInt()).toByte())
-                                midiBuff.put((var55 and Byte.MAX_VALUE.toInt()).toByte())
+                                if (shouldWriteOpcode) midiBuff.writeByte(NOTE_OFF + var52)
+                                var53 += data.getByte(notesIndex++).toInt()
+                                var55 += data.getByte(notesOffIndex++).toInt()
+                                midiBuff.writeByte(var53 and Byte.MAX_VALUE.toInt())
+                                midiBuff.writeByte(var55 and Byte.MAX_VALUE.toInt())
                             }
                             JAG_CONTROL_CHANGE -> {
                                 if (shouldWriteOpcode) {
-                                    midiBuff.put((CONTROL_CHANGE + var52).toByte())
+                                    midiBuff.writeByte(CONTROL_CHANGE + var52)
                                 }
-                                controllerNumber = controllerNumber + buffer.array()[controlChangeIndex++] and
+                                controllerNumber = controllerNumber + data.getByte(controlChangeIndex++) and
                                         Byte.MAX_VALUE.toInt()
-                                midiBuff.put(controllerNumber.toByte())
-                                val result = if(
-                                    controllerNumber == CONTROLLER_BANK_SELECT
-                                    || controllerNumber == CONTROLLER_BANK_SELECT_2
-                                ) {
-                                    buffer.array()[programChangeIndex++]
+                                midiBuff.writeByte(controllerNumber)
+                                val result = if(controllerNumber == CONTROLLER_BANK_SELECT
+                                    || controllerNumber == CONTROLLER_BANK_SELECT_2) {
+                                    data.getByte(programChangeIndex++)
                                 } else if (controllerNumber == CONTROLLER_MODULATION_WHEEL) {
-                                    buffer.array()[modulationWheelOffset++]
+                                    data.getByte(modulationWheelOffset++)
                                 } else if (controllerNumber == CONTROLLER_MODULATION_WHEEL2) {
-                                    buffer.array()[modulationWheel2Offset++]
+                                    data.getByte(modulationWheel2Offset++)
                                 } else if (controllerNumber == CONTROLLER_CHANNEL_VOLUME) {
-                                    buffer.array()[channelVolumeOffset++]
+                                    data.getByte(channelVolumeOffset++)
                                 } else if (controllerNumber == CONTROLLER_CHANNEL_VOLUME_2) {
-                                    buffer.array()[channelVolume2Offset++]
+                                    data.getByte(channelVolume2Offset++)
                                 } else if (controllerNumber == CONTROLLER_PAN) {
-                                    buffer.array()[panOffset++]
+                                    data.getByte(panOffset++)
                                 } else if (controllerNumber == CONTROLLER_PAN_2) {
-                                    buffer.array()[pan2Offset++]
+                                    data.getByte(pan2Offset++)
                                 } else if (controllerNumber == CONTROLLER_NON_REGISTERED_PARAMETER_NUMBER_MSB) {
-                                    buffer.array()[nonRegisteredMsbIndex++]
+                                    data.getByte(nonRegisteredMsbIndex++)
                                 } else if (controllerNumber == CONTROLLER_NON_REGISTERED_PARAMETER_NUMBER_LSB) {
-                                    buffer.array()[nonRegisteredLsbIndex++]
+                                    data.getByte(nonRegisteredLsbIndex++)
                                 } else if (controllerNumber == CONTROLLER_REGISTERED_PARAMETER_NUMBER_MSB) {
-                                    buffer.array()[registeredMsbIndex++]
+                                    data.getByte(registeredMsbIndex++)
                                 } else if (controllerNumber == CONTROLLER_REGISTERED_PARAMETER_NUMBER_LSB) {
-                                    buffer.array()[registeredLsbIndex++]
+                                    data.getByte(registeredLsbIndex++)
                                 } else if (
                                     controllerNumber != CONTROLLER_DAMPER_PEDAL &&
                                     controllerNumber != CONTROLLER_PORTAMENTO &&
@@ -314,37 +308,37 @@ class MidiFile(
                                     controllerNumber != CONTROLLER_RESET_ALL_CONTROLLERS &&
                                     controllerNumber != CONTROLLER_ALL_NOTES_OFF
                                 ) {
-                                     buffer.array()[otherIndex++]
+                                    data.getByte(otherIndex++)
                                 } else {
-                                    buffer.array()[commandsIndex++]
+                                    data.getByte(commandsIndex++)
                                 }
 
                                 val var67 = result + var59[controllerNumber]
                                 var59[controllerNumber] = var67
-                                midiBuff.put((var67 and Byte.MAX_VALUE.toInt()).toByte())
+                                midiBuff.writeByte(var67 and Byte.MAX_VALUE.toInt())
                             }
                             JAG_PITCH_BEND -> {
-                                if (shouldWriteOpcode)  midiBuff.put((PITCH_WHEEL_CHANGE + var52).toByte())
-                                var56 += buffer.array()[pitchWheelLowIndex++].toInt()
-                                var56 += buffer.array()[pitchWheelHighIndex++].toInt() shl 7
-                                midiBuff.put((var56 and Byte.MAX_VALUE.toInt()).toByte())
-                                midiBuff.put((var56 shr 7 and Byte.MAX_VALUE.toInt()).toByte())
+                                if (shouldWriteOpcode)  midiBuff.writeByte(PITCH_WHEEL_CHANGE + var52)
+                                var56 += data.getByte(pitchWheelLowIndex++)
+                                var56 += data.getByte(pitchWheelHighIndex++).toInt() shl 7
+                                midiBuff.writeByte(var56 and Byte.MAX_VALUE.toInt())
+                                midiBuff.writeByte(var56 shr 7 and Byte.MAX_VALUE.toInt())
                             }
                             JAG_CHANNEL_PRESSURE -> {
-                                if (shouldWriteOpcode) midiBuff.put((CHANNEL_PRESSURE + var52).toByte())
-                                var57 += buffer.array()[channelPressureIndex++].toInt()
-                                midiBuff.put((var57 and Byte.MAX_VALUE.toInt()).toByte())
+                                if (shouldWriteOpcode) midiBuff.writeByte(CHANNEL_PRESSURE + var52)
+                                var57 += data.getByte(channelPressureIndex++)
+                                midiBuff.writeByte(var57 and Byte.MAX_VALUE.toInt())
                             }
                             JAG_POLY_PRESSURE -> {
-                                if (shouldWriteOpcode) midiBuff.put((POLYPHONIC_KEY_PRESSURE + var52).toByte())
-                                var53 += buffer.array()[notesIndex++].toInt()
-                                var58 += buffer.array()[polyPressureIndex++].toInt()
-                                midiBuff.put((var53 and Byte.MAX_VALUE.toInt()).toByte())
-                                midiBuff.put((var58 and Byte.MAX_VALUE.toInt()).toByte())
+                                if (shouldWriteOpcode) midiBuff.writeByte(POLYPHONIC_KEY_PRESSURE + var52)
+                                var53 += data.getByte(notesIndex++)
+                                var58 += data.getByte(polyPressureIndex++)
+                                midiBuff.writeByte(var53 and Byte.MAX_VALUE.toInt())
+                                midiBuff.writeByte(var58 and Byte.MAX_VALUE.toInt())
                             }
                             JAG_PROGRAM_CHANGE -> {
-                                if (shouldWriteOpcode) midiBuff.put((PROGRAM_CHANGE + var52).toByte())
-                                midiBuff.put(buffer.array()[programChangeIndex++])
+                                if (shouldWriteOpcode) midiBuff.writeByte(PROGRAM_CHANGE + var52)
+                                midiBuff.writeByte(data.getByte(programChangeIndex++).toInt())
                             } else -> throw IOException("Did not recognise jag track opcode $curJagOpcode.")
                         }
                     }
@@ -353,11 +347,11 @@ class MidiFile(
             return MidiFile(midiBuff.array())
         }
 
-        private fun ByteBuffer.writeLength(length: Int) {
-            val pos = position()
-            position(pos - length - 4)
-            putInt(length)
-            position(pos)
+        private fun ByteBuf.writeLength(length: Int) {
+            val pos = readerIndex()
+            readerIndex(pos - length - 4)
+            writeInt(length)
+            readerIndex(pos)
         }
     }
 }

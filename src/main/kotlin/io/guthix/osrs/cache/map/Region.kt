@@ -17,31 +17,26 @@
  */
 package io.guthix.osrs.cache.map
 
-import io.guthix.cache.js5.io.smallUSmart
-import io.guthix.cache.js5.io.uByte
-import java.nio.ByteBuffer
+import io.guthix.buffer.readUnsignedSmallSmart
+import io.netty.buffer.ByteBuf
 
-class Region @ExperimentalUnsignedTypes constructor(
+class Region(
     val tileHeights: Array<Array<IntArray>>,
-    val renderRules: Array<Array<UByteArray>>,
+    val renderRules: Array<Array<ShortArray>>,
     val overlayIds: Array<Array<ByteArray>>,
-    val overlayPaths: Array<Array<UByteArray>>,
-    val overlayRotations: Array<Array<UByteArray>>,
-    val underlayIds: Array<Array<UByteArray>>,
+    val overlayPaths: Array<Array<ShortArray>>,
+    val overlayRotations: Array<Array<ShortArray>>,
+    val underlayIds: Array<Array<ShortArray>>,
     val objectLocation: List<ObjectLocation>
 ) {
-
     companion object {
         const val FLOOR_COUNT = 4
 
         const val SIZE = 64
 
-        @ExperimentalUnsignedTypes
-        fun decode(landData: ByteArray, mapData: ByteArray, baseX: Int, baseY: Int): Region {
-            val landBuffer = ByteBuffer.wrap(landData)
-            val mapBuffer = ByteBuffer.wrap(mapData)
-            val land = Land.decode(landBuffer, baseX, baseY)
-            val objectLocations = ObjectLocation.decode(mapBuffer, land.renderRules)
+        fun decode(landData: ByteBuf, mapData: ByteBuf, baseX: Int, baseY: Int): Region {
+            val land = Land.decode(landData, baseX, baseY)
+            val objectLocations = ObjectLocation.decode(mapData, land.renderRules)
             return Region(
                 land.tileHeights, land.renderRules, land.overlayIds, land.overlayPaths, land.overlayRotations,
                 land.underlayIds, objectLocations
@@ -50,59 +45,56 @@ class Region @ExperimentalUnsignedTypes constructor(
     }
 }
 
-@ExperimentalUnsignedTypes
 class Land(
     val tileHeights: Array<Array<IntArray>>,
-    val renderRules: Array<Array<UByteArray>>,
+    val renderRules: Array<Array<ShortArray>>,
     val overlayIds: Array<Array<ByteArray>>,
-    val overlayPaths: Array<Array<UByteArray>>,
-    val overlayRotations: Array<Array<UByteArray>>,
-    val underlayIds: Array<Array<UByteArray>>
+    val overlayPaths: Array<Array<ShortArray>>,
+    val overlayRotations: Array<Array<ShortArray>>,
+    val underlayIds: Array<Array<ShortArray>>
 ) {
     companion object {
         private const val JAGEX_CIRCULAR_ANGLE = 2048
         private const val ANGULAR_RATIO = 360.0 / JAGEX_CIRCULAR_ANGLE
         private val JAGEX_RADIAN = Math.toRadians(ANGULAR_RATIO)
         private val COS = IntArray(JAGEX_CIRCULAR_ANGLE) {
-            ((UShort.MAX_VALUE.toInt() + 1) * Math.cos(it.toDouble() * JAGEX_RADIAN).toInt())
+            ((0xFFFF + 1) * Math.cos(it.toDouble() * JAGEX_RADIAN).toInt())
         }
 
-        @ExperimentalUnsignedTypes
-        fun decode(buffer: ByteBuffer, baseX: Int, baseY: Int): Land {
+        fun decode(data: ByteBuf, baseX: Int, baseY: Int): Land {
             val tileHeights = Array(Region.FLOOR_COUNT) { Array(Region.SIZE) { IntArray(
                 Region.SIZE
             ) } }
-            val renderRules = Array(Region.FLOOR_COUNT) { Array(Region.SIZE) { UByteArray(
+            val renderRules = Array(Region.FLOOR_COUNT) { Array(Region.SIZE) { ShortArray(
                 Region.SIZE
             ) } }
             val overlayIds = Array(Region.FLOOR_COUNT) { Array(Region.SIZE) { ByteArray(
                 Region.SIZE
             ) } }
-            val overlayPaths = Array(Region.FLOOR_COUNT) { Array(Region.SIZE) { UByteArray(
+            val overlayPaths = Array(Region.FLOOR_COUNT) { Array(Region.SIZE) { ShortArray(
                 Region.SIZE
             ) } }
-            val overlayRotations = Array(Region.FLOOR_COUNT) { Array(Region.SIZE) { UByteArray(
+            val overlayRotations = Array(Region.FLOOR_COUNT) { Array(Region.SIZE) { ShortArray(
                 Region.SIZE
             ) } }
-            val underlayIds = Array(Region.FLOOR_COUNT) { Array(Region.SIZE) { UByteArray(
+            val underlayIds = Array(Region.FLOOR_COUNT) { Array(Region.SIZE) { ShortArray(
                 Region.SIZE
             ) } }
             for (z in 0 until Region.FLOOR_COUNT) {
                 for (x in 0 until Region.SIZE) {
                     for (y in 0 until Region.SIZE) {
                         while (true) {
-                            val opcode = buffer.uByte.toInt()
+                            val opcode = data.readUnsignedByte().toInt()
                             when {
                                 opcode == 0 -> {
                                     if(z == 0) {
-                                        tileHeights[0][x][y] =
-                                            calcZ0Height(baseX, baseY, x, y)
+                                        tileHeights[0][x][y] = calcZ0Height(baseX, baseY, x, y)
                                     } else {
                                         tileHeights[z][x][y] = tileHeights[z - 1][x][y] - 240
                                     }
                                 }
                                 opcode == 1 -> {
-                                    var height = buffer.uByte.toInt()
+                                    var height = data.readUnsignedByte().toInt()
                                     if (height == 1) height = 0
                                     if(z == 0) {
                                         tileHeights[0][x][y] = -height * 8
@@ -111,12 +103,12 @@ class Land(
                                     }
                                 }
                                 opcode <= 49 -> {
-                                    overlayIds[z][x][y] = buffer.get()
-                                    overlayPaths[z][x][y] = ((opcode - 2) shr 2).toUByte()
-                                    overlayRotations[z][x][y] = ((opcode - 2) and 0x3).toUByte()
+                                    overlayIds[z][x][y] = data.readByte()
+                                    overlayPaths[z][x][y] = ((opcode - 2) shr 2).toShort()
+                                    overlayRotations[z][x][y] = ((opcode - 2) and 0x3).toShort()
                                 }
-                                opcode <= 89 -> renderRules[z][x][y] = (opcode - 49).toUByte()
-                                else -> underlayIds[z][x][y] = (opcode - 81).toUByte()
+                                opcode <= 89 -> renderRules[z][x][y] = (opcode - 49).toShort()
+                                else -> underlayIds[z][x][y] = (opcode - 81).toShort()
                             }
                         }
                     }
@@ -125,7 +117,6 @@ class Land(
             return Land(tileHeights, renderRules, overlayIds, overlayPaths, overlayRotations, underlayIds)
         }
 
-        @ExperimentalUnsignedTypes
         private fun calcZ0Height(baseX: Int, baseY: Int, x: Int, y: Int): Int {
             val xc = x + baseX + 932731
             val yc = y + baseY + 556238
@@ -137,7 +128,6 @@ class Land(
             return -height * 8
         }
 
-        @ExperimentalUnsignedTypes
         private fun interpolateNoise(x: Int, y: Int, frequency: Int): Int {
             val intX = x / frequency
             val fracX = x and (frequency - 1)
@@ -152,7 +142,7 @@ class Land(
             return interpolate(i1, i2, fracY, frequency)
         }
 
-        @ExperimentalUnsignedTypes
+
         private fun smoothNoise2d(x: Int, y: Int): Int {
             val corners = noise(x - 1, y - 1) + noise(x + 1, y - 1) + noise(x - 1, 1 + y)
                 + noise(x + 1, y + 1)
@@ -161,21 +151,19 @@ class Land(
             return corners / 16 + sides / 8 + center / 4
         }
 
-        @ExperimentalUnsignedTypes
         private fun noise(x: Int, y: Int): Int {
             var n = x + y * 57
             n = n xor (n shl 13)
-            return (n * n * 15731 + 789221) * n + 1376312589 and (Int.MAX_VALUE shr 19) and UByte.MAX_VALUE.toInt()
+            return (n * n * 15731 + 789221) * n + 1376312589 and (Int.MAX_VALUE shr 19) and 0xFF
         }
 
         private fun interpolate(a: Int, b: Int, x: Int, y: Int): Int {
-            val f = (UShort.MAX_VALUE.toInt() + 1) - COS[(JAGEX_CIRCULAR_ANGLE / 2) * x / y] shr 1
-            return (f * b shr 16) + (a * ((UShort.MAX_VALUE.toInt() + 1) - f) shr 16)
+            val f = (0xFFFF + 1) - COS[(JAGEX_CIRCULAR_ANGLE / 2) * x / y] shr 1
+            return (f * b shr 16) + (a * ((0xFFFF + 1) - f) shr 16)
         }
     }
 }
 
-@ExperimentalUnsignedTypes
 class ObjectLocation(
     val id: Int,
     val floor: Int,
@@ -185,19 +173,18 @@ class ObjectLocation(
     val orientation: Int
 ) {
     companion object {
-        const val BLOCKED_TILE_MASK: UByte = 0x1u
-        const val BRIDGE_TILE_MASK: UByte = 0x2u
-        const val ROOF_TILE_MASK: UByte = 0x4u
+        const val BLOCKED_TILE_MASK: Short = 0x1
+        const val BRIDGE_TILE_MASK: Short = 0x2
+        const val ROOF_TILE_MASK: Short = 0x4
 
-        @ExperimentalUnsignedTypes
-        fun decode(buffer: ByteBuffer, renderRules: Array<Array<UByteArray>>): List<ObjectLocation> {
+        fun decode(data: ByteBuf, renderRules: Array<Array<ShortArray>>): List<ObjectLocation> {
             var id = -1
-            var offset = buffer.smallUSmart.toInt()
+            var offset = data.readUnsignedSmallSmart()
             val locations = mutableListOf<ObjectLocation>()
             while (offset != 0) {
                 id += offset
                 var positionHash = 0
-                var positionOffset = buffer.smallUSmart.toInt()
+                var positionOffset = data.readUnsignedSmallSmart()
                 while (positionOffset != 0) {
                     positionHash += positionOffset - 1
                     val localY = positionHash and 0x3F
@@ -205,16 +192,16 @@ class ObjectLocation(
                     var z = (positionHash shr 12) and 0x3
                     if(renderRules[1][localX][localY] == BRIDGE_TILE_MASK) z--
                     if(z < 0) {
-                        buffer.get()
+                        data.readByte()
                     } else {
-                        val attributes = buffer.uByte.toInt()
+                        val attributes = data.readUnsignedByte().toInt()
                         val orientation = attributes and 0x3
                         val type = attributes shr 2
                         locations.add(ObjectLocation(id, z, localX, localY, type, orientation))
                     }
-                    positionOffset = buffer.smallUSmart.toInt()
+                    positionOffset = data.readUnsignedSmallSmart()
                 }
-                offset = buffer.smallUSmart.toInt()
+                offset = data.readUnsignedSmallSmart()
             }
             return locations
         }

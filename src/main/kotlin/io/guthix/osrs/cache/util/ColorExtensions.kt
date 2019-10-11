@@ -26,8 +26,8 @@ fun Color.getHSLComponents(): IntArray {
     val r = red / 256.0
     val g = green / 256.0
     val b = blue / 256.0
-    val min = min(Math.min(g, r), b)
-    val max = max(Math.max(g, r), b)
+    val min = min(min(g, r), b)
+    val max = max(max(g, r), b)
     val luminace= (max + min) / 2.0
     var saturation = (if(min != max) {
         if(luminace < 0.5) {

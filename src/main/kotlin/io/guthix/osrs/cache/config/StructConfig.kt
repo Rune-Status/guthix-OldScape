@@ -17,40 +17,33 @@
  */
 package io.guthix.osrs.cache.config
 
-import io.guthix.cache.js5.io.params
-import io.guthix.cache.js5.io.uByte
-import io.guthix.cache.js5.io.writeParams
-import java.io.ByteArrayOutputStream
-import java.io.DataOutputStream
+import io.netty.buffer.ByteBuf
+import io.netty.buffer.Unpooled
 import java.io.IOException
-import java.nio.ByteBuffer
 
 data class StructConfig(override val id: Int) : Config(id) {
-    var params: HashMap<Int, Any>? = null
+    var params: MutableMap<Int, Any>? = null
 
-    override fun encode(): ByteBuffer {
-        val byteStr = ByteArrayOutputStream()
-        DataOutputStream(byteStr).use { os ->
-            params?.let {
-                os.writeOpcode(249)
-                os.writeParams(params!!)
-            }
-            os.writeOpcode(0)
+    override fun encode(): ByteBuf {
+        val data = Unpooled.buffer()
+        params?.let {
+            data.writeOpcode(249)
+            data.writeParams(it)
         }
-        return ByteBuffer.wrap(byteStr.toByteArray())
+        data.writeOpcode(0)
+        return data
     }
 
     companion object : ConfigCompanion<StructConfig>() {
         override val id = 34
 
         @ExperimentalUnsignedTypes
-        override fun decode(id: Int, data: ByteArray): StructConfig {
-            val buffer = ByteBuffer.wrap(data)
+        override fun decode(id: Int, data: ByteBuf): StructConfig {
             val structConfig = StructConfig(id)
             decoder@ while (true) {
-                when (val opcode = buffer.uByte.toInt()) {
+                when (val opcode = data.readUnsignedByte().toInt()) {
                     0 -> break@decoder
-                    249 -> structConfig.params = buffer.params
+                    249 -> structConfig.params = data.readParams()
                     else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }

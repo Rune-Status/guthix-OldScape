@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2019 Guthix
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
 package io.guthix.osrs.cache.export
 
 import de.javagl.jgltf.impl.v2.*
@@ -29,7 +46,7 @@ fun gltfExport(id: Int, model: Model) {
     model.computeTextureUVCoordinates()
     val gltf = GlTF()
     gltf.asset = jagexAsset
-    val textureCount = if(model.triangleTextures == null) 0 else model.triangleTextures!!.count { it.toInt() != -1 }
+    val textureCount = if(model.triangleTextures == null) 0 else model.triangleTextures!!.count { it != -1 }
     val buffer = ByteBuffer.allocate(
         indexHeaderSize + (model.triangleCount * vertexInTriangle * floatInVertex * floatSize) * 2 + 2 * vertexInTriangle * floatSize * textureCount
     )
@@ -64,11 +81,9 @@ fun gltfExport(id: Int, model: Model) {
         }
     }
     gltf.addBuffers(createBuffer(id.toString(), buffer))
-    gltf.addBufferViews(indexBufferView)
     createTriangleBufferView(gltf, model)
     val textureMap = createTextures(gltf, model)
     val materialMap = createMaterials(gltf, model, textureMap)
-    gltf.addAccessors(indexAccessor)
     createVertexAccessor(gltf, model)
     gltf.addNodes(singleMeshNode)
     gltf.addScenes(singleNodeScene)

@@ -17,20 +17,19 @@
  */
 package io.guthix.osrs.cache
 
+import io.guthix.cache.js5.Js5Archive
 import io.guthix.cache.js5.Js5Cache
 import io.guthix.osrs.cache.script.MachineScript
 
-class CS2Archive (
-    val scripts: Map<Int, MachineScript>
-)  {
+class CS2Archive(val scripts: Map<Int, MachineScript>) {
     companion object  {
         const val id = 12
 
-        @ExperimentalUnsignedTypes
-        fun load(cache: Js5Cache): CS2Archive {
+        fun load(archive: Js5Archive): CS2Archive {
             val scripts = mutableMapOf<Int, MachineScript>()
-            cache.readArchive(id).forEach { (groupId, group) ->
-                scripts[groupId] = MachineScript.decode(groupId, group.files[0]!!.data) //TODO fix decoding
+            archive.groupSettings.forEach { (groupId, _) ->
+                val group = archive.readGroup(groupId)
+                scripts[groupId] = MachineScript.decode(groupId, group.files[0]!!.data)
             }
             return CS2Archive(scripts)
         }

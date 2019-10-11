@@ -17,37 +17,31 @@
  */
 package io.guthix.osrs.cache.sound
 
-import io.guthix.cache.js5.io.*
-import java.nio.ByteBuffer
+import io.guthix.buffer.readSmallSmart
+import io.guthix.buffer.readUnsignedSmallSmart
+import io.netty.buffer.ByteBuf
 
-class SoundEffect @ExperimentalUnsignedTypes constructor(
-    val start: UShort,
-    val end: UShort,
-    val instruments: Array<AudioInstrument?>
-) {
-
+class SoundEffect(val start: Int, val end: Int, val instruments: Array<AudioInstrument?>) {
     companion object {
         private const val INSTRUMENT_COUNT = 10
 
-        @ExperimentalUnsignedTypes
-        fun decode(data: ByteArray): SoundEffect {
-            val buffer = ByteBuffer.wrap(data)
+        fun decode(data: ByteBuf): SoundEffect {
             val instruments = arrayOfNulls<AudioInstrument>(INSTRUMENT_COUNT)
             for (i in 0 until INSTRUMENT_COUNT) {
-                val volume = buffer.uByte.toInt()
+                val volume = data.readUnsignedByte().toInt()
                 if (volume != 0) {
-                    buffer.position(buffer.position() - 1)
-                    instruments[i] = AudioInstrument.decode(buffer)
+                    data.readerIndex(data.writerIndex() - 1)
+                    instruments[i] = AudioInstrument.decode(data)
                 }
             }
-            val start = buffer.uShort
-            val end = buffer.uShort
+            val start = data.readUnsignedShort()
+            val end = data.readUnsignedShort()
             return SoundEffect(start, end, instruments)
         }
     }
 }
 
-class AudioInstrument @ExperimentalUnsignedTypes constructor(
+class AudioInstrument(
     val pitch: AudioEnvelope,
     val volume: AudioEnvelope,
     val pitchModifier: AudioEnvelope?,
@@ -56,142 +50,125 @@ class AudioInstrument @ExperimentalUnsignedTypes constructor(
     val volumeMultiplierAmplitude: AudioEnvelope?,
     val release: AudioEnvelope?,
     val field1397: AudioEnvelope?,
-    val oscillatorVolume: UShortArray,
-    val oscillatorPitch: ShortArray,
-    val oscillatorDelays: UShortArray,
-    val delayTime: UShort,
-    val delayDecay: UShort,
-    val duration: UShort,
-    val offset: UShort,
+    val oscillatorVolume: IntArray,
+    val oscillatorPitch: IntArray,
+    val oscillatorDelays: IntArray,
+    val delayTime: Int,
+    val delayDecay: Int,
+    val duration: Int,
+    val offset: Int,
     val filterEnvelope: AudioEnvelope,
     val filter: AudioFilter
 ) {
     companion object {
         private const val OSCILLATOR_COUNT = 10
 
-        @ExperimentalUnsignedTypes
-        fun decode(buffer: ByteBuffer): AudioInstrument {
-            val pitch = AudioEnvelope.decode(buffer)
-            val volume = AudioEnvelope.decode(buffer)
-            val (pitchModifier, pitchModifierAmplitude) = if (buffer.uByte.toInt() != 0) {
-                buffer.position(buffer.position() - 1)
-                Pair(
-                    AudioEnvelope.decode(buffer),
-                    AudioEnvelope.decode(buffer)
-                )
+        fun decode(data: ByteBuf): AudioInstrument {
+            val pitch = AudioEnvelope.decode(data)
+            val volume = AudioEnvelope.decode(data)
+            val (pitchModifier, pitchModifierAmplitude) = if (data.readUnsignedByte().toInt() != 0) {
+                data.readerIndex(data.readerIndex() - 1)
+                Pair(AudioEnvelope.decode(data), AudioEnvelope.decode(data))
             } else Pair(null, null)
-            val (volumeMultiplier, volumeMultiplierAmplitude) = if (buffer.uByte.toInt() != 0) {
-                buffer.position(buffer.position() - 1)
-                Pair(
-                    AudioEnvelope.decode(buffer),
-                    AudioEnvelope.decode(buffer)
-                )
+            val (volumeMultiplier, volumeMultiplierAmplitude) = if (data.readUnsignedByte().toInt() != 0) {
+                data.readerIndex(data.readerIndex() - 1)
+                Pair(AudioEnvelope.decode(data), AudioEnvelope.decode(data))
             } else Pair(null, null)
-            val (release, field1397) = if (buffer.uByte.toInt() != 0) {
-                buffer.position(buffer.position() - 1)
-                Pair(
-                    AudioEnvelope.decode(buffer),
-                    AudioEnvelope.decode(buffer)
-                )
+            val (release, field1397) = if (data.readUnsignedByte().toInt() != 0) {
+                data.readerIndex(data.readerIndex() - 1)
+                Pair(AudioEnvelope.decode(data), AudioEnvelope.decode(data))
             } else Pair(null, null)
-            val oscillatorVolume = UShortArray(OSCILLATOR_COUNT)
-            val oscillatorPitch = ShortArray(OSCILLATOR_COUNT)
-            val oscillatorDelays = UShortArray(OSCILLATOR_COUNT)
+            val oscillatorVolume = IntArray(OSCILLATOR_COUNT)
+            val oscillatorPitch = IntArray(OSCILLATOR_COUNT)
+            val oscillatorDelays = IntArray(OSCILLATOR_COUNT)
             for (i in 0 until OSCILLATOR_COUNT) {
-                val oscVolume = buffer.smallUSmart
-                if (oscVolume.toInt() == 0) {
+                val oscVolume = data.readUnsignedSmallSmart()
+                if (oscVolume == 0) {
                     break
                 }
                 oscillatorVolume[i] = oscVolume
-                oscillatorPitch[i] = buffer.smallSmart
-                oscillatorDelays[i] = buffer.smallUSmart
+                oscillatorPitch[i] = data.readSmallSmart()
+                oscillatorDelays[i] = data.readUnsignedSmallSmart()
             }
 
-            val delayTime = buffer.smallUSmart
-            val delayDecay = buffer.smallUSmart
-            val duration = buffer.uShort
-            val offset = buffer.uShort
+            val delayTime = data.readUnsignedSmallSmart()
+            val delayDecay = data.readUnsignedSmallSmart()
+            val duration = data.readUnsignedShort()
+            val offset = data.readUnsignedShort()
             val filterEnvelope = AudioEnvelope()
-            val filter = AudioFilter.decode(buffer, filterEnvelope)
+            val filter = AudioFilter.decode(data, filterEnvelope)
             return AudioInstrument(
-                pitch, volume, pitchModifier, pitchModifierAmplitude, volumeMultiplier,
-                volumeMultiplierAmplitude, release, field1397, oscillatorVolume, oscillatorPitch, oscillatorDelays,
-                delayTime, delayDecay, duration, offset, filterEnvelope, filter
+                pitch, volume, pitchModifier, pitchModifierAmplitude, volumeMultiplier, volumeMultiplierAmplitude,
+                release, field1397, oscillatorVolume, oscillatorPitch, oscillatorDelays, delayTime, delayDecay,
+                duration, offset, filterEnvelope, filter
             )
         }
     }
 }
 
-@ExperimentalUnsignedTypes
 class AudioEnvelope {
-    var form: UByte? = null
+    var form: Short? = null
     var start: Int? = null
     var end: Int? = null
-    var durations: UShortArray? = null
-    var phases: UShortArray? = null
+    var durations: IntArray? = null
+    var phases: IntArray? = null
 
-
-    @ExperimentalUnsignedTypes
-    fun decodeSegments(buffer: ByteBuffer): AudioEnvelope {
-        val segmentCount = buffer.uByte.toInt()
-        durations = UShortArray(segmentCount)
-        phases = UShortArray(segmentCount)
+    fun decodeSegments(data: ByteBuf): AudioEnvelope {
+        val segmentCount = data.readUnsignedByte().toInt()
+        durations = IntArray(segmentCount)
+        phases = IntArray(segmentCount)
         for (i in 0 until segmentCount) {
-            durations!![i] = buffer.uShort
-            phases!![i] = buffer.uShort
+            durations!![i] = data.readUnsignedShort()
+            phases!![i] = data.readUnsignedShort()
         }
         return this
     }
 
     companion object {
-        @ExperimentalUnsignedTypes
-        fun decode(buffer: ByteBuffer): AudioEnvelope {
+        fun decode(data: ByteBuf): AudioEnvelope {
             val audioEnvelope = AudioEnvelope()
-            audioEnvelope.form = buffer.uByte
-            audioEnvelope.start = buffer.int
-            audioEnvelope.end = buffer.int
-            return audioEnvelope.decodeSegments(buffer)
+            audioEnvelope.form = data.readUnsignedByte()
+            audioEnvelope.start = data.readInt()
+            audioEnvelope.end = data.readInt()
+            return audioEnvelope.decodeSegments(data)
         }
     }
 }
 
-class AudioFilter @ExperimentalUnsignedTypes constructor(
-    pairs: UShortArray,
-    unity: UShortArray,
-    phases: Array<Array<UShortArray>>,
-    magnitudes: Array<Array<UShortArray>>
+class AudioFilter(
+    pairs: IntArray,
+    unity: IntArray,
+    phases: Array<Array<IntArray>>,
+    magnitudes: Array<Array<IntArray>>
 ) {
 
     companion object {
         const val SIZE = 2
 
-        @ExperimentalUnsignedTypes
-        fun decode(buffer: ByteBuffer, audioEnvelope: AudioEnvelope): AudioFilter {
-            val pair = buffer.uByte.toInt()
-            val pairs = UShortArray(SIZE)
-            pairs[0] = (pair shr 4).toUShort()
-            pairs[1] = (pair and 0xF).toUShort()
-            val phases = Array(SIZE) { Array(SIZE) { UShortArray(
-                SIZE * 2) } }
-            val magnitudes = Array(SIZE) { Array(SIZE) { UShortArray(
-                SIZE * 2) } }
-            val unity = UShortArray(SIZE)
+        fun decode(data: ByteBuf, audioEnvelope: AudioEnvelope): AudioFilter {
+            val pair = data.readUnsignedByte().toInt()
+            val pairs = IntArray(SIZE)
+            pairs[0] = pair shr 4
+            pairs[1] = pair and 0xF
+            val phases = Array(SIZE) { Array(SIZE) { IntArray(SIZE * 2) } }
+            val magnitudes = Array(SIZE) { Array(SIZE) { IntArray(SIZE * 2) } }
+            val unity = IntArray(SIZE)
             if (pair != 0) {
-                unity[0] = buffer.uShort
-                unity[1] = buffer.uShort
-                val uByte1 = buffer.uByte.toInt()
+                unity[0] = data.readUnsignedShort()
+                unity[1] = data.readUnsignedShort()
+                val uByte1 = data.readUnsignedByte().toInt()
                 for(i in 0 until SIZE) {
                     for(j in 0 until pairs[i].toInt()) {
-                        phases[i][0][j] = buffer.uShort
-                        magnitudes[i][0][j] = buffer.uShort
+                        phases[i][0][j] = data.readUnsignedShort()
+                        magnitudes[i][0][j] = data.readUnsignedShort()
                     }
                 }
 
                 for(i in 0 until SIZE) {
                     for(j in 0 until pairs[i].toInt()) {
                         if (uByte1 and (1 shl i * 4 shl j) != 0) {
-                            phases[i][1][j] = buffer.uShort
-                            magnitudes[i][1][j] = buffer.uShort
+                            phases[i][1][j] = data.readUnsignedShort()
+                            magnitudes[i][1][j] = data.readUnsignedShort()
                         } else {
                             phases[i][1][j] = phases[i][0][j]
                             magnitudes[i][1][j] = magnitudes[i][0][j]
@@ -200,10 +177,10 @@ class AudioFilter @ExperimentalUnsignedTypes constructor(
                 }
 
                 if (uByte1 != 0 || unity[1] != unity[0]) {
-                    audioEnvelope.decodeSegments(buffer)
+                    audioEnvelope.decodeSegments(data)
                 }
             } else {
-                unity[1] = 0u
+                unity[1] = 0
             }
             return AudioFilter(pairs, unity, phases, magnitudes)
         }

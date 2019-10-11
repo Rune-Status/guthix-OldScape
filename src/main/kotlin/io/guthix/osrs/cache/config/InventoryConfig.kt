@@ -17,39 +17,34 @@
  */
 package io.guthix.osrs.cache.config
 
-import io.guthix.cache.js5.io.uByte
-import io.guthix.cache.js5.io.uShort
+import io.netty.buffer.ByteBuf
+import io.netty.buffer.Unpooled
 import java.io.IOException
-import java.nio.ByteBuffer
 
-@ExperimentalUnsignedTypes
 data class InventoryConfig(override val id: Int) : Config(id) {
-    var capacity: UShort = 0u
+    var capacity: Int = 0
 
-    @ExperimentalUnsignedTypes
-    override fun encode(): ByteBuffer = if(capacity.toInt() != 0) {
-        ByteBuffer.allocate(4).apply {
-            put(2)
-            putShort(capacity.toShort())
-            put(0)
+    override fun encode(): ByteBuf = if(capacity != 0) {
+        Unpooled.buffer(4).apply {
+            writeOpcode(2)
+            writeShort(capacity)
+            writeOpcode(0)
         }
     } else {
-        ByteBuffer.allocate(1).apply {
-            put(0)
+        Unpooled.buffer(1).apply {
+            writeOpcode(0)
         }
     }
 
     companion object : ConfigCompanion<InventoryConfig>() {
         override val id = 5
 
-        @ExperimentalUnsignedTypes
-        override fun decode(id: Int, data: ByteArray): InventoryConfig {
-            val buffer = ByteBuffer.wrap(data)
+        override fun decode(id: Int, data: ByteBuf): InventoryConfig {
             val inventoryConfig = InventoryConfig(id)
             decoder@ while (true) {
-                when (val opcode = buffer.uByte.toInt()) {
+                when (val opcode = data.readUnsignedByte().toInt()) {
                     0 -> break@decoder
-                    2 -> inventoryConfig.capacity = buffer.uShort
+                    2 -> inventoryConfig.capacity = data.readUnsignedShort()
                     else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }

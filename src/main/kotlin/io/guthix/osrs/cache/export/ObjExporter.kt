@@ -5,7 +5,6 @@ import io.guthix.osrs.cache.model.Model
 import java.awt.Color
 import java.io.PrintWriter
 
-@ExperimentalUnsignedTypes
 fun exportObj(model: Model, textureArchive: TextureArchive, objWriter: PrintWriter, mtlWriter: PrintWriter) {
     model.computeNormals()
     model.computeTextureUVCoordinates()
@@ -47,10 +46,10 @@ fun exportObj(model: Model, textureArchive: TextureArchive, objWriter: PrintWrit
     }
 
     for (i in 0 until model.triangleCount) {
-        val textureId = if(model.triangleTextures == null) -1 else model.triangleTextures!![i].toInt()
+        val textureId = if(model.triangleTextures == null) -1 else model.triangleTextures!![i]
         mtlWriter.println("newmtl m$i")
         if (textureId == -1) {
-            val color = rs2hsbToColor(model.triangleColors!![i].toInt())
+            val color = rs2hsbToColor(model.triangleColors!![i])
             val r = color.red / 255.0
             val g = color.green / 255.0
             val b = color.blue / 255.0

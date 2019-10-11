@@ -17,30 +17,23 @@
  */
 package io.guthix.osrs.cache.model
 
-import java.nio.ByteBuffer
-import io.guthix.cache.js5.io.uByte
+import io.netty.buffer.ByteBuf
 
-
-@ExperimentalUnsignedTypes
-class FrameMap(
-    val types: UByteArray,
-    val frameMaps: Array<UByteArray>
-) {
+class FrameMap(val types: ShortArray, val frameMaps: Array<ShortArray>) {
     companion object {
-        @ExperimentalUnsignedTypes
-        fun decode(buffer: ByteBuffer): FrameMap {
-            val length = buffer.uByte.toInt()
-            val types = UByteArray(length) {
-                buffer.uByte
+        fun decode(data: ByteBuf): FrameMap {
+            val length = data.readUnsignedByte().toInt()
+            val types = ShortArray(length) {
+                data.readUnsignedByte()
             }
             val frameMaps = Array(length) {
-                UByteArray(buffer.uByte.toInt())
+                ShortArray(data.readUnsignedByte().toInt())
             }
-            frameMaps[0].map { buffer.uByte }
+            frameMaps[0].map { data.readUnsignedByte() }
 
             frameMaps.forEach { frameMap ->
-                for(i in 0 until frameMap.size) {
-                    frameMap[i] = buffer.uByte
+                for(i in frameMap.indices) {
+                    frameMap[i] = data.readUnsignedByte()
                 }
             }
             return FrameMap(types, frameMaps)

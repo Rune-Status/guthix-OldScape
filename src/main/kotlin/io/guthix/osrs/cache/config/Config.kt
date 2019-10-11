@@ -17,28 +17,49 @@
  */
 package io.guthix.osrs.cache.config
 
+import io.guthix.buffer.readStringCP1252
+import io.guthix.buffer.writeStringCP1252
 import io.guthix.cache.js5.Js5Group
-import java.io.DataOutputStream
-import java.nio.ByteBuffer
+import io.netty.buffer.ByteBuf
 
 abstract class Config(open val id: Int) {
-    abstract fun encode(): ByteBuffer
+    abstract fun encode(): ByteBuf
 
-    protected fun DataOutputStream.writeOpcode(opcode: Int) = writeByte(opcode)
+    protected fun ByteBuf.writeOpcode(opcode: Int): ByteBuf = writeByte(opcode)
+
+    protected fun ByteBuf.writeParams(params: MutableMap<Int, Any>) {
+        writeByte(params.size)
+        for((key, value) in params) {
+            val isString = value is String
+            writeByte(if(isString) 1 else 0)
+            writeMedium(key)
+            if(isString) writeStringCP1252(value as String) else value as Int
+        }
+    }
 }
 
 abstract class ConfigCompanion<out T: Config> {
     abstract val id: Int
 
-    @ExperimentalUnsignedTypes
-    fun load(archive: Js5Group): Map<Int, T> {
+    fun load(group: Js5Group): Map<Int, T> {
         val configs = mutableMapOf<Int, T>()
-        archive.files.forEach{ (fileId, file) ->
+        group.files.forEach{ (fileId, file) ->
             configs[fileId] = decode(fileId, file.data)
         }
         return configs
     }
 
-    @ExperimentalUnsignedTypes
-    abstract fun decode(id: Int, data: ByteArray): T
+    abstract fun decode(id: Int, data: ByteBuf): T
+
+    protected fun ByteBuf.readParams(): MutableMap<Int, Any> {
+        val amount = readUnsignedByte()
+        val paramMap = mutableMapOf<Int, Any>()
+        for(i in 0 until amount) {
+            val isString = readUnsignedByte().toInt() == 1
+            val index = readUnsignedMedium()
+            val value: Any = if(isString) readStringCP1252() else readInt()
+            paramMap[index] = value
+        }
+        return paramMap
+    }
 }

@@ -17,19 +17,17 @@
  */
 package io.guthix.osrs.cache
 
-import io.guthix.cache.js5.Js5Cache
+import io.guthix.cache.js5.Js5Archive
 import io.guthix.osrs.cache.sound.MidiFile
 
-class MusicJingleArchive(
-    val tracks: List<MidiFile>
-) {
+class MusicJingleArchive(val tracks: List<MidiFile>) {
     companion object {
         const val id = 11
 
-        @ExperimentalUnsignedTypes
-        fun load(cache: Js5Cache): MusicTrackArchive {
+        fun load(archive: Js5Archive): MusicTrackArchive {
             val tracks = mutableListOf<MidiFile>()
-            cache.readArchive(id).forEach { (_, group) ->
+            archive.groupSettings.forEach { (groupId, _) ->
+                val group = archive.readGroup(groupId)
                 group.files.forEach { (_, file) ->
                     tracks.add(MidiFile.decode(file.data))
                 }

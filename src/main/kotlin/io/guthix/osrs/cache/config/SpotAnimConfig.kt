@@ -17,114 +17,112 @@
  */
 package io.guthix.osrs.cache.config
 
-import io.guthix.cache.js5.io.uByte
-import io.guthix.cache.js5.io.uShort
+import io.netty.buffer.ByteBuf
+import io.netty.buffer.Unpooled
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 
-@ExperimentalUnsignedTypes
 data class SpotAnimConfig(override val id: Int) : Config(id) {
-    var animationId: UShort? = null
-    var rotation: UShort = 0u
-    var resizeY: UShort = 128u
-    var resizeX: UShort = 128u
-    var modelId: UShort = 0u
-    var ambient: UByte = 0u
-    var contrast: UByte = 0u
-    var textureReplace: UShortArray? = null
-    var textureFind: UShortArray? = null
-    var colorFind: UShortArray? = null
-    var colorReplace: UShortArray? = null
+    var animationId: Int? = null
+    var rotation: Int = 0
+    var resizeY: Int = 128
+    var resizeX: Int = 128
+    var modelId: Int = 0
+    var ambient: Short = 0
+    var contrast: Short = 0
+    var textureReplace: IntArray? = null
+    var textureFind: IntArray? = null
+    var colorFind: IntArray? = null
+    var colorReplace: IntArray? = null
 
-    @ExperimentalUnsignedTypes
-    override fun encode(): ByteBuffer {
-        val byteStr = ByteArrayOutputStream()
-        DataOutputStream(byteStr).use { os ->
-            if(modelId.toInt() != 0) {
-                os.writeOpcode(1)
-                os.writeShort(modelId.toInt())
-            }
-            animationId?.let {
-                os.writeOpcode(2)
-                os.writeShort(animationId!!.toInt())
-            }
-            if(resizeX.toInt() != 128) {
-                os.writeOpcode(4)
-                os.writeOpcode(resizeX.toInt())
-            }
-            if(resizeY.toInt() != 128) {
-                os.writeOpcode(5)
-                os.writeOpcode(resizeY.toInt())
-            }
-            if(rotation.toInt() != 0) {
-                os.writeOpcode(6)
-                os.writeShort(rotation.toInt())
-            }
-            if(ambient.toInt() != 0) {
-                os.writeOpcode(7)
-                os.writeByte(ambient.toInt())
-            }
-            if(contrast.toInt() != 0) {
-                os.writeOpcode(8)
-                os.writeByte(contrast.toInt())
-            }
-            if (colorFind != null && colorReplace != null) {
-                os.writeOpcode(40)
-                os.writeByte(colorFind!!.size)
-                for (i in 0 until colorFind!!.size) {
-                    os.writeShort(colorFind!![i].toInt())
-                    os.writeShort(colorReplace!![i].toInt())
-                }
-            }
-            if (textureFind != null && textureReplace != null) {
-                os.writeOpcode(41)
-                os.writeByte(textureFind!!.size)
-                for (i in 0 until textureReplace!!.size) {
-                    os.writeShort(textureFind!![i].toInt())
-                    os.writeShort(textureReplace!![i].toInt())
-                }
-            }
-            os.writeOpcode(0)
+    override fun encode(): ByteBuf {
+        val data = Unpooled.buffer()
+        if(modelId != 0) {
+            data.writeOpcode(1)
+            data.writeShort(modelId)
         }
-        return ByteBuffer.wrap(byteStr.toByteArray())
+        animationId?.let {
+            data.writeOpcode(2)
+            data.writeShort(animationId!!.toInt())
+        }
+        if(resizeX.toInt() != 128) {
+            data.writeOpcode(4)
+            data.writeByte(resizeX.toInt())
+        }
+        if(resizeY.toInt() != 128) {
+            data.writeOpcode(5)
+            data.writeByte(resizeY.toInt())
+        }
+        if(rotation.toInt() != 0) {
+            data.writeOpcode(6)
+            data.writeShort(rotation.toInt())
+        }
+        if(ambient.toInt() != 0) {
+            data.writeOpcode(7)
+            data.writeByte(ambient.toInt())
+        }
+        if(contrast.toInt() != 0) {
+            data.writeOpcode(8)
+            data.writeByte(contrast.toInt())
+        }
+        colorFind?.let { colorFind -> colorReplace?.let { colorReplace->
+            data.writeOpcode(40)
+            data.writeByte(colorFind.size)
+            for (i in colorFind.indices) {
+                data.writeShort(colorFind[i])
+                data.writeShort(colorReplace[i])
+            }
+        } }
+        textureFind?.let { textureFind -> textureReplace?.let { textureReplace->
+            data.writeOpcode(41)
+            data.writeByte(textureFind.size)
+            for (i in textureFind.indices) {
+                data.writeShort(textureFind[i])
+                data.writeShort(textureReplace[i])
+            }
+        } }
+        data.writeOpcode(0)
+        return data
     }
 
     companion object : ConfigCompanion<SpotAnimConfig>() {
         override val id = 13
 
-        @ExperimentalUnsignedTypes
-        override fun decode(id: Int, data: ByteArray): SpotAnimConfig {
-            val buffer = ByteBuffer.wrap(data)
+        override fun decode(id: Int, data: ByteBuf): SpotAnimConfig {
             val spotAnimConfig = SpotAnimConfig(id)
             decoder@ while (true) {
-                when (val opcode = buffer.uByte.toInt()) {
+                when (val opcode = data.readUnsignedByte().toInt()) {
                     0 -> break@decoder
-                    1 -> spotAnimConfig.modelId = buffer.uShort
-                    2 -> spotAnimConfig.animationId = buffer.uShort
-                    4 -> spotAnimConfig.resizeX = buffer.uShort
-                    5 -> spotAnimConfig.resizeY = buffer.uShort
-                    6 -> spotAnimConfig.rotation = buffer.uShort
-                    7 -> spotAnimConfig.ambient = buffer.uByte
-                    8 -> spotAnimConfig.contrast = buffer.uByte
+                    1 -> spotAnimConfig.modelId = data.readUnsignedShort()
+                    2 -> spotAnimConfig.animationId = data.readUnsignedShort()
+                    4 -> spotAnimConfig.resizeX = data.readUnsignedShort()
+                    5 -> spotAnimConfig.resizeY = data.readUnsignedShort()
+                    6 -> spotAnimConfig.rotation = data.readUnsignedShort()
+                    7 -> spotAnimConfig.ambient = data.readUnsignedByte()
+                    8 -> spotAnimConfig.contrast = data.readUnsignedByte()
                     40 -> {
-                        val size = buffer.uByte.toInt()
-                        spotAnimConfig.colorFind = UShortArray(size)
-                        spotAnimConfig.colorReplace = UShortArray(size)
-                        for (i in 0 until size) {
-                            spotAnimConfig.colorFind!![i] = buffer.uShort
-                            spotAnimConfig.colorReplace!![i] = buffer.uShort
+                        val colorsSize = data.readUnsignedByte().toInt()
+                        val colorFind = IntArray(colorsSize)
+                        val colorReplace = IntArray(colorsSize)
+                        for (i in 0 until colorsSize) {
+                            colorFind[i] = data.readUnsignedShort()
+                            colorReplace[i] = data.readUnsignedShort()
                         }
+                        spotAnimConfig.colorFind = colorFind
+                        spotAnimConfig.colorReplace = colorReplace
                     }
                     41 -> {
-                        val size = buffer.uByte.toInt()
-                        spotAnimConfig.textureFind = UShortArray(size)
-                        spotAnimConfig.textureReplace = UShortArray(size)
-                        for (i in 0 until size) {
-                            spotAnimConfig.textureFind!![i] = buffer.uShort
-                            spotAnimConfig.textureReplace!![i] = buffer.uShort
+                        val texturesSize = data.readUnsignedByte().toInt()
+                        val textureFind = IntArray(texturesSize)
+                        val textureReplace = IntArray(texturesSize)
+                        for (i in 0 until texturesSize) {
+                            textureFind[i] = data.readUnsignedShort()
+                            textureReplace[i] = data.readUnsignedShort()
                         }
+                        spotAnimConfig.textureFind = textureFind
+                        spotAnimConfig.textureReplace = textureReplace
                     }
                     else -> throw IOException("Did not recognise opcode $opcode.")
                 }

@@ -17,11 +17,11 @@
  */
 package io.guthix.osrs.cache
 
+import io.guthix.cache.js5.Js5Archive
 import io.guthix.cache.js5.Js5Cache
 import io.guthix.osrs.cache.config.*
 
-@ExperimentalUnsignedTypes
-data class ConfigArchive constructor(
+data class ConfigArchive(
     val areaConfigs: Map<Int, AreaConfig>,
     val enumConfigs: Map<Int, EnumConfig>,
     val hitBarConfig: Map<Int, HitBarConfig>,
@@ -44,27 +44,25 @@ data class ConfigArchive constructor(
     companion object {
         const val id = 2
 
-        @ExperimentalUnsignedTypes
-        fun load(cache: Js5Cache): ConfigArchive =
-            ConfigArchive(
-                AreaConfig.load(cache.readGroup(id, AreaConfig.id)),
-                EnumConfig.load(cache.readGroup(id, EnumConfig.id)),
-                HitBarConfig.load(cache.readGroup(id, HitBarConfig.id)),
-                HitMarkConfig.load(cache.readGroup(id, HitMarkConfig.id)),
-                IdentKitConfig.load(cache.readGroup(id, IdentKitConfig.id)),
-                InventoryConfig.load(cache.readGroup(id, InventoryConfig.id)),
-                ItemConfig.load(cache.readGroup(id, ItemConfig.id)),
-                NpcConfig.load(cache.readGroup(id, NpcConfig.id)),
-                ObjectConfig.load(cache.readGroup(id, ObjectConfig.id)),
-                OverlayConfig.load(cache.readGroup(id, OverlayConfig.id)),
-                ParamConfig.load(cache.readGroup(id, ParamConfig.id)),
-                SequenceConfig.load(cache.readGroup(id, SequenceConfig.id)),
-                SpotAnimConfig.load(cache.readGroup(id, SpotAnimConfig.id)),
-                StructConfig.load(cache.readGroup(id, StructConfig.id)),
-                UnderlayConfig.load(cache.readGroup(id, UnderlayConfig.id)),
-                VarbitConfig.load(cache.readGroup(id, VarbitConfig.id)),
-                VarClientConfig.load(cache.readGroup(id, VarClientConfig.id)),
-                VarPlayerConfig.load(cache.readGroup(id, VarPlayerConfig.id))
-            )
+        fun load(archive: Js5Archive): ConfigArchive = ConfigArchive(
+            AreaConfig.load(archive.readGroup(AreaConfig.id)),
+            EnumConfig.load(archive.readGroup(EnumConfig.id)),
+            HitBarConfig.load(archive.readGroup(HitBarConfig.id)),
+            HitMarkConfig.load(archive.readGroup(HitMarkConfig.id)),
+            IdentKitConfig.load(archive.readGroup(IdentKitConfig.id)),
+            InventoryConfig.load(archive.readGroup(InventoryConfig.id)),
+            ItemConfig.load(archive.readGroup(ItemConfig.id)),
+            NpcConfig.load(archive.readGroup(NpcConfig.id)),
+            ObjectConfig.load(archive.readGroup(ObjectConfig.id)),
+            OverlayConfig.load(archive.readGroup(OverlayConfig.id)),
+            ParamConfig.load(archive.readGroup(ParamConfig.id)),
+            SequenceConfig.load(archive.readGroup(SequenceConfig.id)),
+            SpotAnimConfig.load(archive.readGroup(SpotAnimConfig.id)),
+            StructConfig.load(archive.readGroup(StructConfig.id)),
+            UnderlayConfig.load(archive.readGroup(UnderlayConfig.id)),
+            VarbitConfig.load(archive.readGroup(VarbitConfig.id)),
+            VarClientConfig.load(archive.readGroup(VarClientConfig.id)),
+            VarPlayerConfig.load(archive.readGroup(VarPlayerConfig.id))
+        )
     }
 }

@@ -17,19 +17,17 @@
  */
 package io.guthix.osrs.cache
 
-import io.guthix.cache.js5.Js5Cache
+import io.guthix.cache.js5.Js5Archive
 import io.guthix.osrs.cache.sound.SoundEffect
 
-class SoundEffectArchive(
-    val soundEffects: List<SoundEffect>
-) {
+class SoundEffectArchive(val soundEffects: List<SoundEffect>) {
     companion object  {
         const val id = 4
 
-        @ExperimentalUnsignedTypes
-        fun load(cache: Js5Cache): SoundEffectArchive {
+        fun load(archive: Js5Archive): SoundEffectArchive {
             val soundEffects = mutableListOf<SoundEffect>()
-            cache.readArchive(id).forEach { (_, group) ->
+            archive.groupSettings.forEach { (groupId, _) ->
+                val group = archive.readGroup(groupId)
                 group.files.forEach { (_, file) ->
                     soundEffects.add(SoundEffect.decode(file.data))
                 }

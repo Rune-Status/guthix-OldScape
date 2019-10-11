@@ -17,19 +17,18 @@
  */
 package io.guthix.osrs.cache
 
+import io.guthix.cache.js5.Js5Archive
 import io.guthix.cache.js5.Js5Cache
 import io.guthix.osrs.cache.model.Model
 
-@ExperimentalUnsignedTypes
-class ModelArchive(
-    val models: List<Model>
-) {
+class ModelArchive(val models: List<Model>) {
     companion object {
         const val id = 7
 
-        fun load(cache: Js5Cache): ModelArchive {
+        fun load(archive: Js5Archive): ModelArchive {
             val models = mutableListOf<Model>()
-            cache.readArchive(id).forEach { (groupId, group) ->
+            archive.groupSettings.forEach { (groupId, _) ->
+                val group = archive.readGroup(groupId)
                 group.files.forEach { (_, file) ->
                     models.add(Model.decode(groupId, file.data))
                 }

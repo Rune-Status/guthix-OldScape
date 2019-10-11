@@ -17,93 +17,83 @@
  */
 package io.guthix.osrs.cache.config
 
-import io.guthix.cache.js5.io.nullableLargeSmart
-import io.guthix.cache.js5.io.uByte
-import io.guthix.cache.js5.io.uShort
-import io.guthix.cache.js5.io.writeNullableLargeSmart
-import java.io.ByteArrayOutputStream
-import java.io.DataOutputStream
+import io.guthix.buffer.readNullableLargeSmart
+import io.guthix.buffer.writeNullableLargeSmart
+import io.netty.buffer.ByteBuf
+import io.netty.buffer.Unpooled
 import java.io.IOException
-import java.nio.ByteBuffer
 
-@ExperimentalUnsignedTypes
 data class HitBarConfig(override val id: Int) : Config(id) {
-    var field3310: UByte = UByte.MAX_VALUE
-    var field3307: UByte = UByte.MAX_VALUE
-    var field3312: UShort? = null
-    var field3313: UShort = 70u
-    var field3315: Int? = null
-    var field3316: Int? = null
-    var healthScale: UByte = 30u
-    var field3318: UByte = 0u
+    var int1: Short = 255
+    var int2: Short = 255
+    var int3: Int? = null
+    var int4: Int = 70
+    var frontSpriteId: Int? = null
+    var backSpriteId: Int? = null
+    var width: Short = 30
+    var widthPadding: Short = 0
 
-
-    @ExperimentalUnsignedTypes
-    override fun encode(): ByteBuffer {
-        val byteStr = ByteArrayOutputStream()
-        DataOutputStream(byteStr).use { os ->
-            if(field3310 != UByte.MAX_VALUE) {
-                os.writeOpcode(2)
-                os.writeByte(field3310.toInt())
-            }
-            if(field3307 != UByte.MAX_VALUE) {
-                os.writeOpcode(3)
-                os.writeByte(field3307.toInt())
-            }
-            field3312?.let {
-                if(field3312!!.toInt() != 0) throw IOException("Field3312 should be 0.")
-                os.writeOpcode(4)
-            }
-            if(field3313.toInt() != 70) {
-                os.writeOpcode(5)
-                os.writeShort(field3313.toInt())
-            }
-            field3315?.let {
-                os.writeOpcode(7)
-                os.writeNullableLargeSmart(field3315)
-            }
-            field3316?.let {
-                os.writeOpcode(8)
-                os.writeNullableLargeSmart(field3316)
-            }
-            field3312?.let {
-                os.writeOpcode(11)
-                os.writeShort(field3312!!.toInt())
-            }
-            if(healthScale.toInt() != 30) {
-                os.writeOpcode(14)
-                os.writeByte(healthScale.toInt())
-            }
-            if(field3318.toInt() != 0) {
-                os.writeOpcode(15)
-                os.writeByte(field3318.toInt())
-            }
-            os.writeOpcode(0)
+    override fun encode(): ByteBuf {
+        val data = Unpooled.buffer()
+        if(int1.toInt() != 255) {
+            data.writeOpcode(2)
+            data.writeByte(int1.toInt())
         }
-        return ByteBuffer.wrap(byteStr.toByteArray())
+        if(int2.toInt() != 255) {
+            data.writeOpcode(3)
+            data.writeByte(int2.toInt())
+        }
+        int3?.let {
+            if(it == 0) {
+                data.writeOpcode(4)
+            } else {
+                data.writeOpcode(11)
+                data.writeShort(it)
+            }
+        }
+        if(int4 != 70) {
+            data.writeOpcode(5)
+            data.writeShort(int4)
+        }
+        frontSpriteId.let {
+            data.writeOpcode(7)
+            data.writeNullableLargeSmart(it)
+        }
+        backSpriteId.let {
+            data.writeOpcode(8)
+            data.writeNullableLargeSmart(it)
+        }
+        if(width.toInt() != 30) {
+            data.writeOpcode(14)
+            data.writeByte(width.toInt())
+        }
+        if(widthPadding.toInt() != 0) {
+            data.writeOpcode(15)
+            data.writeByte(widthPadding.toInt())
+        }
+        data.writeOpcode(0)
+        return data
     }
 
     companion object : ConfigCompanion<HitBarConfig>() {
         override val id = 33
 
-        @ExperimentalUnsignedTypes
-        override fun decode(id: Int, data: ByteArray): HitBarConfig {
-            val buffer = ByteBuffer.wrap(data)
+        override fun decode(id: Int, data: ByteBuf): HitBarConfig {
             val hitBarConfig = HitBarConfig(id)
             decoder@ while (true) {
-                when(val opcode = buffer.uByte.toInt()) {
+                when(val opcode = data.readUnsignedByte().toInt()) {
                     0 -> break@decoder
-                    1 -> buffer.uShort
-                    2 -> hitBarConfig.field3310 = buffer.uByte
-                    3 -> hitBarConfig.field3307 = buffer.uByte
-                    4 -> hitBarConfig.field3312 = 0u
-                    5 -> hitBarConfig.field3313 = buffer.uShort
-                    6 -> buffer.uByte
-                    7 -> hitBarConfig.field3315 = buffer.nullableLargeSmart
-                    8 -> hitBarConfig.field3316 = buffer.nullableLargeSmart
-                    11 -> hitBarConfig.field3312 = buffer.uShort
-                    14 -> hitBarConfig.healthScale = buffer.uByte
-                    15 -> hitBarConfig.field3318 = buffer.uByte
+                    1 -> data.readUnsignedShort()
+                    2 -> hitBarConfig.int1 = data.readUnsignedByte()
+                    3 -> hitBarConfig.int2 = data.readUnsignedByte()
+                    4 -> hitBarConfig.int3 = 0
+                    5 -> hitBarConfig.int4 = data.readUnsignedShort()
+                    6 -> data.readUnsignedByte()
+                    7 -> hitBarConfig.frontSpriteId = data.readNullableLargeSmart()
+                    8 -> hitBarConfig.backSpriteId = data.readNullableLargeSmart()
+                    11 -> hitBarConfig.int3 = data.readUnsignedShort()
+                    14 -> hitBarConfig.width = data.readUnsignedByte()
+                    15 -> hitBarConfig.widthPadding = data.readUnsignedByte()
                     else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }

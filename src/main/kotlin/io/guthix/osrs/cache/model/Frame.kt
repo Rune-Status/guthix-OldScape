@@ -17,14 +17,9 @@
  */
 package io.guthix.osrs.cache.model
 
-import io.guthix.cache.js5.io.skip
-import io.guthix.cache.js5.io.smallSmart
-import io.guthix.cache.js5.io.uByte
-import io.guthix.cache.js5.io.uShort
-import java.nio.ByteBuffer
+import io.guthix.buffer.readSmallSmart
+import io.netty.buffer.ByteBuf
 
-
-// Unfinished
 class Frame(
     val frameMapId: Int,
     val translateX: IntArray,
@@ -36,11 +31,11 @@ class Frame(
 ) {
     companion object {
         @ExperimentalUnsignedTypes
-        fun decode(frameMaps: FrameMap, buffer: ByteBuffer): Frame {
-            val data = buffer.duplicate()
-            val frameMapId = buffer.uShort
-            val length = buffer.uByte.toInt()
-            data.skip(3 + length)
+        fun decode(frameMaps: FrameMap, data: ByteBuf): Frame {
+            val data0 = data.duplicate()
+            val frameMapId = data.readUnsignedShort()
+            val length = data.readUnsignedByte().toInt()
+            data0.skipBytes(3 + length)
             val indexFrameIds = IntArray(500)
             val translatorX = IntArray(500)
             val translatorY = IntArray(500)
@@ -50,7 +45,7 @@ class Frame(
             var index = 0
             var showing = false
             for (i in 0 until length) {
-                val opcode = buffer.uByte.toInt()
+                val opcode = data.readUnsignedByte().toInt()
 
                 if (opcode <= 0) {
                     continue
@@ -77,19 +72,19 @@ class Frame(
                 }
 
                 if (opcode and 1 != 0) {
-                    translatorX[index] = data.smallSmart.toInt()
+                    translatorX[index] = data0.readSmallSmart()
                 } else {
                     translatorX[index] = var11
                 }
 
                 if (opcode and 2 != 0) {
-                    translatorY[index] = data.smallSmart.toInt()
+                    translatorY[index] = data0.readSmallSmart()
                 } else {
                     translatorY[index] = var11
                 }
 
                 if (opcode and 4 != 0) {
-                    translatorZ[index] = data.smallSmart.toInt()
+                    translatorZ[index] = data0.readSmallSmart()
                 } else {
                     translatorZ[index] = var11
                 }
@@ -99,7 +94,7 @@ class Frame(
                 lastI = i
                 index++
             }
-            return Frame(frameMapId.toInt(), translatorX, translatorY, translatorZ, length, indexFrameIds, showing)
+            return Frame(frameMapId, translatorX, translatorY, translatorZ, length, indexFrameIds, showing)
         }
     }
 }

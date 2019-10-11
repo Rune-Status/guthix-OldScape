@@ -17,64 +17,52 @@
  */
 package io.guthix.osrs.cache.config
 
-import io.guthix.cache.js5.io.uByte
-import io.guthix.cache.js5.io.uMedium
-import io.guthix.cache.js5.io.writeMedium
+import io.netty.buffer.ByteBuf
+import io.netty.buffer.Unpooled
 import java.awt.Color
-import java.io.ByteArrayOutputStream
-import java.io.DataOutputStream
 import java.io.IOException
-import java.nio.ByteBuffer
 
-@ExperimentalUnsignedTypes
 data class OverlayConfig(override val id: Int) : Config(id) {
     var color = Color(0)
-    var texture: UByte? = null
+    var texture: Short? = null
     var isHidden = true
     var otherColor: Color? = null
 
-    @ExperimentalUnsignedTypes
-    override fun encode(): ByteBuffer {
-        val byteStr = ByteArrayOutputStream()
-        DataOutputStream(byteStr).use { os ->
-            if(color.rgb != 0) {
-                os.writeOpcode(1)
-                os.writeMedium(color.rgb)
-            }
-            texture?.let {
-                os.writeOpcode(2)
-                os.writeByte(texture!!.toInt())
-            }
-            if(!isHidden) os.writeOpcode(5)
-            otherColor?.let {
-                os.writeOpcode(7)
-                os.writeMedium(otherColor!!.rgb)
-            }
-            os.writeOpcode(0)
+    override fun encode(): ByteBuf {
+        val data = Unpooled.buffer()
+        if(color.rgb != 0) {
+            data.writeOpcode(1)
+            data.writeMedium(color.rgb)
         }
-        return ByteBuffer.wrap(byteStr.toByteArray())
+        texture?.let {
+            data.writeOpcode(2)
+            data.writeByte(it.toInt())
+        }
+        if(!isHidden) data.writeOpcode(5)
+        otherColor?.let {
+            data.writeOpcode(7)
+            data.writeMedium(it.rgb)
+        }
+        data.writeOpcode(0)
+        return data
     }
 
     companion object : ConfigCompanion<OverlayConfig>() {
         override val id = 4
 
-        @ExperimentalUnsignedTypes
-        override fun decode(id: Int, data: ByteArray): OverlayConfig {
-            val buffer = ByteBuffer.wrap(data)
+        override fun decode(id: Int, data: ByteBuf): OverlayConfig {
             val overlayConfig = OverlayConfig(id)
             decoder@ while (true) {
-                when (val opcode = buffer.uByte.toInt()) {
+                when (val opcode = data.readUnsignedByte().toInt()) {
                     0 -> break@decoder
-                    1 -> overlayConfig.color = Color(buffer.uMedium)
-                    2 -> overlayConfig.texture = buffer.uByte
+                    1 -> overlayConfig.color = Color(data.readUnsignedMedium())
+                    2 -> overlayConfig.texture = data.readUnsignedByte()
                     5 -> overlayConfig.isHidden = false
-                    7 -> overlayConfig.otherColor = Color(buffer.uMedium)
+                    7 -> overlayConfig.otherColor = Color(data.readUnsignedMedium())
                     else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
             return overlayConfig
         }
-
-
     }
 }

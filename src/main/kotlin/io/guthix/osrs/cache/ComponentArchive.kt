@@ -17,22 +17,21 @@
  */
 package io.guthix.osrs.cache
 
-import io.guthix.cache.js5.Js5Cache
-import io.guthix.osrs.cache.plane.Component
+import io.guthix.cache.js5.Js5Archive
+import io.guthix.osrs.cache.plane.RsComponent
 
-class ComponentArchive @ExperimentalUnsignedTypes constructor(
-    val components: List<Component>
-) {
+class ComponentArchive(val components: List<RsComponent>) {
     companion object {
         const val id = 3
 
         @ExperimentalUnsignedTypes
-        fun load(cache: Js5Cache): ComponentArchive {
-            val components = mutableListOf<Component>()
-            cache.readArchive(id).forEach { (groupId, group) ->
+        fun load(archive: Js5Archive): ComponentArchive {
+            val components = mutableListOf<RsComponent>()
+            archive.groupSettings.forEach { (groupId, _) ->
+                val group = archive.readGroup(groupId)
                 group.files.forEach { (fileId, file) ->
                     val widgetId = (groupId shl 16) + fileId
-                    components.add(Component.decode(widgetId, file.data))
+                    components.add(RsComponent.decode(widgetId, file.data))
                 }
             }
             return ComponentArchive(components)

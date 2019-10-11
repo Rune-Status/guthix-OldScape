@@ -17,59 +17,45 @@
  */
 package io.guthix.osrs.cache.plane
 
-import io.guthix.cache.js5.io.uByte
-import io.guthix.cache.js5.io.uShort
+import io.netty.buffer.ByteBuf
 import java.io.IOException
-import java.nio.ByteBuffer
 
-class Texture @ExperimentalUnsignedTypes constructor(
+class Texture(
     val id: Int,
-    val field1527: UShort,
+    val field1527: Int,
     val field1530: Boolean,
-    val fileIds: UShortArray,
-    val field1535: UByteArray?,
-    val field1532: UByteArray?,
+    val fileIds: IntArray,
+    val field1535: ShortArray?,
+    val field1532: ShortArray?,
     val field1536: IntArray,
-    val field1537: UByte,
-    val field1538: UByte
+    val field1537: Short,
+    val field1538: Short
 ) {
     companion object {
-        @ExperimentalUnsignedTypes
-        fun decode(id: Int, data: ByteArray): Texture {
-            val buffer = ByteBuffer.wrap(data)
-            val field1527 = buffer.uShort
-            val field1530 = buffer.uByte.toInt() == 1
-            val amount = buffer.uByte.toInt()
+        fun decode(id: Int, data: ByteBuf): Texture {
+            val field1527 = data.readUnsignedShort()
+            val field1530 = data.readUnsignedByte().toInt() == 1
+            val amount = data.readUnsignedByte().toInt()
             if(amount !in 0..4) throw IOException("Amount of textures should be between 0 and 4 but is $amount.")
-            val fileIds = UShortArray(amount) {
-                buffer.uShort
+            val fileIds = IntArray(amount) {
+                data.readUnsignedShort()
             }
             val (field1535, field1532) = if (amount > 1) {
                 Pair(
-                    UByteArray(amount - 1) {
-                        buffer.uByte
+                    ShortArray(amount - 1) {
+                        data.readUnsignedByte()
                     },
-                    UByteArray(amount - 1) {
-                        buffer.uByte
+                    ShortArray(amount - 1) {
+                        data.readUnsignedByte()
                     }
                 )
             } else Pair(null, null)
             val field1536 = IntArray(amount) {
-                buffer.int
+                data.readInt()
             }
-            val field1537 = buffer.uByte
-            val field1538 = buffer.uByte
-            return Texture(
-                id,
-                field1527,
-                field1530,
-                fileIds,
-                field1535,
-                field1532,
-                field1536,
-                field1537,
-                field1538
-            )
+            val field1537 = data.readUnsignedByte()
+            val field1538 = data.readUnsignedByte()
+            return Texture(id, field1527, field1530, fileIds, field1535, field1532, field1536, field1537, field1538)
         }
     }
 }

@@ -17,19 +17,17 @@
  */
 package io.guthix.osrs.cache
 
-import io.guthix.cache.js5.Js5Cache
+import io.guthix.cache.js5.Js5Archive
 import io.guthix.osrs.cache.plane.Texture
 
-class TextureArchive(
-    val textures: List<Texture>
-) {
+class TextureArchive(val textures: List<Texture>) {
     companion object {
         const val id = 9
 
-        @ExperimentalUnsignedTypes
-        fun load(cache: Js5Cache): TextureArchive {
+        fun load(archive: Js5Archive): TextureArchive {
             val textures = mutableListOf<Texture>()
-            cache.readArchive(id).forEach { (_, group) ->
+            archive.groupSettings.forEach { (groupId, _) ->
+                val group = archive.readGroup(groupId)
                 group.files.forEach { (fileId, file) ->
                     textures.add(Texture.decode(fileId, file.data))
                 }
