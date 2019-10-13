@@ -16,5 +16,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-rootProject.name = 'OSRS-Cache'
+rootProject.name = 'OldScape'
 
+include 'cache'
+include 'cache:codec'
+include 'cache:formats'

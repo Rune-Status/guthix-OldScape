@@ -15,30 +15,24 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+package io.guthix.oldscape.cache
 
-plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.3.50'
-}
+import io.guthix.cache.js5.Js5Archive
+import io.guthix.oldscape.cache.sound.SoundEffect
 
-group 'io.guthix.oldscape'
-version '0.1-SNAPSHOT'
+class SoundEffectArchive(val soundEffects: List<SoundEffect>) {
+    companion object  {
+        const val id = 4
 
-allprojects {
-    apply plugin: "org.jetbrains.kotlin.jvm"
-
-    repositories {
-        mavenCentral()
-        mavenLocal()
-        maven { url 'https://jitpack.io' }
-    }
-
-    compileKotlin {
-        sourceCompatibility = JavaVersion.VERSION_11
-        kotlinOptions.jvmTarget = JavaVersion.VERSION_11
-    }
-    compileTestKotlin {
-        sourceCompatibility = JavaVersion.VERSION_11
-        kotlinOptions.jvmTarget = JavaVersion.VERSION_11
+        fun load(archive: Js5Archive): SoundEffectArchive {
+            val soundEffects = mutableListOf<SoundEffect>()
+            archive.groupSettings.forEach { (groupId, _) ->
+                val group = archive.readGroup(groupId)
+                group.files.forEach { (_, file) ->
+                    soundEffects.add(SoundEffect.decode(file.data))
+                }
+            }
+            return SoundEffectArchive(soundEffects)
+        }
     }
 }
-

@@ -15,30 +15,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+package io.guthix.oldscape.cache.export.gltf
 
-plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.3.50'
+enum class GltfDataType(val opcode: Int, val size: Int) {
+    BYTE(5120, 1),
+    UNSIGNED_BYTE(5121, BYTE.size),
+    SHORT(5122, 2),
+    UNSIGNED_SHORT(5123, SHORT.size),
+    UNSIGNED_INT(5125, 4),
+    FLOAT(5126, 4)
 }
-
-group 'io.guthix.oldscape'
-version '0.1-SNAPSHOT'
-
-allprojects {
-    apply plugin: "org.jetbrains.kotlin.jvm"
-
-    repositories {
-        mavenCentral()
-        mavenLocal()
-        maven { url 'https://jitpack.io' }
-    }
-
-    compileKotlin {
-        sourceCompatibility = JavaVersion.VERSION_11
-        kotlinOptions.jvmTarget = JavaVersion.VERSION_11
-    }
-    compileTestKotlin {
-        sourceCompatibility = JavaVersion.VERSION_11
-        kotlinOptions.jvmTarget = JavaVersion.VERSION_11
-    }
-}
-

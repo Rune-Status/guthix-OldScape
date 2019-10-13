@@ -15,30 +15,26 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+package io.guthix.oldscape.cache
 
-plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.3.50'
-}
+import io.guthix.cache.js5.Js5Archive
+import io.guthix.oldscape.cache.plane.RsComponent
 
-group 'io.guthix.oldscape'
-version '0.1-SNAPSHOT'
+class ComponentArchive(val components: List<RsComponent>) {
+    companion object {
+        const val id = 3
 
-allprojects {
-    apply plugin: "org.jetbrains.kotlin.jvm"
-
-    repositories {
-        mavenCentral()
-        mavenLocal()
-        maven { url 'https://jitpack.io' }
-    }
-
-    compileKotlin {
-        sourceCompatibility = JavaVersion.VERSION_11
-        kotlinOptions.jvmTarget = JavaVersion.VERSION_11
-    }
-    compileTestKotlin {
-        sourceCompatibility = JavaVersion.VERSION_11
-        kotlinOptions.jvmTarget = JavaVersion.VERSION_11
+        @ExperimentalUnsignedTypes
+        fun load(archive: Js5Archive): ComponentArchive {
+            val components = mutableListOf<RsComponent>()
+            archive.groupSettings.forEach { (groupId, _) ->
+                val group = archive.readGroup(groupId)
+                group.files.forEach { (fileId, file) ->
+                    val widgetId = (groupId shl 16) + fileId
+                    components.add(RsComponent.decode(widgetId, file.data))
+                }
+            }
+            return ComponentArchive(components)
+        }
     }
 }
-

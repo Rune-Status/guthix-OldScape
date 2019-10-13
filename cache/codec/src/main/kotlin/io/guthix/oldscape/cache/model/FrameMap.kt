@@ -15,30 +15,28 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+package io.guthix.oldscape.cache.model
 
-plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.3.50'
+import io.netty.buffer.ByteBuf
+
+class FrameMap(val types: ShortArray, val frameMaps: Array<ShortArray>) {
+    companion object {
+        fun decode(data: ByteBuf): FrameMap {
+            val length = data.readUnsignedByte().toInt()
+            val types = ShortArray(length) {
+                data.readUnsignedByte()
+            }
+            val frameMaps = Array(length) {
+                ShortArray(data.readUnsignedByte().toInt())
+            }
+            frameMaps[0].map { data.readUnsignedByte() }
+
+            frameMaps.forEach { frameMap ->
+                for(i in frameMap.indices) {
+                    frameMap[i] = data.readUnsignedByte()
+                }
+            }
+            return FrameMap(types, frameMaps)
+        }
+    }
 }
-
-group 'io.guthix.oldscape'
-version '0.1-SNAPSHOT'
-
-allprojects {
-    apply plugin: "org.jetbrains.kotlin.jvm"
-
-    repositories {
-        mavenCentral()
-        mavenLocal()
-        maven { url 'https://jitpack.io' }
-    }
-
-    compileKotlin {
-        sourceCompatibility = JavaVersion.VERSION_11
-        kotlinOptions.jvmTarget = JavaVersion.VERSION_11
-    }
-    compileTestKotlin {
-        sourceCompatibility = JavaVersion.VERSION_11
-        kotlinOptions.jvmTarget = JavaVersion.VERSION_11
-    }
-}
-

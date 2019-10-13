@@ -15,30 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+package io.guthix.oldscape.cache.xtea
 
-plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.3.50'
+class MapXtea(val id: Int, val key: IntArray) {
+    val x get() = id shr 8
+    val y get() = id and 0xFF
 }
-
-group 'io.guthix.oldscape'
-version '0.1-SNAPSHOT'
-
-allprojects {
-    apply plugin: "org.jetbrains.kotlin.jvm"
-
-    repositories {
-        mavenCentral()
-        mavenLocal()
-        maven { url 'https://jitpack.io' }
-    }
-
-    compileKotlin {
-        sourceCompatibility = JavaVersion.VERSION_11
-        kotlinOptions.jvmTarget = JavaVersion.VERSION_11
-    }
-    compileTestKotlin {
-        sourceCompatibility = JavaVersion.VERSION_11
-        kotlinOptions.jvmTarget = JavaVersion.VERSION_11
-    }
-}
-
