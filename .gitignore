@@ -3,3 +3,4 @@
 build/
 resources/
 libs
+gradle.properties
