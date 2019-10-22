@@ -2,6 +2,6 @@
 .idea/
 build/
 out/
-resources/
+*/cache/
 libs
 gradle.properties
