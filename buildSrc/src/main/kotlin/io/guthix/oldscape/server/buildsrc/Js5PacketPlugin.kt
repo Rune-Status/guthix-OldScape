@@ -6,7 +6,6 @@ import io.guthix.cache.js5.Js5CacheValidator
 import io.guthix.cache.js5.container.Js5Container
 import io.guthix.cache.js5.container.disk.Js5DiskStore
 import io.guthix.cache.js5.util.crc
-import io.guthix.cache.js5.util.whirlPoolHash
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import org.gradle.api.Plugin
@@ -42,8 +41,8 @@ class Js5PacketPlugin : Plugin<Project> {
                 }
             }
         }
-        val build = target.getTasksByName("build", false).first()
-        build.actions.addAll(compileCache.actions)
+//        val build = target.getTasksByName("build", false).first()
+//        build.actions.addAll(compileCache.actions)
     }
 
     fun readPackets(diskStore: Js5DiskStore): Map<Int, Map<Int, ByteBuf>> {
@@ -74,19 +73,15 @@ class Js5PacketPlugin : Plugin<Project> {
                 "Could not find archive data for archive $archiveId."
             )
             val heapData = Unpooled.copiedBuffer(data)
-            val uncompressedSize = archiveSettings.groupSettings.values.sumBy {
-                it.sizes?.uncompressed ?: 0
-            }
             archiveValidators.add(
                 Js5ArchiveValidator(
-                    heapData.crc(), archiveSettings.version ?: 0, archiveSettings.groupSettings.size,
-                    uncompressedSize, heapData.whirlPoolHash()
+                    heapData.crc(), archiveSettings.version ?: 0, null, null, null
                 )
             )
         }
         val validatorData = Js5CacheValidator(archiveValidators.toTypedArray()).encode()
         archiveSettingsContainers[Js5DiskStore.MASTER_INDEX] = createPacket(
-            Js5DiskStore.MASTER_INDEX, Js5DiskStore.MASTER_INDEX, validatorData
+            Js5DiskStore.MASTER_INDEX, Js5DiskStore.MASTER_INDEX, Js5Container(data = validatorData).encode()
         )
         return containers
     }
