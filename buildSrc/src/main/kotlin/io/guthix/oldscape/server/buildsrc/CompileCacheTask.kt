@@ -36,12 +36,12 @@ open class CompileCacheTask : DefaultTask() {
             readSettingsData.readerIndex(0)
             val readSettingsPacket = createPacket(Js5DiskStore.MASTER_INDEX, archiveId, readSettingsData)
             val settingsFile = masterDir.resolve(archiveId.toString())
+            archiveSettingsData[archiveId] = readSettingsData
+            archiveSettings[archiveId]= readSettings
             if(Files.exists(settingsFile)) {
                 val storedSettingsPacket = Unpooled.wrappedBuffer(
                     Files.readAllBytes(settingsFile)
                 )
-                archiveSettingsData[archiveId] = readSettingsData
-                archiveSettings[archiveId]= readSettings
                 if(readSettingsPacket != storedSettingsPacket) {
                     rebuildValidator = true
                     val storedSettings = Js5ArchiveSettings.decode(
@@ -84,23 +84,28 @@ open class CompileCacheTask : DefaultTask() {
             }
         }
         if(rebuildValidator) { // update validator if needed
-            val archiveValidators = mutableListOf<Js5ArchiveValidator>()
-            for((archiveId, settings) in archiveSettings) {
-                val data = archiveSettingsData[archiveId] ?: throw IllegalStateException(
-                    "Archive data does not exist."
-                )
-                val validator = Js5ArchiveValidator(data.crc(), settings.version, null, null, null)
-                archiveValidators.add(validator)
-            }
-            val validatorData = Js5CacheValidator(archiveValidators.toTypedArray()).encode()
-            val validatorPacket = createPacket(
-                Js5DiskStore.MASTER_INDEX, Js5DiskStore.MASTER_INDEX, Js5Container(data = validatorData).encode()
-            )
-            val validatorFile = masterDir.resolve(Js5DiskStore.MASTER_INDEX.toString())
-            Files.deleteIfExists(validatorFile)
-            Files.createFile(validatorFile)
-            Files.write(validatorFile, validatorPacket.array())
+            writeValidator(archiveSettingsData, archiveSettings, masterDir)
         }
+    }
+
+    private fun writeValidator(aSettingsData: Map<Int, ByteBuf>, aSettings: Map<Int, Js5ArchiveSettings>, masterDir: Path) {
+        val archiveValidators = mutableListOf<Js5ArchiveValidator>()
+        for((archiveId, settings) in aSettings) {
+            val data = aSettingsData[archiveId] ?: throw IllegalStateException(
+                "Archive data does not exist."
+            )
+            val heapBuf = Unpooled.copiedBuffer(data)
+            val validator = Js5ArchiveValidator(heapBuf.crc(), settings.version ?: 0, null, null, null)
+            archiveValidators.add(validator)
+        }
+        val validatorData = Js5CacheValidator(archiveValidators.toTypedArray()).encode()
+        val validatorPacket = createPacket(
+            Js5DiskStore.MASTER_INDEX, Js5DiskStore.MASTER_INDEX, Js5Container(data = validatorData).encode()
+        )
+        val validatorFile = masterDir.resolve(Js5DiskStore.MASTER_INDEX.toString())
+        Files.deleteIfExists(validatorFile)
+        Files.createFile(validatorFile)
+        Files.write(validatorFile, validatorPacket.array())
     }
 
     private fun createPacket(indexFileId: Int, containerId: Int, data: ByteBuf): ByteBuf {
@@ -110,7 +115,7 @@ open class CompileCacheTask : DefaultTask() {
         ).toInt())
         packetBuf.writeByte(indexFileId)
         packetBuf.writeShort(containerId)
-        val firstSectorSize = if(dataSize > BYTES_AFTER_HEADER) BYTES_AFTER_HEADER else dataSize
+        val firstSectorSize = if(data.readableBytes() > BYTES_AFTER_HEADER) BYTES_AFTER_HEADER else data.readableBytes()
         packetBuf.writeBytes(data, firstSectorSize)
         while(data.isReadable) {
             val dataToRead = data.readableBytes()
