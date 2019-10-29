@@ -53,22 +53,16 @@ open class CompileCacheTask : DefaultTask() {
                         val groupFile = archiveDir.resolve(groupId.toString())
                         if(sGroupSettings == null) { // create new file
                             val packet = createPacket(archiveId, groupId, ds.read(archiveIdx, groupId))
-                            Files.createFile(groupFile)
-                            Files.write(groupFile, packet.array())
+                            writePacket(groupFile, packet)
                             logger.info("Creating archive $archiveId group $groupId")
                         } else { // check if file is still up to date
                             if(rGroupSettings.crc != sGroupSettings.crc) {
-                                val packet = createPacket(archiveId, groupId, ds.read(archiveIdx, groupId))
-                                Files.deleteIfExists(groupFile)
-                                Files.createFile(groupFile)
-                                Files.write(groupFile, packet.array())
+                                replacePacket(groupFile, createPacket(archiveId, groupId, ds.read(archiveIdx, groupId)))
                                 logger.info("Updating archive $archiveId group $groupId")
                             }
                         }
                     }
-                    Files.deleteIfExists(settingsFile)
-                    Files.createFile(settingsFile)
-                    Files.write(settingsFile, readSettingsPacket.array())
+                    replacePacket(settingsFile, readSettingsPacket)
                     logger.info("Creating settings for $archiveId")
                 }
             } else {
@@ -89,6 +83,16 @@ open class CompileCacheTask : DefaultTask() {
         }
     }
 
+    private fun replacePacket(file: Path, packet: ByteBuf) {
+        Files.deleteIfExists(file)
+        writePacket(file, packet)
+    }
+
+    private fun writePacket(file: Path, packet: ByteBuf) {
+        Files.createFile(file)
+        Files.write(file, packet.array())
+    }
+
     private fun writeValidator(aSettingsData: Map<Int, ByteBuf>, aSettings: Map<Int, Js5ArchiveSettings>, masterDir: Path) {
         val archiveValidators = mutableListOf<Js5ArchiveValidator>()
         for((archiveId, settings) in aSettings) {
@@ -104,9 +108,7 @@ open class CompileCacheTask : DefaultTask() {
             Js5DiskStore.MASTER_INDEX, Js5DiskStore.MASTER_INDEX, Js5Container(data = validatorData).encode()
         )
         val validatorFile = masterDir.resolve(Js5DiskStore.MASTER_INDEX.toString())
-        Files.deleteIfExists(validatorFile)
-        Files.createFile(validatorFile)
-        Files.write(validatorFile, validatorPacket.array())
+        replacePacket(validatorFile, validatorPacket)
     }
 
     private fun createPacket(indexFileId: Int, containerId: Int, data: ByteBuf): ByteBuf {
