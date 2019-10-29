@@ -35,6 +35,7 @@ open class CompileCacheTask : DefaultTask() {
             val readSettings = Js5ArchiveSettings.decode(Js5Container.decode(readSettingsData))
             readSettingsData.readerIndex(0)
             val readSettingsPacket = createPacket(Js5DiskStore.MASTER_INDEX, archiveId, readSettingsData)
+            readSettingsData.readerIndex(0)
             val settingsFile = masterDir.resolve(archiveId.toString())
             archiveSettingsData[archiveId] = readSettingsData
             archiveSettings[archiveId]= readSettings
@@ -92,7 +93,7 @@ open class CompileCacheTask : DefaultTask() {
         val archiveValidators = mutableListOf<Js5ArchiveValidator>()
         for((archiveId, settings) in aSettings) {
             val data = aSettingsData[archiveId] ?: throw IllegalStateException(
-                "Archive data does not exist."
+                    "Could not find archive data for archive $archiveId."
             )
             val heapBuf = Unpooled.copiedBuffer(data)
             val validator = Js5ArchiveValidator(heapBuf.crc(), settings.version ?: 0, null, null, null)
