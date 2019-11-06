@@ -17,6 +17,7 @@
  */
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.3.50'
+    id 'com.github.hierynomus.license' version '0.15.0'
 }
 
 repositories {
@@ -38,4 +39,8 @@ compileKotlin {
 compileTestKotlin {
     sourceCompatibility = JavaVersion.VERSION_11
     kotlinOptions.jvmTarget = JavaVersion.VERSION_11
+}
+
+license {
+    header = file('..\\license\\GPL.txt')
 }
