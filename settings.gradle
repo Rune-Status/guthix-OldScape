@@ -18,8 +18,9 @@
 
 rootProject.name = 'OldScape'
 
-include 'server'
 include 'cache'
 include 'cache:codec'
 include 'cache:formats'
+include 'server'
+include 'server:scripts'
 include 'wiki'
