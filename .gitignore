@@ -3,5 +3,6 @@
 build/
 out/
 */cache/
+*/xteas.json
 libs
 gradle.properties
