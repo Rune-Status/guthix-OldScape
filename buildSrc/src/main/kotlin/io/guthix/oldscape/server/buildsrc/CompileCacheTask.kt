@@ -149,15 +149,20 @@ open class CompileCacheTask : DefaultTask() {
         data.readUnsignedByte() // index file id
         data.readUnsignedShort() // container id
         val dataLeft = data.writerIndex() - data.readerIndex()
-        val resultBuffer = Unpooled.buffer(dataLeft - ceil(
-            (dataLeft - BYTES_AFTER_HEADER) / BYTES_AFTER_BLOCK.toDouble()
-        ).toInt())
-        data.readBytes(resultBuffer, BYTES_AFTER_HEADER)
-        while(data.isReadable) {
-            check(data.readUnsignedByte().toInt() == 0xFF) { "First block byte should be equal to 0xFF" }
-            data.readBytes(resultBuffer, BYTES_AFTER_BLOCK)
+        val resultSize = if(dataLeft <= BYTES_AFTER_HEADER) {
+            dataLeft
+        } else {
+            dataLeft - ceil((dataLeft - BYTES_AFTER_HEADER) / SECTOR_SIZE.toDouble()).toInt()
         }
-        return data
+        val resultBuffer = Unpooled.buffer(resultSize)
+        val headDataSize = if(data.readableBytes() > BYTES_AFTER_HEADER) BYTES_AFTER_HEADER else data.readableBytes()
+        data.readBytes(resultBuffer, headDataSize)
+        while(data.isReadable) {
+            check(data.readUnsignedByte().toInt() == 0xFF) { "First block byte should be equal to 0xFF." }
+            val blockDataSize = if(data.readableBytes() > BYTES_AFTER_BLOCK) BYTES_AFTER_BLOCK else data.readableBytes()
+            data.readBytes(resultBuffer, blockDataSize)
+        }
+        return resultBuffer
     }
 
     companion object {
