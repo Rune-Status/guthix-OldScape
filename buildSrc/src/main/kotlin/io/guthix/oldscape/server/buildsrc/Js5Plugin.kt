@@ -25,8 +25,8 @@ class Js5Plugin : Plugin<Project> {
     override fun apply(target: Project) {
         val processResourceTask = target.getTasksByName("processResources", false).first()
         if(processResourceTask is ProcessResources) {
-            processResourceTask.exclude("*.dat2*")
-            processResourceTask.exclude("*.idx*")
+            processResourceTask.exclude("**\\*.dat2*")
+            processResourceTask.exclude("**\\*.idx*")
         } else {
             throw IllegalStateException("Could not find processResources task in gradle project ${target.name}.")
         }
