@@ -37,7 +37,6 @@ ext {
     jagexCacheVersion = '0.2.9'
     nettyVersion = '4.1.42.Final'
     jgltfVersion = '2.0.0'
-    sl4jVersion = '1.7.28'
     ktorVersion = '1.2.4'
 }
 
