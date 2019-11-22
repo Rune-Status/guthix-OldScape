@@ -28,7 +28,7 @@ repositories {
 
 dependencies {
     implementation group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8'
-    implementation group: 'io.guthix.cache', name: 'Jagex-Store-5', version: '0.2.7'
+    implementation group: 'io.guthix.cache', name: 'Jagex-Store-5', version: '0.2.9'
 }
 
 compileKotlin {
