@@ -16,7 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 buildscript {
-    ext.kotlin_version = '1.3.50'
+    ext.kotlinVersion = '1.3.60'
 }
 
 plugins {
@@ -29,7 +29,16 @@ version '0.1-SNAPSHOT'
 
 ext {
     kotlinLoggingVersion = '1.7.6'
+    kotlinCoroutinesVersion = '1.3.2'
+    kotlinSerializationVersion = '0.13.0'
+    kamlVersion = '0.14.0'
+    classGraphVersion = '4.8.53'
     logbackVersion = '1.2.3'
+    jagexCacheVersion = '0.2.9'
+    nettyVersion = '4.1.42.Final'
+    jgltfVersion = '2.0.0'
+    sl4jVersion = '1.7.28'
+    ktorVersion = '1.2.4'
 }
 
 allprojects {
