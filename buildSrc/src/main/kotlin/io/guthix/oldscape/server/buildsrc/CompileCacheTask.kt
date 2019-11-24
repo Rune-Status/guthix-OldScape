@@ -28,16 +28,15 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import java.nio.file.Files
 import java.nio.file.Path
+import javax.inject.Inject
 import kotlin.math.ceil
 
-open class CompileCacheTask : DefaultTask() {
-    val cacheDir = Path.of("${project.projectDir}\\src\\main\\resources\\cache")
+open class CompileCacheTask @Inject constructor(val ds: Js5DiskStore) : DefaultTask() {
     val buildDir = Path.of("${project.buildDir.path}\\resources\\main\\cache")
 
     @TaskAction
     fun execute() {
         if(!Files.exists(buildDir)) Files.createDirectories(buildDir)
-        val ds = Js5DiskStore.open(cacheDir)
         val masterDir = buildDir.resolve(Js5DiskStore.MASTER_INDEX.toString())
         if(!Files.isDirectory(masterDir)) Files.createDirectory(masterDir)
         var rebuildValidator = false

@@ -16,12 +16,16 @@
  */
 package io.guthix.oldscape.server.buildsrc
 
+import io.guthix.cache.js5.container.disk.Js5DiskStore
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.language.jvm.tasks.ProcessResources
+import java.nio.file.Path
 
 @Suppress("UnstableApiUsage")
 class Js5Plugin : Plugin<Project> {
+
+
     override fun apply(target: Project) {
         val processResourceTask = target.getTasksByName("processResources", false).first()
         if(processResourceTask is ProcessResources) {
@@ -30,7 +34,11 @@ class Js5Plugin : Plugin<Project> {
         } else {
             throw IllegalStateException("Could not find processResources task in gradle project ${target.name}.")
         }
-        val compileCache = target.tasks.register("compileCache", CompileCacheTask::class.java).get()
+        val cacheDir = Path.of("${target.projectDir}\\src\\main\\resources\\cache")
+        val ds = Js5DiskStore.open(cacheDir)
+        val compileCache = target.tasks.register(
+            "compileCache", CompileCacheTask::class.java, ds
+        ).get()
         val build = target.getTasksByName("build", false).first()
         build.dependsOn(compileCache)
     }
