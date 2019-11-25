@@ -18,6 +18,5 @@
 rootProject.name = 'OldScape'
 
 includeBuild 'cache'
-include 'server'
-include 'server:scripts'
+includeBuild 'server'
 includeBuild 'wiki'

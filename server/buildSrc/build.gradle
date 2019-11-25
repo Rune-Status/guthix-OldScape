@@ -26,7 +26,7 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
-apply from:  '../gradle/dependencies.gradle'
+apply from:  '../../gradle/dependencies.gradle'
 
 dependencies {
     implementation group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8'
@@ -44,5 +44,5 @@ compileTestKotlin {
 }
 
 license {
-    header = file('..\\license\\GPL.txt')
+    header = file('..\\..\\license\\GPL.txt')
 }
