@@ -26,9 +26,11 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
+apply from:  '../gradle/dependencies.gradle'
+
 dependencies {
     implementation group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8'
-    implementation group: 'io.guthix.cache', name: 'Jagex-Store-5', version: '0.2.9'
+    implementation group: 'io.guthix.cache', name: 'Jagex-Store-5', version: jagexCacheVersion
 }
 
 compileKotlin {
