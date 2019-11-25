@@ -5,7 +5,7 @@ ext {
     kamlVersion = '0.14.0'
     classGraphVersion = '4.8.53'
     logbackVersion = '1.2.3'
-    jagexCacheVersion = '0.2.9'
+    jagexCacheVersion = '0.2.10'
     nettyVersion = '4.1.42.Final'
     jgltfVersion = '2.0.0'
     ktorVersion = '1.2.4'
