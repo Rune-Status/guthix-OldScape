@@ -22,20 +22,20 @@ import java.io.IOException
 
 data class SequenceConfig(
     override val id: Int,
-    var frameIds: IntArray? = null,
-    var field3048: IntArray? = null,
-    var frameLengths: IntArray? = null,
-    var interleave: IntArray? = null,
-    var stretches: Boolean = false,
-    var forcedPriority: Short = 5,
-    var maxLoops: Short = 99,
-    var field3056: IntArray? = null,
-    var precedenceAnimating: Short? = null,
-    var leftHandItem: Int? = null,
-    var rightHandItem: Int? = null,
-    var replyMode: Short = 2,
-    var frameStep: Int? = null,
-    var priority: Short? = null
+    val frameIds: IntArray? = null,
+    val field3048: IntArray? = null,
+    val frameLengths: IntArray? = null,
+    val interleave: IntArray? = null,
+    val stretches: Boolean = false,
+    val forcedPriority: Short = 5,
+    val maxLoops: Short = 99,
+    val field3056: IntArray? = null,
+    val precedenceAnimating: Short? = null,
+    val leftHandItem: Int? = null,
+    val rightHandItem: Int? = null,
+    val replyMode: Short = 2,
+    val frameStep: Int? = null,
+    val priority: Short? = null
 
 ) : Config(id) {
     override fun encode(): ByteBuf {

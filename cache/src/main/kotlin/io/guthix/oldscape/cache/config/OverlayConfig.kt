@@ -23,10 +23,10 @@ import java.io.IOException
 
 data class OverlayConfig(
     override val id: Int,    
-    var color: Color = Color(0),
-    var texture: Short? = null,
-    var isHidden: Boolean = true,
-    var otherColor: Color? = null
+    val color: Color = Color(0),
+    val texture: Short? = null,
+    val isHidden: Boolean = true,
+    val otherColor: Color? = null
 ) : Config(id) {
     override fun encode(): ByteBuf {
         val data = Unpooled.buffer()

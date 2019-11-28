@@ -26,10 +26,10 @@ import java.io.IOException
 
 data class ParamConfig(
     override val id: Int,    
-    var stackType: Char? = null,
-    var autoDisable: Boolean = true,
-    var defaultInt: Int? = null,
-    var defaultString: String? = null
+    val stackType: Char? = null,
+    val autoDisable: Boolean = true,
+    val defaultInt: Int? = null,
+    val defaultString: String? = null
 ) : Config(id) {
     override fun encode(): ByteBuf {
         val data = Unpooled.buffer()
