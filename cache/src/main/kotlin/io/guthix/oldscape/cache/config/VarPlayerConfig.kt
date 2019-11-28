@@ -20,9 +20,7 @@ import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import java.io.IOException
 
-data class VarPlayerConfig(override val id: Int) : Config(id) {
-    var type: Int = 0
-
+data class VarPlayerConfig(override val id: Int, val type: Int = 0) : Config(id) {
     override fun encode(): ByteBuf = if(type != 0) {
         Unpooled.buffer(2).apply {
             writeOpcode(5)
@@ -37,15 +35,15 @@ data class VarPlayerConfig(override val id: Int) : Config(id) {
         override val id = 16
 
         override fun decode(id: Int, data: ByteBuf): VarPlayerConfig {
-            val varPlayerConfig = VarPlayerConfig(id)
+            var type = 0
             decoder@ while (true) {
                 when (val opcode = data.readUnsignedByte().toInt()) {
                     0 -> break@decoder
-                    5 -> varPlayerConfig.type = data.readUnsignedShort()
+                    5 -> type = data.readUnsignedShort()
                     else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
-            return varPlayerConfig
+            return VarPlayerConfig(id, type)
         }
     }
 }
