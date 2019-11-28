@@ -20,10 +20,13 @@ import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import java.io.IOException
 
-data class VarbitConfig(override val id: Int) : Config(id) {
-    var varpId: Int = 0
-    var lsb: Short = 0
-    var msb: Short = 0
+data class VarbitConfig(
+    override val id: Int,
+    val varpId: Int = 0,
+    val lsb: Short = 0,
+    val msb: Short = 0
+) : Config(id) {
+
 
     override fun encode(): ByteBuf  = if(varpId != 0 && lsb.toInt() != 0 && msb.toInt() != 0) {
         Unpooled.buffer(6).apply {
@@ -41,19 +44,21 @@ data class VarbitConfig(override val id: Int) : Config(id) {
         override val id = 14
 
         override fun decode(id: Int, data: ByteBuf): VarbitConfig {
-            val varbitConfig = VarbitConfig(id)
+            var varpId: Int = 0
+            var lsb: Short = 0
+            var msb: Short = 0
             decoder@ while (true) {
                 when(val opcode = data.readUnsignedByte().toInt()) {
                     0 -> break@decoder
                     1 -> {
-                        varbitConfig.varpId = data.readUnsignedShort()
-                        varbitConfig.lsb = data.readUnsignedByte()
-                        varbitConfig.msb = data.readUnsignedByte()
+                        varpId = data.readUnsignedShort()
+                        lsb = data.readUnsignedByte()
+                        msb = data.readUnsignedByte()
                     }
                     else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
-            return varbitConfig
+            return VarbitConfig(id, varpId, lsb, msb)
         }
     }
 }
