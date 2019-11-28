@@ -22,27 +22,28 @@ import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import java.io.IOException
 
-data class HitBarConfig(override val id: Int) : Config(id) {
-    var int1: Short = 255
-    var int2: Short = 255
-    var int3: Int? = null
-    var int4: Int = 70
-    var frontSpriteId: Int? = null
-    var backSpriteId: Int? = null
-    var width: Short = 30
+data class HitBarConfig(
+    override val id: Int,
+    var anInt1: Short = 255,
+    var anInt2: Short = 255,
+    var anInt3: Int? = null,
+    var anInt4: Int = 70,
+    var frontSpriteId: Int? = null,
+    var backSpriteId: Int? = null,
+    var width: Short = 30,
     var widthPadding: Short = 0
-
+) : Config(id) {
     override fun encode(): ByteBuf {
         val data = Unpooled.buffer()
-        if(int1.toInt() != 255) {
+        if(anInt1.toInt() != 255) {
             data.writeOpcode(2)
-            data.writeByte(int1.toInt())
+            data.writeByte(anInt1.toInt())
         }
-        if(int2.toInt() != 255) {
+        if(anInt2.toInt() != 255) {
             data.writeOpcode(3)
-            data.writeByte(int2.toInt())
+            data.writeByte(anInt2.toInt())
         }
-        int3?.let {
+        anInt3?.let {
             if(it == 0) {
                 data.writeOpcode(4)
             } else {
@@ -50,9 +51,9 @@ data class HitBarConfig(override val id: Int) : Config(id) {
                 data.writeShort(it)
             }
         }
-        if(int4 != 70) {
+        if(anInt4 != 70) {
             data.writeOpcode(5)
-            data.writeShort(int4)
+            data.writeShort(anInt4)
         }
         frontSpriteId.let {
             data.writeOpcode(7)
@@ -78,25 +79,32 @@ data class HitBarConfig(override val id: Int) : Config(id) {
         override val id = 33
 
         override fun decode(id: Int, data: ByteBuf): HitBarConfig {
-            val hitBarConfig = HitBarConfig(id)
+            var anInt1: Short = 255
+            var anInt2: Short = 255
+            var anInt3: Int? = null
+            var anInt4 = 70
+            var frontSpriteId: Int? = null
+            var backSpriteId: Int? = null
+            var width: Short = 30
+            var widthPadding: Short = 0
             decoder@ while (true) {
                 when(val opcode = data.readUnsignedByte().toInt()) {
                     0 -> break@decoder
                     1 -> data.readUnsignedShort()
-                    2 -> hitBarConfig.int1 = data.readUnsignedByte()
-                    3 -> hitBarConfig.int2 = data.readUnsignedByte()
-                    4 -> hitBarConfig.int3 = 0
-                    5 -> hitBarConfig.int4 = data.readUnsignedShort()
+                    2 -> anInt1 = data.readUnsignedByte()
+                    3 -> anInt2 = data.readUnsignedByte()
+                    4 -> anInt3 = 0
+                    5 -> anInt4 = data.readUnsignedShort()
                     6 -> data.readUnsignedByte()
-                    7 -> hitBarConfig.frontSpriteId = data.readNullableLargeSmart()
-                    8 -> hitBarConfig.backSpriteId = data.readNullableLargeSmart()
-                    11 -> hitBarConfig.int3 = data.readUnsignedShort()
-                    14 -> hitBarConfig.width = data.readUnsignedByte()
-                    15 -> hitBarConfig.widthPadding = data.readUnsignedByte()
+                    7 -> frontSpriteId = data.readNullableLargeSmart()
+                    8 -> backSpriteId = data.readNullableLargeSmart()
+                    11 -> anInt3 = data.readUnsignedShort()
+                    14 -> width = data.readUnsignedByte()
+                    15 -> widthPadding = data.readUnsignedByte()
                     else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
-            return HitBarConfig(id)
+            return HitBarConfig(id, anInt1, anInt2, anInt3, anInt4, frontSpriteId, backSpriteId, width, widthPadding)
         }
 
     }
