@@ -20,7 +20,7 @@ import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import java.io.IOException
 
-data class StructConfig(override val id: Int, var params: MutableMap<Int, Any>? = null) : Config(id) {
+data class StructConfig(override val id: Int, val params: MutableMap<Int, Any>? = null) : Config(id) {
     override fun encode(): ByteBuf {
         val data = Unpooled.buffer()
         params?.let {

@@ -20,9 +20,7 @@ import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import java.io.IOException
 
-data class UnderlayConfig(override val id: Int) : Config(id) {
-    var color = 0
-
+data class UnderlayConfig(override val id: Int, val color: Int = 0) : Config(id) {
     override fun encode(): ByteBuf = if(color != 0) {
         Unpooled.buffer(2).apply {
             writeOpcode(1)
@@ -37,15 +35,15 @@ data class UnderlayConfig(override val id: Int) : Config(id) {
         override val id = 1
 
         override fun decode(id: Int, data: ByteBuf): UnderlayConfig {
-            val underlayConfig = UnderlayConfig(id)
+            var color = 0
             decoder@ while (true) {
                 when (val opcode = data.readUnsignedByte().toInt()) {
                     0 -> break@decoder
-                    1 -> underlayConfig.color = data.readUnsignedMedium()
+                    1 -> color = data.readUnsignedMedium()
                     else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
-            return underlayConfig
+            return UnderlayConfig(id, color)
         }
     }
 }
