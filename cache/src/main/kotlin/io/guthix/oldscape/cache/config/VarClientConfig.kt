@@ -20,9 +20,7 @@ import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import java.io.IOException
 
-data class VarClientConfig(override val id: Int) : Config(id) {
-    var isPeristent = false
-
+data class VarClientConfig(override val id: Int, val isPeristent: Boolean = false) : Config(id) {
     override fun encode(): ByteBuf = if(isPeristent) {
         Unpooled.buffer(2).apply {
             writeOpcode(2)
@@ -36,15 +34,15 @@ data class VarClientConfig(override val id: Int) : Config(id) {
         override val id = 19
 
         override fun decode(id: Int, data: ByteBuf): VarClientConfig {
-            val varClientConfig = VarClientConfig(id)
+            var isPeristent = false
             decoder@ while (true) {
                 when (val opcode = data.readUnsignedByte().toInt()) {
                     0 -> break@decoder
-                    2 -> varClientConfig.isPeristent = true
+                    2 -> isPeristent = true
                     else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
-            return varClientConfig
+            return VarClientConfig(id, isPeristent)
         }
     }
 }
