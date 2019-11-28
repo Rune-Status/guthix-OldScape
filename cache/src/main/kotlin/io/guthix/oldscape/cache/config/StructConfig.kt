@@ -20,9 +20,7 @@ import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import java.io.IOException
 
-data class StructConfig(override val id: Int) : Config(id) {
-    var params: MutableMap<Int, Any>? = null
-
+data class StructConfig(override val id: Int, var params: MutableMap<Int, Any>? = null) : Config(id) {
     override fun encode(): ByteBuf {
         val data = Unpooled.buffer()
         params?.let {
@@ -38,15 +36,15 @@ data class StructConfig(override val id: Int) : Config(id) {
 
         @ExperimentalUnsignedTypes
         override fun decode(id: Int, data: ByteBuf): StructConfig {
-            val structConfig = StructConfig(id)
+            var params: MutableMap<Int, Any>? = null
             decoder@ while (true) {
                 when (val opcode = data.readUnsignedByte().toInt()) {
                     0 -> break@decoder
-                    249 -> structConfig.params = data.readParams()
+                    249 -> params = data.readParams()
                     else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
-            return structConfig
+            return StructConfig(id, params)
         }
     }
 }
