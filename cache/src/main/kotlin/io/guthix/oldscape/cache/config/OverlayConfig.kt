@@ -21,12 +21,13 @@ import io.netty.buffer.Unpooled
 import java.awt.Color
 import java.io.IOException
 
-data class OverlayConfig(override val id: Int) : Config(id) {
-    var color = Color(0)
-    var texture: Short? = null
-    var isHidden = true
+data class OverlayConfig(
+    override val id: Int,    
+    var color: Color = Color(0),
+    var texture: Short? = null,
+    var isHidden: Boolean = true,
     var otherColor: Color? = null
-
+) : Config(id) {
     override fun encode(): ByteBuf {
         val data = Unpooled.buffer()
         if(color.rgb != 0) {
@@ -50,18 +51,21 @@ data class OverlayConfig(override val id: Int) : Config(id) {
         override val id = 4
 
         override fun decode(id: Int, data: ByteBuf): OverlayConfig {
-            val overlayConfig = OverlayConfig(id)
+            var color = Color(0)
+            var texture: Short? = null
+            var isHidden = true
+            var otherColor: Color? = null
             decoder@ while (true) {
                 when (val opcode = data.readUnsignedByte().toInt()) {
                     0 -> break@decoder
-                    1 -> overlayConfig.color = Color(data.readUnsignedMedium())
-                    2 -> overlayConfig.texture = data.readUnsignedByte()
-                    5 -> overlayConfig.isHidden = false
-                    7 -> overlayConfig.otherColor = Color(data.readUnsignedMedium())
+                    1 -> color = Color(data.readUnsignedMedium())
+                    2 -> texture = data.readUnsignedByte()
+                    5 -> isHidden = false
+                    7 -> otherColor = Color(data.readUnsignedMedium())
                     else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
-            return overlayConfig
+            return OverlayConfig(id, color, texture, isHidden, otherColor)
         }
     }
 }
