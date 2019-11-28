@@ -22,40 +22,41 @@ import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import java.io.IOException
 
-data class NpcConfig(override val id: Int) : Config(id) {
-    var name = "null"
-    var size: Short = 1
-    var combatLevel: Int? = null
-    var isInteractable = true
-    var drawMapDot = true
-    var isClickable = true
-    var rotation: Int = 32
-    var headIcon: Int? = null
-    val options = arrayOfNulls<String>(5)
-    var stanceAnimation: Int? = null
-    var walkSequence: Int? = null
-    var walkLeftSequence: Int? = null
-    var walkRightSequence: Int? = null
-    var walkBackSequence: Int? = null
-    var turnLeftAnimation: Int? = null
-    var turnRightAnimation: Int? = null
-    var colorReplace: IntArray? = null
-    var colorFind: IntArray? = null
-    var textureReplace: IntArray? = null
-    var textureFind: IntArray? = null
-    var models: IntArray? = null
-    var models2: IntArray? = null
-    var resizeX: Int = 128
-    var resizeY: Int = 128
-    var contrast = 0
-    var ambient: Byte = 0
-    var hasRenderPriority = false
-    var transformVarbit: Int? = null
-    var transformVarp: Int? = null
-    var transforms: Array<Int?>? = null
-    var aBool2190 = false
-    var params: MutableMap<Int, Any>? = null
-
+data class NpcConfig(
+    override val id: Int,
+    val name: String = "null",
+    val size: Short = 1,
+    val combatLevel: Int? = null,
+    val isInteractable: Boolean = true,
+    val drawMapDot: Boolean = true,
+    val isClickable: Boolean = true,
+    val rotation: Int = 32,
+    val headIcon: Int? = null,
+    val options: Array<String?> = arrayOfNulls<String>(5),
+    val stanceAnimation: Int? = null,
+    val walkSequence: Int? = null,
+    val walkLeftSequence: Int? = null,
+    val walkRightSequence: Int? = null,
+    val walkBackSequence: Int? = null,
+    val turnLeftAnimation: Int? = null,
+    val turnRightAnimation: Int? = null,
+    val colorReplace: IntArray? = null,
+    val colorFind: IntArray? = null,
+    val textureReplace: IntArray? = null,
+    val textureFind: IntArray? = null,
+    val models: IntArray? = null,
+    val models2: IntArray? = null,
+    val resizeX: Int = 128,
+    val resizeY: Int = 128,
+    val contrast: Int = 0,
+    val ambient: Byte = 0,
+    val hasRenderPriority: Boolean = false,
+    val transformVarbit: Int? = null,
+    val transformVarp: Int? = null,
+    val transforms: Array<Int?>? = null,
+    val aBool2190: Boolean = false,
+    val params: MutableMap<Int, Any>? = null
+) : Config(id) {
     override fun encode(): ByteBuf {
         val data = Unpooled.buffer()
         models?.let { models ->
@@ -190,90 +191,122 @@ data class NpcConfig(override val id: Int) : Config(id) {
         override val id = 9
 
         override fun decode(id: Int, data: ByteBuf): NpcConfig {
-            val npcConfig = NpcConfig(id)
+            var name = "null"
+            var size: Short = 1
+            var combatLevel: Int? = null
+            var isInteractable = true
+            var drawMapDot = true
+            var isClickable = true
+            var rotation: Int = 32
+            var headIcon: Int? = null
+            val options = arrayOfNulls<String>(5)
+            var stanceAnimation: Int? = null
+            var walkSequence: Int? = null
+            var walkLeftSequence: Int? = null
+            var walkRightSequence: Int? = null
+            var walkBackSequence: Int? = null
+            var turnLeftAnimation: Int? = null
+            var turnRightAnimation: Int? = null
+            var colorReplace: IntArray? = null
+            var colorFind: IntArray? = null
+            var textureReplace: IntArray? = null
+            var textureFind: IntArray? = null
+            var models: IntArray? = null
+            var models2: IntArray? = null
+            var resizeX: Int = 128
+            var resizeY: Int = 128
+            var contrast = 0
+            var ambient: Byte = 0
+            var hasRenderPriority = false
+            var transformVarbit: Int? = null
+            var transformVarp: Int? = null
+            var transforms: Array<Int?>? = null
+            var aBool2190 = false
+            var params: MutableMap<Int, Any>? = null
+
             decoder@ while (true) {
                 when (val opcode = data.readUnsignedByte().toInt()) {
                     0 -> break@decoder
                     1 -> {
                         val length = data.readUnsignedByte().toInt()
-                        npcConfig.models = IntArray(length) { data.readUnsignedShort() }
+                        models = IntArray(length) { data.readUnsignedShort() }
                     }
-                    2 -> npcConfig.name = data.readStringCP1252()
-                    12 -> npcConfig.size = data.readUnsignedByte()
-                    13 -> npcConfig.stanceAnimation = data.readUnsignedShort()
-                    14 -> npcConfig.walkSequence = data.readUnsignedShort()
-                    15 -> npcConfig.turnLeftAnimation = data.readUnsignedShort()
-                    16 -> npcConfig.turnRightAnimation = data.readUnsignedShort()
+                    2 -> name = data.readStringCP1252()
+                    12 -> size = data.readUnsignedByte()
+                    13 -> stanceAnimation = data.readUnsignedShort()
+                    14 -> walkSequence = data.readUnsignedShort()
+                    15 -> turnLeftAnimation = data.readUnsignedShort()
+                    16 -> turnRightAnimation = data.readUnsignedShort()
                     17 -> {
-                        npcConfig.walkSequence = data.readUnsignedShort()
-                        npcConfig.walkBackSequence = data.readUnsignedShort()
-                        npcConfig.walkLeftSequence = data.readUnsignedShort()
-                        npcConfig.walkRightSequence = data.readUnsignedShort()
+                        walkSequence = data.readUnsignedShort()
+                        walkBackSequence = data.readUnsignedShort()
+                        walkLeftSequence = data.readUnsignedShort()
+                        walkRightSequence = data.readUnsignedShort()
                     }
-                    in 30..34 -> npcConfig.options[opcode - 30] = data.readStringCP1252().takeIf { it != "Hidden" }
+                    in 30..34 -> options[opcode - 30] = data.readStringCP1252().takeIf { it != "Hidden" }
                     40 -> {
-                        val colorsSize = data.readUnsignedByte().toInt()
-                        val colorFind = IntArray(colorsSize)
-                        val colorReplace = IntArray(colorsSize)
-                        for (i in 0 until colorsSize) {
+                        val amount = data.readUnsignedByte().toInt()
+                        colorFind = IntArray(amount)
+                        colorReplace = IntArray(amount)
+                        for (i in 0 until amount) {
                             colorFind[i] = data.readUnsignedShort()
                             colorReplace[i] = data.readUnsignedShort()
                         }
-                        npcConfig.colorFind = colorFind
-                        npcConfig.colorReplace = colorReplace
                     }
                     41 -> {
-                        val texturesSize = data.readUnsignedByte().toInt()
-                        val textureFind = IntArray(texturesSize)
-                        val textureReplace = IntArray(texturesSize)
-                        for (i in 0 until texturesSize) {
+                        val amount = data.readUnsignedByte().toInt()
+                        textureFind = IntArray(amount)
+                        textureReplace = IntArray(amount)
+                        for (i in 0 until amount) {
                             textureFind[i] = data.readUnsignedShort()
                             textureReplace[i] = data.readUnsignedShort()
                         }
-                        npcConfig.textureFind = textureFind
-                        npcConfig.textureReplace = textureReplace
                     }
                     60 -> {
                         val length = data.readUnsignedByte().toInt()
-                        npcConfig.models2 = IntArray(length) { data.readUnsignedShort() }
+                        models2 = IntArray(length) { data.readUnsignedShort() }
                     }
-                    93 -> npcConfig.drawMapDot = false
-                    95 -> npcConfig.combatLevel = data.readUnsignedShort()
-                    97 -> npcConfig.resizeX = data.readUnsignedShort()
-                    98 -> npcConfig.resizeY = data.readUnsignedShort()
-                    99 -> npcConfig.hasRenderPriority = true
-                    100 -> npcConfig.ambient = data.readByte()
-                    101 -> npcConfig.contrast = data.readByte() * 5
-                    102 -> npcConfig.headIcon = data.readUnsignedShort()
-                    103 -> npcConfig.rotation = data.readUnsignedShort()
+                    93 -> drawMapDot = false
+                    95 -> combatLevel = data.readUnsignedShort()
+                    97 -> resizeX = data.readUnsignedShort()
+                    98 -> resizeY = data.readUnsignedShort()
+                    99 -> hasRenderPriority = true
+                    100 -> ambient = data.readByte()
+                    101 -> contrast = data.readByte() * 5
+                    102 -> headIcon = data.readUnsignedShort()
+                    103 -> rotation = data.readUnsignedShort()
                     106, 118 -> {
-                        val transformVarbit = data.readUnsignedShort()
-                        npcConfig.transformVarbit = if(transformVarbit == 65535) null else transformVarbit
-                        val transformVarp = data.readUnsignedShort()
-                        npcConfig.transformVarp = if(transformVarbit == 65535) null else transformVarp
+                        transformVarbit = data.readUnsignedShort()
+                        transformVarbit = if(transformVarbit == 65535) null else transformVarbit
+                        transformVarp = data.readUnsignedShort()
+                        transformVarp = if(transformVarbit == 65535) null else transformVarp
                         val lastEntry = if(opcode == 118) {
                             val entry = data.readUnsignedShort()
                             if(entry == 65535) null else entry
                         } else null
-                        val size = data.readUnsignedByte().toInt()
-                        val transforms = arrayOfNulls<Int?>(size + 2)
-                        for(i in 0..size) {
+                        val amount = data.readUnsignedByte().toInt()
+                        transforms = arrayOfNulls<Int?>(amount + 2)
+                        for(i in 0..amount) {
                             val transform = data.readUnsignedShort()
                             transforms[i] = if(transform == 65535) null else transform
                         }
                         if(opcode == 118) {
-                            transforms[size + 1] = lastEntry
+                            transforms[amount + 1] = lastEntry
                         }
-                        npcConfig.transforms = transforms
                     }
-                    107 -> npcConfig.isInteractable = false
-                    109 -> npcConfig.isClickable = false
-                    111 -> npcConfig.aBool2190 = true
-                    249 -> npcConfig.params = data.readParams()
+                    107 -> isInteractable = false
+                    109 -> isClickable = false
+                    111 -> aBool2190 = true
+                    249 -> params = data.readParams()
                     else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
-            return npcConfig
+            return NpcConfig(id, name, size, combatLevel, isInteractable, drawMapDot, isClickable, rotation, headIcon,
+                options, stanceAnimation, walkSequence, walkLeftSequence, walkRightSequence, walkBackSequence,
+                turnLeftAnimation, turnRightAnimation, colorReplace, colorFind, textureReplace, textureFind, models,
+                models2, resizeX, resizeY, contrast, ambient, hasRenderPriority, transformVarbit, transformVarp,
+                transforms, aBool2190, params
+            )
         }
     }
 }
