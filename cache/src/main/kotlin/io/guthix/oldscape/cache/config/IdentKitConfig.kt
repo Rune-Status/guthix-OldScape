@@ -20,17 +20,19 @@ import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import java.io.IOException
 
-data class IdentKitConfig(override val id: Int) : Config(id) {
-    var colorFind: IntArray? = null
-    var colorReplace: IntArray? = null
-    var textureFind: IntArray? = null
-    var textureReplace: IntArray? = null
-    var bodyPartId: Short? = null
-    var modelIds: IntArray? = null
-    val models = intArrayOf(-1, -1, -1, -1, -1)
-    var nonSelectable = false
+data class IdentKitConfig(
+    override val id: Int,
+    val colorFind: IntArray? = null,
+    val colorReplace: IntArray? = null,
+    val textureFind: IntArray? = null,
+    val textureReplace: IntArray? = null,
+    val bodyPartId: Short? = null,
+    val modelIds: IntArray? = null,
+    val models: IntArray = intArrayOf(-1, -1, -1, -1, -1),
+    val nonSelectable: Boolean = false
+) : Config(id) {
 
-    @ExperimentalUnsignedTypes
+    
     override fun encode(): ByteBuf {
         val data = Unpooled.buffer()
         bodyPartId?.let {
@@ -69,49 +71,98 @@ data class IdentKitConfig(override val id: Int) : Config(id) {
         return data
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        other as IdentKitConfig
+        if (id != other.id) return false
+        if (colorFind != null) {
+            if (other.colorFind == null) return false
+            if (!colorFind.contentEquals(other.colorFind)) return false
+        } else if (other.colorFind != null) return false
+        if (colorReplace != null) {
+            if (other.colorReplace == null) return false
+            if (!colorReplace.contentEquals(other.colorReplace)) return false
+        } else if (other.colorReplace != null) return false
+        if (textureFind != null) {
+            if (other.textureFind == null) return false
+            if (!textureFind.contentEquals(other.textureFind)) return false
+        } else if (other.textureFind != null) return false
+        if (textureReplace != null) {
+            if (other.textureReplace == null) return false
+            if (!textureReplace.contentEquals(other.textureReplace)) return false
+        } else if (other.textureReplace != null) return false
+        if (bodyPartId != other.bodyPartId) return false
+        if (modelIds != null) {
+            if (other.modelIds == null) return false
+            if (!modelIds.contentEquals(other.modelIds)) return false
+        } else if (other.modelIds != null) return false
+        if (models != other.models) return false
+        if (nonSelectable != other.nonSelectable) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id
+        result = 31 * result + (colorFind?.contentHashCode() ?: 0)
+        result = 31 * result + (colorReplace?.contentHashCode() ?: 0)
+        result = 31 * result + (textureFind?.contentHashCode() ?: 0)
+        result = 31 * result + (textureReplace?.contentHashCode() ?: 0)
+        result = 31 * result + (bodyPartId ?: 0)
+        result = 31 * result + (modelIds?.contentHashCode() ?: 0)
+        result = 31 * result + models.hashCode()
+        result = 31 * result + nonSelectable.hashCode()
+        return result
+    }
+
     companion object : ConfigCompanion<IdentKitConfig>() {
         override val id = 3
 
         override fun decode(id: Int, data: ByteBuf): IdentKitConfig {
-            val identKitConfig = IdentKitConfig(id)
+            var colorFind: IntArray? = null
+            var colorReplace: IntArray? = null
+            var textureFind: IntArray? = null
+            var textureReplace: IntArray? = null
+            var bodyPartId: Short? = null
+            var modelIds: IntArray? = null
+            val models = intArrayOf(-1, -1, -1, -1, -1)
+            var nonSelectable = false
             decoder@ while (true) {
                 when (val opcode = data.readUnsignedByte().toInt()) {
                     0 -> break@decoder
-                    1 -> identKitConfig.bodyPartId = data.readUnsignedByte()
+                    1 -> bodyPartId = data.readUnsignedByte()
                     2 -> {
                         val length = data.readUnsignedByte().toInt()
-                        identKitConfig.modelIds = IntArray(length) { data.readUnsignedShort() }
+                        modelIds = IntArray(length) { data.readUnsignedShort() }
                     }
-                    3 -> identKitConfig.nonSelectable = true
+                    3 -> nonSelectable = true
                     40 -> {
                         val colorsSize = data.readUnsignedByte().toInt()
-                        val colorFind = IntArray(colorsSize)
-                        val colorReplace = IntArray(colorsSize)
+                        colorFind = IntArray(colorsSize)
+                        colorReplace = IntArray(colorsSize)
                         for (i in 0 until colorsSize) {
                             colorFind[i] = data.readUnsignedShort()
                             colorReplace[i] = data.readUnsignedShort()
                         }
-                        identKitConfig.colorFind = colorFind
-                        identKitConfig.colorReplace = colorReplace
                     }
                     41 -> {
                         val texturesSize = data.readUnsignedByte().toInt()
-                        val textureFind = IntArray(texturesSize)
-                        val textureReplace = IntArray(texturesSize)
+                        textureFind = IntArray(texturesSize)
+                        textureReplace = IntArray(texturesSize)
                         for (i in 0 until texturesSize) {
                             textureFind[i] = data.readUnsignedShort()
                             textureReplace[i] = data.readUnsignedShort()
                         }
-                        identKitConfig.textureFind = textureFind
-                        identKitConfig.textureReplace = textureReplace
                     }
                     in 60..69 -> {
-                        identKitConfig.models[opcode - 60] = data.readUnsignedShort()
+                        models[opcode - 60] = data.readUnsignedShort()
                     }
                     else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
-            return identKitConfig
+            return IdentKitConfig(id, colorFind, colorReplace, textureFind, textureReplace, bodyPartId, modelIds,
+                models, nonSelectable
+            )
         }
     }
 }
