@@ -20,22 +20,24 @@ import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import java.io.IOException
 
-data class SequenceConfig(override val id: Int) : Config(id) {
-    var frameIds: IntArray? = null
-    var field3048: IntArray? = null
-    var frameLengths: IntArray? = null
-    var interleave: IntArray? = null
-    var stretches = false
-    var forcedPriority: Short = 5
-    var maxLoops: Short = 99
-    var field3056: IntArray? = null
-    var precedenceAnimating: Short? = null
-    var leftHandItem: Int? = null
-    var rightHandItem: Int? = null
-    var replyMode: Short = 2
-    var frameStep: Int? = null
+data class SequenceConfig(
+    override val id: Int,
+    var frameIds: IntArray? = null,
+    var field3048: IntArray? = null,
+    var frameLengths: IntArray? = null,
+    var interleave: IntArray? = null,
+    var stretches: Boolean = false,
+    var forcedPriority: Short = 5,
+    var maxLoops: Short = 99,
+    var field3056: IntArray? = null,
+    var precedenceAnimating: Short? = null,
+    var leftHandItem: Int? = null,
+    var rightHandItem: Int? = null,
+    var replyMode: Short = 2,
+    var frameStep: Int? = null,
     var priority: Short? = null
 
+) : Config(id) {
     override fun encode(): ByteBuf {
         val data = Unpooled.buffer()
         frameLengths?.let { frameLengths -> frameIds?.let { frameIds ->
@@ -117,60 +119,74 @@ data class SequenceConfig(override val id: Int) : Config(id) {
         override val id = 12
 
         override fun decode(id: Int, data: ByteBuf): SequenceConfig {
-            val sequenceConfig = SequenceConfig(id)
+            var frameIds: IntArray? = null
+            var field3048: IntArray? = null
+            var frameLengths: IntArray? = null
+            var interleave: IntArray? = null
+            var stretches = false
+            var forcedPriority: Short = 5
+            var maxLoops: Short = 99
+            var field3056: IntArray? = null
+            var precedenceAnimating: Short? = null
+            var leftHandItem: Int? = null
+            var rightHandItem: Int? = null
+            var replyMode: Short = 2
+            var frameStep: Int? = null
+            var priority: Short? = null
+
             decoder@ while (true) {
                 when (val opcode = data.readUnsignedByte().toInt()) {
                     0 -> break@decoder
                     1 -> {
                         val length = data.readUnsignedShort()
-                        sequenceConfig.frameLengths = IntArray(length) { data.readUnsignedShort() }
-                        val frameIds = IntArray(length) { data.readUnsignedShort() }
+                        frameLengths = IntArray(length) { data.readUnsignedShort() }
+                        frameIds = IntArray(length) { data.readUnsignedShort() }
                         for(i in 0 until length) {
                             frameIds[i] += data.readUnsignedShort() shl 16
                         }
-                        sequenceConfig.frameIds = frameIds
                     }
-                    2 -> sequenceConfig.frameStep = data.readUnsignedShort()
+                    2 -> frameStep = data.readUnsignedShort()
                     3 -> {
                         val length = data.readUnsignedByte().toInt()
-                        val interleave = IntArray(length + 1)
+                        interleave = IntArray(length + 1)
                         for(i in 0 until length) {
                             interleave[i] = data.readUnsignedByte().toInt()
                         }
                         interleave[length] = 9999999
-                        sequenceConfig.interleave = interleave
                     }
-                    4 -> sequenceConfig.stretches = true
-                    5 -> sequenceConfig.forcedPriority = data.readUnsignedByte()
-                    6 -> sequenceConfig.leftHandItem = data.readUnsignedShort()
-                    7 -> sequenceConfig.rightHandItem = data.readUnsignedShort()
-                    8 -> sequenceConfig.maxLoops = data.readUnsignedByte()
-                    9 -> sequenceConfig.precedenceAnimating = data.readUnsignedByte()
-                    10 -> sequenceConfig.priority = data.readUnsignedByte()
-                    11 -> sequenceConfig.replyMode = data.readUnsignedByte()
+                    4 -> stretches = true
+                    5 -> forcedPriority = data.readUnsignedByte()
+                    6 -> leftHandItem = data.readUnsignedShort()
+                    7 -> rightHandItem = data.readUnsignedShort()
+                    8 -> maxLoops = data.readUnsignedByte()
+                    9 -> precedenceAnimating = data.readUnsignedByte()
+                    10 -> priority = data.readUnsignedByte()
+                    11 -> replyMode = data.readUnsignedByte()
                     12 -> {
                         val length = data.readUnsignedByte().toInt()
                         val array = IntArray(length) { data.readUnsignedShort() }
                         for (i in 0 until length) {
                             array[i] += data.readUnsignedShort() shl 16
                         }
-                        sequenceConfig.field3048 = array
+                        field3048 = array
                     }
                     13 -> {
                         val length = data.readUnsignedByte().toInt()
-                        sequenceConfig.field3056 = IntArray(length) { data.readUnsignedMedium() }
+                        field3056 = IntArray(length) { data.readUnsignedMedium() }
                     }
                     else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
-            sequenceConfig.precedenceAnimating?.let {
-                sequenceConfig.precedenceAnimating = if(sequenceConfig.interleave != null) 2 else 0
+            precedenceAnimating?.let {
+                precedenceAnimating = if(interleave != null) 2 else 0
 
             }
-            sequenceConfig.priority?.let {
-                sequenceConfig.priority = if(sequenceConfig.interleave != null) 2 else 0
+            priority?.let {
+                priority = if(interleave != null) 2 else 0
             }
-            return sequenceConfig
+            return SequenceConfig(id, frameIds, field3048, frameLengths, interleave, stretches, forcedPriority,
+                maxLoops, field3056, precedenceAnimating, leftHandItem, rightHandItem, replyMode, frameStep, priority
+            )
         }
     }
 }
