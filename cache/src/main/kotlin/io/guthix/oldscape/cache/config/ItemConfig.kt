@@ -22,54 +22,56 @@ import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import java.io.IOException
 
-data class ItemConfig(override val id: Int) : Config(id) {
-    var model: Int = 0
-    var name = "null"
-    var zoom2d = 2000
-    var xan2d: Int = 0
-    var yan2d: Int = 0
-    var zan2d: Int = 0
-    var xoff2d: Int = 0
-    var yoff2d: Int = 0
-    var stackable = false
-    var cost = 1
-    var members = false
-    val groundActions = arrayOf(null, null, "Take", null, null)
-    val iop= arrayOf(null, null, null, null, "Drop")
-    var shiftClickDropIndex: Byte = -2
-    var maleModel0: Int? = null
-    var maleModel1: Int? = null
-    var maleModel2: Int? = null
-    var maleOffset: Short = 0
-    var femaleModel0: Int? = null
-    var femaleModel1: Int? = null
-    var femaleModel2: Int? = null
-    var femaleOffset: Short = 0
-    var maleHeadModel: Int? = null
-    var maleHeadModel2: Int? = null
-    var femaleHeadModel: Int? = null
-    var femaleHeadModel2: Int? = null
-    var notedId: Int? = null
-    var notedTemplate: Int? = null
-    var resizeX: Int = 128
-    var resizeY: Int = 128
-    var resizeZ: Int = 128
-    var ambient: Byte = 0
-    var contrast: Byte = 0
-    var team: Short = 0
-    var tradable = false
-    var colorFind: IntArray? = null
-    var colorReplace: IntArray? = null
-    var textureFind: IntArray? = null
-    var textureReplace: IntArray? = null
-    var countCo: IntArray? = null
-    var countObj: IntArray? = null
-    var boughtId: Int? = null
-    var boughtTemplate: Int? = null
-    var placeholderId: Int? = null
-    var placeholderTemplateId: Int? = null
-    var params: MutableMap<Int, Any>? = null
+data class ItemConfig(
+    override val id: Int,
+    val model: Int = 0,
+    val name: String = "null",
+    val zoom2d: Int = 2000,
+    val xan2d: Int = 0,
+    val yan2d: Int = 0,
+    val zan2d: Int = 0,
+    val xoff2d: Int = 0,
+    val yoff2d: Int = 0,
+    val stackable: Boolean = false,
+    val cost: Int = 1,
+    val members: Boolean = false,
+    val groundActions: Array<String?> = arrayOf(null, null, "Take", null, null),
+    val iop: Array<String?> = arrayOf(null, null, null, null, "Drop"),
+    val shiftClickDropIndex: Byte = -2,
+    val maleModel0: Int? = null,
+    val maleModel1: Int? = null,
+    val maleModel2: Int? = null,
+    val maleOffset: Short = 0,
+    val femaleModel0: Int? = null,
+    val femaleModel1: Int? = null,
+    val femaleModel2: Int? = null,
+    val femaleOffset: Short = 0,
+    val maleHeadModel: Int? = null,
+    val maleHeadModel2: Int? = null,
+    val femaleHeadModel: Int? = null,
+    val femaleHeadModel2: Int? = null,
+    val notedId: Int? = null,
+    val notedTemplate: Int? = null,
+    val resizeX: Int = 128,
+    val resizeY: Int = 128,
+    val resizeZ: Int = 128,
+    val ambient: Byte = 0,
+    val contrast: Byte = 0,
+    val team: Short = 0,
+    val tradable: Boolean = false,
+    val colorFind: IntArray? = null,
+    val colorReplace: IntArray? = null,
+    val textureFind: IntArray? = null,
+    val textureReplace: IntArray? = null,
+    val countCo: IntArray? = null,
+    val countObj: IntArray? = null,
+    val boughtId: Int? = null,
+    val boughtTemplate: Int? = null,
+    val placeholderId: Int? = null,
+    val placeholderTemplateId: Int? = null,
+    val params: MutableMap<Int, Any>? = null
 
+) : Config(id) {
     override fun encode(): ByteBuf {
         val data = Unpooled.buffer()
         if(model != 0) {
@@ -247,96 +249,143 @@ data class ItemConfig(override val id: Int) : Config(id) {
         override val id = 10
 
         override fun decode(id: Int, data: ByteBuf): ItemConfig {
-            val itemConfig = ItemConfig(id)
+            var model = 0
+            var name = "null"
+            var zoom2d = 2000
+            var xan2d = 0
+            var yan2d = 0
+            var zan2d = 0
+            var xoff2d = 0
+            var yoff2d = 0
+            var stackable = false
+            var cost = 1
+            var members = false
+            val groundActions = arrayOf(null, null, "Take", null, null)
+            val iop= arrayOf(null, null, null, null, "Drop")
+            var shiftClickDropIndex: Byte = -2
+            var maleModel0: Int? = null
+            var maleModel1: Int? = null
+            var maleModel2: Int? = null
+            var maleOffset: Short = 0
+            var femaleModel0: Int? = null
+            var femaleModel1: Int? = null
+            var femaleModel2: Int? = null
+            var femaleOffset: Short = 0
+            var maleHeadModel: Int? = null
+            var maleHeadModel2: Int? = null
+            var femaleHeadModel: Int? = null
+            var femaleHeadModel2: Int? = null
+            var notedId: Int? = null
+            var notedTemplate: Int? = null
+            var resizeX = 128
+            var resizeY = 128
+            var resizeZ = 128
+            var ambient: Byte = 0
+            var contrast: Byte = 0
+            var team: Short = 0
+            var tradable = false
+            var colorFind: IntArray? = null
+            var colorReplace: IntArray? = null
+            var textureFind: IntArray? = null
+            var textureReplace: IntArray? = null
+            var countCo: IntArray? = null
+            var countObj: IntArray? = null
+            var boughtId: Int? = null
+            var boughtTemplate: Int? = null
+            var placeholderId: Int? = null
+            var placeholderTemplateId: Int? = null
+            var params: MutableMap<Int, Any>? = null
             decoder@ while (true) {
                 when (val opcode = data.readUnsignedByte().toInt()) {
                     0 -> break@decoder
-                    1 -> itemConfig.model = data.readUnsignedShort()
-                    2 -> itemConfig.name = data.readStringCP1252()
-                    4 -> itemConfig.zoom2d = data.readUnsignedShort()
-                    5 -> itemConfig.xan2d = data.readUnsignedShort()
-                    6 -> itemConfig.yan2d = data.readUnsignedShort()
+                    1 -> model = data.readUnsignedShort()
+                    2 -> name = data.readStringCP1252()
+                    4 -> zoom2d = data.readUnsignedShort()
+                    5 -> xan2d = data.readUnsignedShort()
+                    6 -> yan2d = data.readUnsignedShort()
                     7 -> {
                         val temp= data.readUnsignedShort()
-                        itemConfig.xoff2d = if (temp > 32767) temp - 65536 else temp
+                        xoff2d = if (temp > 32767) temp - 65536 else temp
                     }
                     8 -> {
                         val temp= data.readUnsignedShort()
-                        itemConfig.yoff2d = if (temp > 32767) temp - 65536 else temp
+                        yoff2d = if (temp > 32767) temp - 65536 else temp
                     }
-                    11 -> itemConfig.stackable = true
-                    12 -> itemConfig.cost = data.readInt()
-                    16 -> itemConfig.members = true
+                    11 -> stackable = true
+                    12 -> cost = data.readInt()
+                    16 -> members = true
                     23 -> {
-                        itemConfig.maleModel0 = data.readUnsignedShort()
-                        itemConfig.maleOffset = data.readUnsignedByte()
+                        maleModel0 = data.readUnsignedShort()
+                        maleOffset = data.readUnsignedByte()
                     }
-                    24 -> itemConfig.maleModel1 = data.readUnsignedShort()
+                    24 -> maleModel1 = data.readUnsignedShort()
                     25 -> {
-                        itemConfig.femaleModel0 = data.readUnsignedShort()
-                        itemConfig.femaleOffset = data.readUnsignedByte()
+                        femaleModel0 = data.readUnsignedShort()
+                        femaleOffset = data.readUnsignedByte()
                     }
-                    26 -> itemConfig.femaleModel1 = data.readUnsignedShort()
-                    in 30..34 -> itemConfig.groundActions[opcode - 30] = data.readStringCP1252().takeIf {
+                    26 -> femaleModel1 = data.readUnsignedShort()
+                    in 30..34 -> groundActions[opcode - 30] = data.readStringCP1252().takeIf {
                         it != "Hidden"
                     }
-                    in 35..39 -> itemConfig.iop[opcode - 35] = data.readStringCP1252()
+                    in 35..39 -> iop[opcode - 35] = data.readStringCP1252()
                     40 -> {
                         val colorsSize = data.readUnsignedByte().toInt()
-                        val colorFind = IntArray(colorsSize)
-                        val colorReplace = IntArray(colorsSize)
+                        colorFind = IntArray(colorsSize)
+                        colorReplace = IntArray(colorsSize)
                         for (i in 0 until colorsSize) {
                             colorFind[i] = data.readUnsignedShort()
                             colorReplace[i] = data.readUnsignedShort()
                         }
-                        itemConfig.colorFind = colorFind
-                        itemConfig.colorReplace = colorReplace
                     }
                     41 -> {
                         val texturesSize = data.readUnsignedByte().toInt()
-                        val textureFind = IntArray(texturesSize)
-                        val textureReplace = IntArray(texturesSize)
+                        textureFind = IntArray(texturesSize)
+                        textureReplace = IntArray(texturesSize)
                         for (i in 0 until texturesSize) {
                             textureFind[i] = data.readUnsignedShort()
                             textureReplace[i] = data.readUnsignedShort()
                         }
-                        itemConfig.textureFind = textureFind
-                        itemConfig.textureReplace = textureReplace
                     }
-                    42 -> itemConfig.shiftClickDropIndex = data.readByte()
-                    65 -> itemConfig.tradable = true
-                    78 -> itemConfig.maleModel2 = data.readUnsignedShort()
-                    79 -> itemConfig.femaleModel2 = data.readUnsignedShort()
-                    90 -> itemConfig.maleHeadModel = data.readUnsignedShort()
-                    91 -> itemConfig.femaleHeadModel = data.readUnsignedShort()
-                    92 -> itemConfig.maleHeadModel2 = data.readUnsignedShort()
-                    93 -> itemConfig.femaleHeadModel2 = data.readUnsignedShort()
-                    95 -> itemConfig.zan2d = data.readUnsignedShort()
-                    97 -> itemConfig.notedId = data.readUnsignedShort()
-                    98 -> itemConfig.notedTemplate = data.readUnsignedShort()
+                    42 -> shiftClickDropIndex = data.readByte()
+                    65 -> tradable = true
+                    78 -> maleModel2 = data.readUnsignedShort()
+                    79 -> femaleModel2 = data.readUnsignedShort()
+                    90 -> maleHeadModel = data.readUnsignedShort()
+                    91 -> femaleHeadModel = data.readUnsignedShort()
+                    92 -> maleHeadModel2 = data.readUnsignedShort()
+                    93 -> femaleHeadModel2 = data.readUnsignedShort()
+                    95 -> zan2d = data.readUnsignedShort()
+                    97 -> notedId = data.readUnsignedShort()
+                    98 -> notedTemplate = data.readUnsignedShort()
                     in 100..109 -> {
-                        if (itemConfig.countObj == null) {
-                            itemConfig.countObj = IntArray(10)
-                            itemConfig.countCo = IntArray(10)
+                        if (countObj == null) {
+                            countObj = IntArray(10)
+                            countCo = IntArray(10)
                         }
-                        itemConfig.countObj!![opcode - 100] = data.readUnsignedShort()
-                        itemConfig.countCo!![opcode - 100] = data.readUnsignedShort()
+                        countObj[opcode - 100] = data.readUnsignedShort()
+                        countCo!![opcode - 100] = data.readUnsignedShort()
                     }
-                    110 -> itemConfig.resizeX = data.readUnsignedShort()
-                    111 -> itemConfig.resizeY = data.readUnsignedShort()
-                    112 -> itemConfig.resizeZ = data.readUnsignedShort()
-                    113 -> itemConfig.ambient = data.readByte()
-                    114 -> itemConfig.contrast = data.readByte()
-                    115 -> itemConfig.team = data.readUnsignedByte()
-                    139 -> itemConfig.boughtId = data.readUnsignedShort()
-                    140 -> itemConfig.boughtTemplate = data.readUnsignedShort()
-                    148 -> itemConfig.placeholderId = data.readUnsignedShort()
-                    149 -> itemConfig.placeholderTemplateId = data.readUnsignedShort()
-                    249 -> itemConfig.params = data.readParams()
+                    110 -> resizeX = data.readUnsignedShort()
+                    111 -> resizeY = data.readUnsignedShort()
+                    112 -> resizeZ = data.readUnsignedShort()
+                    113 -> ambient = data.readByte()
+                    114 -> contrast = data.readByte()
+                    115 -> team = data.readUnsignedByte()
+                    139 -> boughtId = data.readUnsignedShort()
+                    140 -> boughtTemplate = data.readUnsignedShort()
+                    148 -> placeholderId = data.readUnsignedShort()
+                    149 -> placeholderTemplateId = data.readUnsignedShort()
+                    249 -> params = data.readParams()
                     else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
-            return itemConfig
+            return ItemConfig(id, model, name, zoom2d, xan2d, yan2d, zan2d, xoff2d, yoff2d, stackable, cost, members,
+                groundActions, iop, shiftClickDropIndex, maleModel0, maleModel1, maleModel2, maleOffset, femaleModel0,
+                femaleModel1, femaleModel2, femaleOffset, maleHeadModel, maleHeadModel2, femaleHeadModel,
+                femaleHeadModel2, notedId, notedTemplate, resizeX, resizeY, resizeZ, ambient, contrast, team, tradable,
+                colorFind, colorReplace, textureFind, textureReplace, countCo, countObj, boughtId, boughtTemplate,
+                placeholderId, placeholderTemplateId, params
+            )
         }
     }
 }
