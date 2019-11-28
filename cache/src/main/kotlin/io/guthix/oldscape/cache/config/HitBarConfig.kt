@@ -24,14 +24,14 @@ import java.io.IOException
 
 data class HitBarConfig(
     override val id: Int,
-    var anInt1: Short = 255,
-    var anInt2: Short = 255,
-    var anInt3: Int? = null,
-    var anInt4: Int = 70,
-    var frontSpriteId: Int? = null,
-    var backSpriteId: Int? = null,
-    var width: Short = 30,
-    var widthPadding: Short = 0
+    val anInt1: Short = 255,
+    val anInt2: Short = 255,
+    val anInt3: Int? = null,
+    val anInt4: Int = 70,
+    val frontSpriteId: Int? = null,
+    val backSpriteId: Int? = null,
+    val width: Short = 30,
+    val widthPadding: Short = 0
 ) : Config(id) {
     override fun encode(): ByteBuf {
         val data = Unpooled.buffer()

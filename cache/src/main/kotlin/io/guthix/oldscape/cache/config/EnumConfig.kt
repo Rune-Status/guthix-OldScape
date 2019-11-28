@@ -24,10 +24,10 @@ import java.io.IOException
 
 data class EnumConfig(
     override val id: Int,
-    var keyType: Char? = null,
-    var valType: Char? = null,
-    var defaultString: String = "null",
-    var defaultInt: Int? = null,
+    val keyType: Char? = null,
+    val valType: Char? = null,
+    val defaultString: String = "null",
+    val defaultInt: Int? = null,
     val keyValuePairs: Map<Int, Any>
 ) : Config(id) {
     override fun encode(): ByteBuf {
