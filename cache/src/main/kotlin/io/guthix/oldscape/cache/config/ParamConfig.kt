@@ -24,12 +24,13 @@ import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import java.io.IOException
 
-data class ParamConfig(override val id: Int) : Config(id) {
-    var stackType: Char? = null
-    var autoDisable: Boolean = true
-    var defaultInt: Int? = null
+data class ParamConfig(
+    override val id: Int,    
+    var stackType: Char? = null,
+    var autoDisable: Boolean = true,
+    var defaultInt: Int? = null,
     var defaultString: String? = null
-
+) : Config(id) {
     override fun encode(): ByteBuf {
         val data = Unpooled.buffer()
         stackType?.let {
@@ -53,18 +54,21 @@ data class ParamConfig(override val id: Int) : Config(id) {
         override val id = 11
 
         override fun decode(id: Int, data: ByteBuf): ParamConfig {
-            val paramConfig = ParamConfig(id)
+            var stackType: Char? = null
+            var autoDisable: Boolean = true
+            var defaultInt: Int? = null
+            var defaultString: String? = null
             decoder@ while (true) {
                 when(val opcode = data.readUnsignedByte().toInt()) {
                     0 -> break@decoder
-                    1 -> paramConfig.stackType = data.readCharCP1252()
-                    2 -> paramConfig.defaultInt = data.readInt()
-                    4 -> paramConfig.autoDisable = false
-                    5 -> paramConfig.defaultString = data.readStringCP1252()
+                    1 -> stackType = data.readCharCP1252()
+                    2 -> defaultInt = data.readInt()
+                    4 -> autoDisable = false
+                    5 -> defaultString = data.readStringCP1252()
                     else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
-            return paramConfig
+            return ParamConfig(id, stackType, autoDisable, defaultInt, defaultString)
         }
     }
 }
