@@ -20,9 +20,10 @@ import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import java.io.IOException
 
-data class InventoryConfig(override val id: Int) : Config(id) {
-    var capacity: Int = 0
-
+data class InventoryConfig(
+    override val id: Int,
+    val capacity: Int = 0
+) : Config(id) {
     override fun encode(): ByteBuf = if(capacity != 0) {
         Unpooled.buffer(4).apply {
             writeOpcode(2)
@@ -39,15 +40,15 @@ data class InventoryConfig(override val id: Int) : Config(id) {
         override val id = 5
 
         override fun decode(id: Int, data: ByteBuf): InventoryConfig {
-            val inventoryConfig = InventoryConfig(id)
+            var capacity = 0
             decoder@ while (true) {
                 when (val opcode = data.readUnsignedByte().toInt()) {
                     0 -> break@decoder
-                    2 -> inventoryConfig.capacity = data.readUnsignedShort()
+                    2 -> capacity = data.readUnsignedShort()
                     else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
-            return inventoryConfig
+            return InventoryConfig(id, capacity)
         }
     }
 }
