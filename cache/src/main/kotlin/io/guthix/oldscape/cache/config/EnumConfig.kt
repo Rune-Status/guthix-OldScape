@@ -22,13 +22,14 @@ import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import java.io.IOException
 
-data class EnumConfig(override val id: Int) : Config(id) {
-    var keyType: Char? = null
-    var valType: Char? = null
-    var defaultString = "null"
-    var defaultInt: Int? = null
-    val keyValuePairs = mutableMapOf<Int, Any>()
-
+data class EnumConfig(
+    override val id: Int,
+    var keyType: Char? = null,
+    var valType: Char? = null,
+    var defaultString: String = "null",
+    var defaultInt: Int? = null,
+    val keyValuePairs: Map<Int, Any>
+) : Config(id) {
     override fun encode(): ByteBuf {
         val data = Unpooled.buffer()
         keyType?.let {
@@ -72,32 +73,36 @@ data class EnumConfig(override val id: Int) : Config(id) {
         override val id = 8
 
         override fun decode(id: Int, data: ByteBuf): EnumConfig {
-            val enumConfig = EnumConfig(id)
+            var keyType: Char? = null
+            var valType: Char? = null
+            var defaultString = "null"
+            var defaultInt: Int? = null
+            val keyValuePairs = mutableMapOf<Int, Any>()
             decoder@ while (true) {
                 when (val opcode = data.readUnsignedByte().toInt()) {
                     0 -> break@decoder
-                    1 -> enumConfig.keyType = data.readUnsignedByte().toChar()
-                    2 -> enumConfig.valType = data.readUnsignedByte().toChar()
-                    3 -> enumConfig.defaultString = data.readStringCP1252()
-                    4 -> enumConfig.defaultInt = data.readInt()
+                    1 -> keyType = data.readUnsignedByte().toChar()
+                    2 -> valType = data.readUnsignedByte().toChar()
+                    3 -> defaultString = data.readStringCP1252()
+                    4 -> defaultInt = data.readInt()
                     5 -> {
                         val length = data.readUnsignedShort()
                         for (i in 0 until length) {
                             val key = data.readInt()
-                            enumConfig.keyValuePairs[key] = data.readStringCP1252()
+                            keyValuePairs[key] = data.readStringCP1252()
                         }
                     }
                     6 -> {
                         val length = data.readUnsignedShort()
                         for (i in 0 until length) {
                             val key = data.readInt()
-                            enumConfig.keyValuePairs[key] = data.readInt()
+                            keyValuePairs[key] = data.readInt()
                         }
                     }
                     else -> throw IOException("Did not recognise opcode $opcode.")
                 }
             }
-            return enumConfig
+            return EnumConfig(id, keyType, valType, defaultString, defaultInt, keyValuePairs)
         }
     }
 }
