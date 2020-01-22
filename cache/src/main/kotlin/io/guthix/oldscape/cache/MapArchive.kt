@@ -22,12 +22,12 @@ import io.guthix.oldscape.cache.map.MapSquareDefinition
 import io.guthix.oldscape.cache.xtea.MapXtea
 import java.io.FileNotFoundException
 
-class MapArchive (val regions: Map<Int, MapSquareDefinition>) {
+class MapArchive(val mapSquares: Map<Int, MapSquareDefinition>) {
     companion object  {
         const val id = 5
 
         fun load(archive: Js5Archive, xteas: List<MapXtea>): MapArchive {
-            val regions = mutableMapOf<Int, MapSquareDefinition>()
+            val mapSquares = mutableMapOf<Int, MapSquareDefinition>()
             xteas.forEach {
                 val mapFile = archive.readGroup("m${it.x}_${it.y}").files[0] ?: throw FileNotFoundException(
                     "Map file not found for map m${it.x}_${it.y}."
@@ -35,9 +35,9 @@ class MapArchive (val regions: Map<Int, MapSquareDefinition>) {
                 val locFile = archive.readGroup("l${it.x}_${it.y}", it.key).files[0] ?: throw FileNotFoundException(
                     "Loc file not found for loc l${it.x}_${it.y}."
                 )
-                regions[it.id] = MapSquareDefinition.decode(mapFile.data, locFile.data, it.x, it.y)
+                mapSquares[it.id] = MapSquareDefinition.decode(mapFile.data, locFile.data, it.x, it.y)
             }
-            return MapArchive(regions)
+            return MapArchive(mapSquares)
         }
     }
 }
