@@ -25,12 +25,12 @@ import io.netty.channel.ChannelHandlerContext
 class ObjAddPacket(
     private val id: Int,
     private val quantity: Int,
-    private val relativeX: TileUnit,
-    private val relativeY: TileUnit
-) : ZoneOutGameEvent {
+    localX: TileUnit,
+    localY: TileUnit
+) : ZoneOutGameEvent(localX, localY) {
     override val opcode = 66
 
-    override val encOpcode = 1
+    override val enclOpcode = 1
 
     override val size = FixedSize(STATIC_SIZE)
 
@@ -38,7 +38,7 @@ class ObjAddPacket(
         val buf = ctx.alloc().buffer(STATIC_SIZE)
         buf.writeShort(quantity)
         buf.writeShortLE(id)
-        buf.writeByte((relativeX.value shl 4) or (relativeY.value and 7))
+        buf.writeByte(posBitPack)
         return buf
     }
 

@@ -42,7 +42,7 @@ class UpdateZonePartialEnclosed(
         header.writeByteADD(relativeZoneY.value)
         buf.addComponent(true, header)
         packets.forEach { packet ->
-            val opcode = ctx.alloc().buffer(1).apply { writeByte(packet.encOpcode) }
+            val opcode = ctx.alloc().buffer(1).apply { writeByte(packet.enclOpcode) }
             val payload = packet.encode(ctx)
             buf.addComponents(true, opcode, payload)
         }
