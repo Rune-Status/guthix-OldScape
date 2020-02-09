@@ -21,6 +21,7 @@ import io.guthix.oldscape.server.world.entity.Loc
 import io.guthix.oldscape.server.world.entity.character.player.Player
 import io.guthix.oldscape.server.world.mapsquare.FloorUnit
 import io.guthix.oldscape.server.world.mapsquare.MapsquareFloor
+import io.guthix.oldscape.server.world.mapsquare.zone.tile.Tile
 import io.guthix.oldscape.server.world.mapsquare.zone.tile.TileUnit
 
 class Zone(
@@ -33,7 +34,7 @@ class Zone(
 
     val players = mutableListOf<Player>()
 
-    val groundObjects = mutableListOf<Obj>()
+    val groundObjects = mutableMapOf<Tile, MutableList<Obj>>()
 
     val staticLocations: MutableMap<Int, Loc> = mutableMapOf()
 
@@ -52,16 +53,37 @@ class Zone(
         return null
     }
 
-    fun addStaticLocation(loc: Loc) {
+    internal fun addStaticLoc(loc: Loc) {
         staticLocations[loc.mapKey] = loc
         collisions.addLocation(loc)
     }
 
     fun addUnwalkableTile(localX: TileUnit, localY: TileUnit) = collisions.addUnwalkableTile(localX, localY)
 
-    fun addObject(obj: Obj) {
-        groundObjects.add(obj)
-        players.forEach { player -> player.mapInterest.addGroundObject(obj) }
+    fun addObject(tile: Tile, obj: Obj) {
+        groundObjects.getOrPut(tile, { mutableListOf() }).add(obj)
+        players.forEach { player -> player.mapInterest.addObject(tile, obj) }
+    }
+
+    fun removeObject(tile: Tile, obj: Obj) {
+        val objList = groundObjects[tile] ?: throw IllegalCallerException(
+            "Object $obj does not exist at tile $tile."
+        )
+        if(!objList.remove(obj)) throw IllegalCallerException(
+            "Object $obj does not exist at tile $tile."
+        )
+        if(objList.isEmpty()) groundObjects.remove(tile)
+        players.forEach { player -> player.mapInterest.removeObject(tile, obj) }
+    }
+
+    fun addDynamicLoc(loc: Loc) {
+        staticLocations[loc.mapKey] = loc
+        players.forEach { player -> player.mapInterest.addDynamicLoc(loc) }
+    }
+
+    fun removeDynamicLoc(loc: Loc) {
+        staticLocations.remove(loc.mapKey)
+        players.forEach { player -> player.mapInterest.removeDynamicLoc(loc) }
     }
 
     override fun toString() = "Zone(z=${floor.value}, x=${x.value}, y=${y.value})"

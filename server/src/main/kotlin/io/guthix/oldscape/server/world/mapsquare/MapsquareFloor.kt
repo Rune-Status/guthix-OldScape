@@ -21,6 +21,7 @@ import io.guthix.oldscape.server.world.entity.Obj
 import io.guthix.oldscape.server.world.entity.Loc
 import io.guthix.oldscape.server.world.mapsquare.zone.Zone
 import io.guthix.oldscape.server.world.mapsquare.zone.ZoneUnit
+import io.guthix.oldscape.server.world.mapsquare.zone.tile.Tile
 import io.guthix.oldscape.server.world.mapsquare.zone.tile.TileUnit
 import io.guthix.oldscape.server.world.mapsquare.zone.zones
 
@@ -51,15 +52,35 @@ class MapsquareFloor(
     fun addStaticLocation(loc: Loc) {
         val zoneX = loc.position.x.inZones.relativeMapSquare
         val zoneY = loc.position.y.inZones.relativeMapSquare
-        zones[zoneX.value][zoneY.value].addStaticLocation(loc)
+        zones[zoneX.value][zoneY.value].addStaticLoc(loc)
     }
 
     fun addUnwalkableTile(localX: TileUnit, localY: TileUnit) = zones[localX.inZones.value][localY.inZones.value]
         .addUnwalkableTile(localX.relativeZone, localY.relativeZone)
 
-    fun addObject(obj: Obj) {
-        val zoneX = obj.position.x.inZones.relativeMapSquare
-        val zoneY = obj.position.y.inZones.relativeMapSquare
-        zones[zoneX.value][zoneY.value].addObject(obj)
+    fun addObject(tile: Tile, obj: Obj) {
+        val zoneX = tile.x.inZones.relativeMapSquare
+        val zoneY = tile.y.inZones.relativeMapSquare
+        zones[zoneX.value][zoneY.value].addObject(tile, obj)
     }
+
+    fun removeObject(tile: Tile, obj: Obj) {
+        val zoneX = tile.x.inZones.relativeMapSquare
+        val zoneY = tile.y.inZones.relativeMapSquare
+        zones[zoneX.value][zoneY.value].removeObject(tile, obj)
+    }
+
+    fun addDynamicLoc(loc: Loc) {
+        val zoneX = loc.position.x.inZones.relativeMapSquare
+        val zoneY = loc.position.y.inZones.relativeMapSquare
+        zones[zoneX.value][zoneY.value].addDynamicLoc(loc)
+    }
+
+    fun removeDynamicLoc(loc: Loc) {
+        val zoneX = loc.position.x.inZones.relativeMapSquare
+        val zoneY = loc.position.y.inZones.relativeMapSquare
+        zones[zoneX.value][zoneY.value].removeDynamicLoc(loc)
+    }
+
+
 }

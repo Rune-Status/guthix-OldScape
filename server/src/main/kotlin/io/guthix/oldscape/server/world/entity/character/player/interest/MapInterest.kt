@@ -16,10 +16,13 @@
  */
 package io.guthix.oldscape.server.world.entity.character.player.interest
 
-import io.guthix.oldscape.server.net.state.game.OutGameEvent
 import io.guthix.oldscape.server.net.state.game.ZoneOutGameEvent
+import io.guthix.oldscape.server.net.state.game.outp.zone.LocAddChangePacket
+import io.guthix.oldscape.server.net.state.game.outp.zone.LocDelPacket
 import io.guthix.oldscape.server.net.state.game.outp.zone.ObjAddPacket
+import io.guthix.oldscape.server.net.state.game.outp.zone.ObjDelPacket
 import io.guthix.oldscape.server.world.WorldMap
+import io.guthix.oldscape.server.world.entity.Loc
 import io.guthix.oldscape.server.world.entity.Obj
 import io.guthix.oldscape.server.world.entity.character.player.Player
 import io.guthix.oldscape.server.world.mapsquare.MapsquareUnit
@@ -35,7 +38,6 @@ class MapInterest(val player: Player) {
     val baseX get() = lastLoadedZone.x - RANGE
 
     val baseY get() = lastLoadedZone.y - RANGE
-
 
     val zones = Array(SIZE.value) {
         arrayOfNulls<Zone>(SIZE.value)
@@ -66,7 +68,9 @@ class MapInterest(val player: Player) {
                 val zone = map.getZone(lastLoadedZone.floor, zoneX, zoneY)
                 zones[i][j] = zone
                 zone?.players?.add(player)
-                zone?.groundObjects?.forEach { addGroundObject(it) }
+                zone?.groundObjects?.forEach { tile, objList ->
+                    objList.forEach { addObject(tile, it)  }
+                }
             }
         }
     }
@@ -80,9 +84,29 @@ class MapInterest(val player: Player) {
         }
     }
 
-    fun addGroundObject(obj: Obj) {
-        packetCache[(obj.position.x.inZones - baseX).value][(obj.position.y.inZones - baseY).value].add(
-            ObjAddPacket(obj.blueprint.id, 1, obj.position.x.relativeZone, obj.position.y.relativeZone)
+    fun addObject(tile: Tile, obj: Obj) {
+        packetCache[(tile.x.inZones - baseX).value][(tile.y.inZones - baseY).value].add(
+            ObjAddPacket(obj.blueprint.id, obj.quantity, tile.x.relativeZone, tile.y.relativeZone)
+        )
+    }
+
+    fun removeObject(tile: Tile, obj: Obj) {
+        packetCache[(tile.x.inZones - baseX).value][(tile.y.inZones - baseY).value].add(
+            ObjDelPacket(obj.blueprint.id, tile.x.relativeZone, tile.y.relativeZone)
+        )
+    }
+
+    fun addDynamicLoc(loc: Loc) {
+        packetCache[(loc.position.x.inZones - baseX).value][(loc.position.y.inZones - baseY).value].add(
+            LocAddChangePacket(
+                loc.blueprint.id, loc.type, loc.orientation, loc.position.x.relativeZone, loc.position.y.relativeZone
+            )
+        )
+    }
+
+    fun removeDynamicLoc(loc: Loc) {
+        packetCache[(loc.position.x.inZones - baseX).value][(loc.position.y.inZones - baseY).value].add(
+            LocDelPacket(loc.type, loc.orientation, loc.position.x.relativeZone, loc.position.y.relativeZone)
         )
     }
 

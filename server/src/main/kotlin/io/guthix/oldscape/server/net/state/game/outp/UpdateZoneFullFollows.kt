@@ -14,39 +14,31 @@
  * You should have received a copy of the GNU General Public License
  * along with Foobar. If not, see <https://www.gnu.org/licenses/>.
  */
-package io.guthix.oldscape.server.net.state.game.outp.zone
+package io.guthix.oldscape.server.net.state.game.outp
 
-import io.guthix.buffer.writeShortADD
-import io.guthix.buffer.writeShortLEADD
+import io.guthix.buffer.writeByteNEG
 import io.guthix.oldscape.server.net.state.game.FixedSize
-import io.guthix.oldscape.server.net.state.game.ZoneOutGameEvent
+import io.guthix.oldscape.server.net.state.game.OutGameEvent
 import io.guthix.oldscape.server.world.mapsquare.zone.tile.TileUnit
 import io.netty.buffer.ByteBuf
 import io.netty.channel.ChannelHandlerContext
 
-class ObjCountPacket(
-    private val id: Int,
-    private val oldCount: Int,
-    private val newCount: Int,
-    localX: TileUnit,
-    localY: TileUnit
-) : ZoneOutGameEvent(localX, localY) {
-    override val opcode = 68
-
-    override val enclOpcode = 7
+class UpdateZoneFullFollows(
+    private val localX: TileUnit,
+    private val localY: TileUnit
+) : OutGameEvent {
+    override val opcode = 70
 
     override val size = FixedSize(STATIC_SIZE)
 
     override fun encode(ctx: ChannelHandlerContext): ByteBuf {
         val buf = ctx.alloc().buffer(STATIC_SIZE)
-        buf.writeShortADD(id)
-        buf.writeShortLEADD(newCount)
-        buf.writeByte(posBitPack)
-        buf.writeShortADD(oldCount)
+        buf.writeByteNEG(localX.value)
+        buf.writeByteNEG(localY.value)
         return buf
     }
 
     companion object {
-        const val STATIC_SIZE = Short.SIZE_BYTES + Short.SIZE_BYTES + Byte.SIZE_BYTES + Short.SIZE_BYTES
+        const val STATIC_SIZE = Byte.SIZE_BYTES + Byte.SIZE_BYTES
     }
 }

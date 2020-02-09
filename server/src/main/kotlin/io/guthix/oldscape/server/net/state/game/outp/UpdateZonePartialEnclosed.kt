@@ -27,8 +27,8 @@ import io.netty.buffer.Unpooled
 import io.netty.channel.ChannelHandlerContext
 
 class UpdateZonePartialEnclosed(
-    private val relativeZoneX: TileUnit,
-    private val relativeZoneY: TileUnit,
+    private val localX: TileUnit,
+    private val localY: TileUnit,
     private val packets: List<ZoneOutGameEvent>
 ) : OutGameEvent {
     override val opcode = 63
@@ -38,8 +38,8 @@ class UpdateZonePartialEnclosed(
     override fun encode(ctx: ChannelHandlerContext): ByteBuf {
         val buf = Unpooled.compositeBuffer(1 + packets.size * 2)
         val header = ctx.alloc().buffer(STATIC_SIZE)
-        header.writeByteSUB(relativeZoneX.value)
-        header.writeByteADD(relativeZoneY.value)
+        header.writeByteSUB(localX.value)
+        header.writeByteADD(localY.value)
         buf.addComponent(true, header)
         packets.forEach { packet ->
             val opcode = ctx.alloc().buffer(1).apply { writeByte(packet.enclOpcode) }
