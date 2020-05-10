@@ -1,7 +1,6 @@
 .gradle/
 .idea/
 build/
-out/
 */cache/
 */xteas.json
 libs
